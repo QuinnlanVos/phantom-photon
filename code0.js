@@ -129,13 +129,15 @@ gdjs.MenuCode.GDCloudObjects1= [];
 gdjs.MenuCode.GDCloudObjects2= [];
 gdjs.MenuCode.GDCloudPuffObjects1= [];
 gdjs.MenuCode.GDCloudPuffObjects2= [];
+gdjs.MenuCode.GDCloudMaskObjects1= [];
+gdjs.MenuCode.GDCloudMaskObjects2= [];
 gdjs.MenuCode.GDCloudBlockObjects1= [];
 gdjs.MenuCode.GDCloudBlockObjects2= [];
 gdjs.MenuCode.GDLightObjects1= [];
 gdjs.MenuCode.GDLightObjects2= [];
 
 
-gdjs.MenuCode.userFunc0x925820 = function GDJSInlineCode(runtimeScene) {
+gdjs.MenuCode.userFunc0x90ea98 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -155,7 +157,7 @@ const G = 3.0e7;                 // black-hole gravity strength (px^3/s^2)
 const G_RANGE = 3.6 * T;         // influence radius of a black hole
 const KILL = 0.42 * T;           // swallow radius
 const EXIT_R = 0.42 * T, SHARD_R = 0.6 * T;
-const STAR_R = 0.8 * T;          // a burning star consumes the orb inside this radius
+const STAR_R = 0.65 * T;          // a burning star consumes the orb inside this radius
 const MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost
 const SUB = 1 / 600;             // fixed sub-step (game and solver produce identical paths)
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
@@ -888,7 +890,7 @@ gdjs.MenuCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.MenuCode.userFunc0x925820(runtimeScene);
+gdjs.MenuCode.userFunc0x90ea98(runtimeScene);
 
 }
 
@@ -1035,6 +1037,8 @@ gdjs.MenuCode.GDCloudObjects1.length = 0;
 gdjs.MenuCode.GDCloudObjects2.length = 0;
 gdjs.MenuCode.GDCloudPuffObjects1.length = 0;
 gdjs.MenuCode.GDCloudPuffObjects2.length = 0;
+gdjs.MenuCode.GDCloudMaskObjects1.length = 0;
+gdjs.MenuCode.GDCloudMaskObjects2.length = 0;
 gdjs.MenuCode.GDCloudBlockObjects1.length = 0;
 gdjs.MenuCode.GDCloudBlockObjects2.length = 0;
 gdjs.MenuCode.GDLightObjects1.length = 0;
@@ -1169,6 +1173,8 @@ gdjs.MenuCode.GDCloudObjects1.length = 0;
 gdjs.MenuCode.GDCloudObjects2.length = 0;
 gdjs.MenuCode.GDCloudPuffObjects1.length = 0;
 gdjs.MenuCode.GDCloudPuffObjects2.length = 0;
+gdjs.MenuCode.GDCloudMaskObjects1.length = 0;
+gdjs.MenuCode.GDCloudMaskObjects2.length = 0;
 gdjs.MenuCode.GDCloudBlockObjects1.length = 0;
 gdjs.MenuCode.GDCloudBlockObjects2.length = 0;
 gdjs.MenuCode.GDLightObjects1.length = 0;

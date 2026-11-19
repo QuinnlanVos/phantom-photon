@@ -18,6 +18,9 @@ const DIRV = SIM.DIRS;
 const MAXPARTS = 380;
 const { rand, lerp, ease, clamp } = LIB;
 const cc = (i) => i * T + T / 2;
+// The Abyss ambient: dim, never black - the whole level is always faintly readable; the orb is the strong light.
+const AMB = [46, 50, 76], FLARE_AMB = [250, 228, 200];
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const mk = (name, layer, x, y, z, blend) => C.mk(name, layer, x, y, z, blend);
 const del = (o) => C.del(o);
 
@@ -85,7 +88,8 @@ function loadLevel(c, n) {
   // "lighting sprite" is still drawn over the layers below (that made chapter 1 render black).
   // So outside the Abyss the ambient is pure white (multiply x1 = no change) AND the sprite is hidden.
   LL.show(G.dark); HL.show(true);
-  if (G.dark && !LIB.lite) LL.setClearColor(2, 2, 6); else LL.setClearColor(255, 255, 255);
+  G.amb = AMB.slice(); G.ambSet = '';
+  if (G.dark && !LIB.lite) LL.setClearColor(AMB[0], AMB[1], AMB[2]); else LL.setClearColor(255, 255, 255);
   try { const ls = LL.getRenderer().getLightingSprite && LL.getRenderer().getLightingSprite(); if (ls) ls.visible = G.dark && !LIB.lite; } catch (e) {}
   if (LIB.lite) G.dark = false;     // lite mode: no darkness at all (Abyss levels are fully lit)
   G.portal = L.exit ? { core: add('PortalCore', cc(L.exit[0]), cc(L.exit[1]), 5, true), r1: add('PortalRing', cc(L.exit[0]), cc(L.exit[1]), 6, true),
@@ -108,7 +112,8 @@ function loadLevel(c, n) {
                                         light: G.dark ? light(cc(i), cc(j), 120, '120;40;70') : null }));
   for (const h of G.holes) { for (const k of ['range', 'swirl', 'glow', 'disk', 'core']) h[k].setScale(0.5); h.disk.setBlendMode(ADD); }
   G.stars = (L.stars || []).map(([i, j], k) => ({ x: cc(i), y: cc(j), k, glow: add('StarGlow', cc(i), cc(j), 3, true), corona: add('StarCorona', cc(i), cc(j), 4, true),
-    corona2: add('StarCorona', cc(i), cc(j), 4, true), core: add('StarCore', cc(i), cc(j), 11, true), light: G.dark ? light(cc(i), cc(j), 230, '255;150;70') : null, flare: 0 }));
+    corona2: add('StarCorona', cc(i), cc(j), 4, true), core: add('StarCore', cc(i), cc(j), 11, true), light: G.dark ? light(cc(i), cc(j), 165, '255;170;90') : null, flare: 0, tele: 0 }));
+  G.flareT = rand(6, 10); G.flareStar = null; G.flareAge = 99; G.flareAmp = 0;
   G.movers = L.movers.map((m, k) => {
     const o = add('Mover', 0, 0, 7, true); o.setAnimationName('M' + m.w + 'x' + m.h); o.setScale(0.5);
     const r0 = SIM.moverRect(L, m, 0);
@@ -127,7 +132,15 @@ function loadLevel(c, n) {
     const sz = ART.clouds[idx]; vis.setScaleX(1); vis.setScaleY(1);
     const block = add('CloudBlock', x0, y0, 0, false); block.setScaleX(cl.w * T / 8); block.setScaleY(cl.h * T / 8); block.setOpacity(0);
     const puffs = []; for (let q = 0; q < Math.min(6, cl.w * cl.h); q++) { const p = add('CloudPuff', cx, cy, 21, false, 'Hint'); puffs.push({ o: p, ph: rand(0, 6.28), r: rand(0.2, 0.42), sp: rand(0.15, 0.35) * (Math.random() < 0.5 ? -1 : 1) }); }
-    return { x0, y0, x1, y1, cx, cy, vis, block, puffs, w: x1 - x0, h: y1 - y0 };
+    // darkness inside the gas: a black mask on the lighting layer removes the ambient (and flare) light there;
+    // only real lights (the orb's light inside, or light scattered in from the orb / mirror flashes nearby) show it
+    let mask = null, scat = null;
+    if (G.dark && !LIB.lite) {
+      mask = add('CloudMask', cx, cy, 0, false, 'Light'); const ms = 96 * 2;
+      mask.setScaleX((x1 - x0 + T * 0.5) / ms * (96 / 68)); mask.setScaleY((y1 - y0 + T * 0.5) / ms * (96 / 68));
+      scat = light(cx, cy, 10, '0;0;0', 2);
+    }
+    return { x0, y0, x1, y1, cx, cy, vis, block, puffs, w: x1 - x0, h: y1 - y0, mask, scat, lit: 0 };
   });
   if (G.dark) {
     G.orbLight = light(st.x, st.y, 170, '210;235;255', 5);
@@ -406,7 +419,7 @@ const orbCloud = inCloud(G.vis.x, G.vis.y);
 G.cloudK = lerp(G.cloudK || 0, orbCloud ? 1 : 0, 1 - Math.pow(0.001, rdt));
 halo.setOpacity((200 + 55 * sp) * (1 - 0.6 * G.cloudK));
 if (G.orbLight) {   // the photon's own light: dims hard inside gas clouds
-  const k = G.cloudK, rad = (170 + 30 * sp) * (1 - 0.68 * k) * Math.max(0.15, G.orbScale) * (1 + 0.03 * Math.sin(G.time * 5));
+  const k = G.cloudK, rad = (170 + 30 * sp) * (1 - 0.45 * k) * Math.max(0.15, G.orbScale) * (1 + 0.03 * Math.sin(G.time * 5));
   G.orbLight.setPosition(G.vis.x, G.vis.y); G.orbLight.setRadius(Math.max(10, rad));
   const b = 1 - 0.6 * k; G.orbLight.setColor(Math.round(210 * b) + ';' + Math.round(235 * b) + ';' + Math.round(255 * b));
 }
@@ -457,11 +470,53 @@ for (const h of G.holes) {
 for (const s of G.stars) {    // burning stars: slow pulsing corona, strong light
   s.flare = Math.max(0, s.flare - rdt * 1.2);
   const pu = 0.5 + 0.5 * Math.sin(G.time * 1.3 + s.k * 2);
-  s.corona.setAngle(G.time * 8 + s.k * 40); s.corona.setScale(0.5 * (1.0 + 0.12 * pu + 0.3 * s.flare)); s.corona.setOpacity(200 + 55 * pu);
-  s.corona2.setAngle(-G.time * 5 + 17); s.corona2.setScale(0.5 * (0.8 + 0.1 * (1 - pu))); s.corona2.setOpacity(150);
-  s.core.setScale(0.5 * 2.2 * (1 + 0.04 * Math.sin(G.time * 7 + s.k) + 0.15 * s.flare));
-  s.glow.setScale(0.5 * (1.6 + 0.25 * pu + 0.5 * s.flare)); s.glow.setOpacity(200);
-  if (s.light) { s.light.setRadius(210 + 40 * pu + 80 * s.flare); s.light.setColor(Math.round(200 + 55 * pu) + ';' + Math.round(110 + 40 * pu) + ';' + Math.round(50 + 20 * pu)); }
+  const SV = 0.8, tw = s.tele * s.tele;    // stars are 80% of the old size (hitbox 0.65 tile); tele = swelling before a solar flare
+  s.corona.setAngle(G.time * (8 + 60 * tw) + s.k * 40); s.corona.setScale(SV * 0.5 * (1.0 + 0.12 * pu + 0.3 * s.flare + 0.45 * tw)); s.corona.setOpacity(Math.min(255, 220 + 35 * pu + 40 * tw));
+  s.corona2.setAngle(-G.time * 5 + 17); s.corona2.setScale(SV * 0.5 * (0.8 + 0.1 * (1 - pu) + 0.3 * tw)); s.corona2.setOpacity(190);
+  s.core.setScale(SV * 0.5 * 2.2 * (1 + 0.04 * Math.sin(G.time * 7 + s.k) + 0.15 * s.flare + 0.3 * tw + 0.05 * Math.sin(G.time * 40) * tw));
+  s.glow.setScale(SV * 0.5 * (1.35 + 0.2 * pu + 0.5 * s.flare + 1.0 * tw)); s.glow.setOpacity(255);
+  if (s.light) { s.light.setRadius(155 + 30 * pu + 80 * s.flare + 160 * tw); s.light.setColor(Math.round(Math.min(255, 225 + 30 * pu + 30 * tw)) + ';' + Math.round(140 + 40 * pu + 80 * tw) + ';' + Math.round(70 + 20 * pu + 90 * tw)); }
+}
+// ---- solar flares: every 8-15 s a star swells for ~1 s, then blasts light across the whole level for ~2.5 s
+if (G.stars.length && G.state !== 'clear') {
+  G.flareT -= rdt;
+  if (G.flareT < 1.1 && !G.flareStar) { G.flareStar = G.stars[Math.floor(Math.random() * G.stars.length)]; G.log.push('flare-warn'); }
+  if (G.flareStar) G.flareStar.tele = clamp01(1 - G.flareT / 1.1);
+  if (G.flareT <= 0 && G.flareStar) {
+    const s = G.flareStar; s.tele = 0; s.flare = 1; G.flareStar = null; G.flareAge = 0; G.flareT = rand(8, 15); G.flares = (G.flares || 0) + 1;
+    G.log.push('flare'); G.shake = Math.max(G.shake, 7); G.flash = Math.max(G.flash, 0.45);
+    // shockwave: thin bright rings racing out across the level (RingW is the crisp ring texture)
+    part('RingW', s.x, s.y, { life: 0.8, s0: 0.05, s1: 2.4, drag: 0, lin: true, color: '255;225;160', z: 19 });
+    part('RingW', s.x, s.y, { life: 1.25, s0: 0.05, s1: 3.6, drag: 0, lin: true, a0: 170, color: '255;160;90', z: 19 });
+    ring(s.x, s.y, 1.6, [255, 230, 170]); flashLight(s.x, s.y, 420, '255;220;150', 1.2);
+    sparks(s.x, s.y, 0, 0, 36, '255;210;130', 620);
+  }
+}
+G.flareAge += rdt;
+{ const t = G.flareAge;    // envelope: fast attack, ~1.3 s hold, ~1.4 s fade
+  G.flareAmp = t < 0.12 ? t / 0.12 : t < 1.4 ? 1 : t < 2.8 ? 0.5 + 0.5 * Math.cos(Math.PI * (t - 1.4) / 1.4) : 0; }
+if (G.dark && !LIB.lite) {
+  const a = G.flareAmp, LL = runtimeScene.getLayer('Light');
+  const c3 = [0, 1, 2].map((q) => Math.round(AMB[q] + (FLARE_AMB[q] - AMB[q]) * a)), key = c3.join(',');
+  if (key !== G.ambSet) { LL.setClearColor(c3[0], c3[1], c3[2]); G.ambSet = key; G.amb = c3; }
+  try { const bl = runtimeScene.getLayer(''); bl.setEffectDoubleParameter('Bloom', 'brightness', 1 + 0.6 * a); bl.setEffectDoubleParameter('Bloom', 'bloomScale', 1.15 + 0.9 * a); } catch (e) {}
+  // gas clouds: light scattered into a cloud from the orb (or a nearby flash, e.g. off a mirror) lights it from the inside
+  for (const c of G.clouds) {
+    if (!c.scat) continue;
+    let best = 0, bx = c.cx, by = c.cy, rgb = [0, 0, 0];
+    const srcs = [];
+    if (G.orbLight && G.state !== 'clear') srcs.push([G.vis.x, G.vis.y, 190 * Math.max(0.15, G.orbScale), [210, 235, 255]]);
+    for (const f of G.flashes) { const u = f.t / f.life, k = 1 - u * u; srcs.push([f.o.getX(), f.o.getY(), f.radius * 0.8, f.rgb.map((v) => v * k)]); }
+    for (const [sx, sy, sr, col] of srcs) {
+      const px = Math.max(c.x0, Math.min(c.x1, sx)), py = Math.max(c.y0, Math.min(c.y1, sy)), d = Math.hypot(px - sx, py - sy);
+      const k = clamp01(1 - d / (sr * 0.7)); if (k <= best) continue;
+      best = k; rgb = col; const ix = Math.max(c.x0 + 14, Math.min(c.x1 - 14, sx)), iy = Math.max(c.y0 + 14, Math.min(c.y1 - 14, sy));
+      bx = d < 1 ? sx : ix; by = d < 1 ? sy : iy;
+    }
+    c.lit = lerp(c.lit, best, 1 - Math.pow(0.002, rdt));
+    c.scat.setPosition(bx, by); c.scat.setRadius(30 + 110 * c.lit);
+    c.scat.setColor(rgb.map((v) => Math.round(v * 0.75 * c.lit)).join(';'));
+  }
 }
 for (const mv of G.movers) {
   const r = SIM.moverRect(L, mv.m, st.time || 0), x = (r.x0 + r.x1) / 2, y = (r.y0 + r.y1) / 2;

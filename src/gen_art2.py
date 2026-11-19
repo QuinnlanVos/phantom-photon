@@ -2,7 +2,7 @@
 # stars (burning hazards): white-hot core + slowly turning spiky corona
 s = 128 * SS; r = radial(s); y, x = np.mgrid[0:s, 0:s]; ang = np.arctan2(y - s / 2, x - s / 2)
 core = np.clip(1 - (r - 15 * SS) / (3 * SS), 0, 1)
-glow_sprite(np.clip(core + np.exp(-(r / (24 * SS)) ** 2) * 0.9, 0, 1), np.array([255, 200, 90]), 'star_core.png', white_core=core)
+glow_sprite(np.clip(core + np.exp(-(r / (26 * SS)) ** 2) * 1.0, 0, 1), np.array([255, 215, 120]), 'star_core.png', white_core=np.clip(core + np.exp(-(r / (19 * SS)) ** 2) * 0.5, 0, 1))
 s = 288 * SS; r = radial(s); y, x = np.mgrid[0:s, 0:s]; ang = np.arctan2(y - s / 2, x - s / 2)
 rnd = np.random.RandomState(5); spikes = np.zeros_like(r)
 for k, (f, a) in enumerate(((7, 1.0), (11, 0.7), (17, 0.5), (29, 0.35))):
@@ -10,8 +10,8 @@ for k, (f, a) in enumerate(((7, 1.0), (11, 0.7), (17, 0.5), (29, 0.35))):
 spikes /= 2.55
 cor = np.exp(-np.maximum(r - 16 * SS, 0) / ((22 + 40 * spikes ** 2) * SS)) * (r > 10 * SS)
 cor = blur(np.clip(cor, 0, 1), 1.5 * SS)
-glow_sprite(np.clip(cor * 0.95, 0, 1), np.array([255, 120, 40]), 'star_corona.png', white_core=np.exp(-(r / (20 * SS)) ** 2) * 0.6)
-glow_sprite(np.exp(-(r / (70 * SS)) ** 2) * 0.5, np.array([255, 110, 30]), 'star_glow.png')
+glow_sprite(np.clip(cor * 1.0, 0, 1), np.array([255, 140, 50]), 'star_corona.png', white_core=np.exp(-(r / (22 * SS)) ** 2) * 0.85)
+glow_sprite(np.exp(-(r / (70 * SS)) ** 2) * 0.7, np.array([255, 130, 40]), 'star_glow.png')
 
 # moving platforms: one image per size used (mint neon block with chevron stripes)
 mover_sizes = {}
@@ -128,3 +128,7 @@ def restart(d, s):
     ax, ay = c + R * math.cos(math.radians(50)), c + R * math.sin(math.radians(50))
     d.polygon([(ax + 9 * SS, ay - 1 * SS), (ax - 6 * SS, ay - 8 * SS), (ax - 2 * SS, ay + 9 * SS)], fill=255)
 icon(restart, 'ic_restart.png')
+
+# gas-cloud darkness mask (drawn black on the lighting layer: removes the ambient light inside clouds)
+s = 96 * SS; im = Image.new('L', (s, s), 0); d = ImageDraw.Draw(im); d.rounded_rectangle([14 * SS, 14 * SS, s - 14 * SS, s - 14 * SS], radius=14 * SS, fill=255)
+save_rgba(np.zeros((s, s, 3)), blur(arr(im), 7 * SS), 'cloud_mask.png')
