@@ -1,0 +1,2143 @@
+{
+  "firstLayout": "Game",
+  "gdVersion": {
+    "build": 279,
+    "major": 5,
+    "minor": 6,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": true,
+    "folderProject": false,
+    "orientation": "default",
+    "packageName": "com.phantomphoton.game",
+    "pixelsRounding": false,
+    "projectUuid": "8e0e37b5-d299-4d44-9653-270e8362e8ca",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "version": "0.1.0",
+    "name": "Phantom Photon",
+    "description": "Neon puzzle-action: you are a photon that can only move along walls. Swipe to slide, fly until you hit the next wall.",
+    "author": "",
+    "windowWidth": 720,
+    "windowHeight": 1280,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {
+      "android-icon-144": "",
+      "android-icon-192": "",
+      "android-icon-36": "",
+      "android-icon-48": "",
+      "android-icon-72": "",
+      "android-icon-96": "",
+      "android-windowSplashScreenAnimatedIcon": "",
+      "desktop-icon-512": "",
+      "ios-icon-100": "",
+      "ios-icon-1024": "",
+      "ios-icon-114": "",
+      "ios-icon-120": "",
+      "ios-icon-144": "",
+      "ios-icon-152": "",
+      "ios-icon-167": "",
+      "ios-icon-180": "",
+      "ios-icon-20": "",
+      "ios-icon-29": "",
+      "ios-icon-40": "",
+      "ios-icon-50": "",
+      "ios-icon-57": "",
+      "ios-icon-58": "",
+      "ios-icon-60": "",
+      "ios-icon-72": "",
+      "ios-icon-76": "",
+      "ios-icon-80": "",
+      "ios-icon-87": ""
+    },
+    "loadingScreen": {
+      "backgroundColor": 263184,
+      "backgroundFadeInDuration": 0.2,
+      "backgroundImageResourceName": "",
+      "gdevelopLogoStyle": "light",
+      "logoAndProgressFadeInDuration": 0.2,
+      "logoAndProgressLogoFadeInDelay": 0,
+      "minDuration": 0.6,
+      "progressBarColor": 16777215,
+      "progressBarHeight": 20,
+      "progressBarMaxWidth": 200,
+      "progressBarMinWidth": 40,
+      "progressBarWidthPercent": 30,
+      "showGDevelopSplash": true,
+      "showProgressBar": true
+    },
+    "watermark": {
+      "placement": "bottom",
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "authorUsernames": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "assets/bg_tile.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bg_tile.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/bh_core.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bh_core.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/bh_disk.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bh_disk.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/bh_glow.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bh_glow.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/bh_range.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bh_range.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/bh_swirl.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bh_swirl.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/btn_restart.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "btn_restart.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/flash.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "flash.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/level_1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "level_1.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/level_2.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "level_2.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/level_3.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "level_3.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/level_4.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "level_4.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/level_5.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "level_5.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/mote.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "mote.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/nebula.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "nebula.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/orb.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "orb.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/orb_halo.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "orb_halo.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/pad_chevron.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "pad_chevron.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/pad_glow.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "pad_glow.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/portal_core.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "portal_core.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/portal_ring.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "portal_ring.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/portal_ring2.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "portal_ring2.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/ring.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "ring.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/shard.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "shard.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/spark.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "spark.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/title_phantom.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "title_phantom.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/title_photon.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "title_photon.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/trail.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "trail.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/txt_clear.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "txt_clear.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/Rajdhani-Bold.ttf",
+        "kind": "font",
+        "metadata": "",
+        "name": "Rajdhani-Bold.ttf",
+        "userAdded": true
+      }
+    ]
+  },
+  "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 16,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Game",
+      "name": "Game",
+      "r": 4,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 6,
+      "uiSettings": {
+        "grid": true,
+        "gridType": "rectangular",
+        "gridWidth": 48,
+        "gridHeight": 48,
+        "gridDepth": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridOffsetZ": 0,
+        "gridColor": 10401023,
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 1,
+        "windowMask": false,
+        "gameEditorMode": "instances-editor"
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 608.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "LevelArt",
+          "persistentUuid": "1d6e28fa-3331-4aa4-be66-836f610a401f",
+          "width": 608.0,
+          "x": 264.0,
+          "y": 264.0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 160.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "PortalCore",
+          "persistentUuid": "c4d17ba4-2e03-438d-a154-f9a9187ace74",
+          "width": 160.0,
+          "x": 264.0,
+          "y": 120.0,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 160.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "PortalRing",
+          "persistentUuid": "b45d07de-0bd8-43a8-80d0-8ac44f3f79c5",
+          "width": 160.0,
+          "x": 264.0,
+          "y": 120.0,
+          "zOrder": 6,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 64.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Shard",
+          "persistentUuid": "7916cdbf-ccbb-4593-b497-fed7cd11053d",
+          "width": 64.0,
+          "x": 456.0,
+          "y": 120.0,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 64.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Shard",
+          "persistentUuid": "6320944a-fa05-4502-aaf5-57303699c089",
+          "width": 64.0,
+          "x": 168.0,
+          "y": 264.0,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 64.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "PreviewOrb",
+          "persistentUuid": "8ea0ec45-f7b9-458f-b00f-77f11e86c2cf",
+          "width": 64.0,
+          "x": 72.0,
+          "y": 456.0,
+          "zOrder": 30,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 64.0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Shard",
+          "persistentUuid": "18aff313-d6d8-443a-8bf8-3b92ddb00d72",
+          "width": 64.0,
+          "x": 264.0,
+          "y": 456.0,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "height": 192,
+          "width": 192,
+          "name": "BgTile",
+          "texture": "bg_tile.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "variables": [],
+          "effects": [],
+          "behaviors": []
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Nebula",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "nebula.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 256.0,
+                        "y": 256.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Mote",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "mote.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 32.0,
+                        "y": 32.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "LevelArt",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "L1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "level_1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 608.0,
+                        "y": 608.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "L2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "level_2.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 608.0,
+                        "y": 608.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "L3",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "level_3.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 608.0,
+                        "y": 608.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "L4",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "level_4.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 608.0,
+                        "y": 608.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "L5",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "level_5.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 608.0,
+                        "y": 656.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PadGlow",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "pad_glow.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 96.0,
+                        "y": 96.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PadChevron",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "pad_chevron.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 48.0,
+                        "y": 48.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PortalCore",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "portal_core.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 160.0,
+                        "y": 160.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PortalRing",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "portal_ring.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 160.0,
+                        "y": 160.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PortalRing2",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "portal_ring2.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 160.0,
+                        "y": 160.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Shard",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "shard.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 64.0,
+                        "y": 64.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "ShardIcon",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "shard.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 64.0,
+                        "y": 64.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BhRange",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bh_range.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 384.0,
+                        "y": 384.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BhSwirl",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bh_swirl.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 384.0,
+                        "y": 384.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BhGlow",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bh_glow.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 224.0,
+                        "y": 224.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BhDisk",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bh_disk.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 224.0,
+                        "y": 224.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BhCore",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "bh_core.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 96.0,
+                        "y": 96.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Trail",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "trail.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 48.0,
+                        "y": 48.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Spark",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "spark.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 24.0,
+                        "y": 24.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Ring",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "ring.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 160.0,
+                        "y": 160.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "OrbHalo",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "orb_halo.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 256.0,
+                        "y": 256.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Orb",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "orb.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 64.0,
+                        "y": 64.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "PreviewOrb",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "orb.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 64.0,
+                        "y": 64.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "TitlePhantom",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "title_phantom.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "TitlePhoton",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "title_photon.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "TxtClear",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "txt_clear.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "BtnRestart",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "btn_restart.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 96.0,
+                        "y": 96.0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "Flash",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flash.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "assetStoreId": "",
+          "name": "LevelText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "",
+            "font": "Rajdhani-Bold.ttf",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 26,
+            "lineHeight": 0,
+            "color": "200;245;255",
+            "smoothed": true,
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "isOutlineEnabled": false,
+            "outlineThickness": 2,
+            "outlineColor": "0;0;0",
+            "isShadowEnabled": true,
+            "shadowColor": "40;200;255",
+            "shadowOpacity": 230,
+            "shadowAngle": 90,
+            "shadowDistance": 0,
+            "shadowBlurRadius": 10
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "ShardText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "",
+            "font": "Rajdhani-Bold.ttf",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 24,
+            "lineHeight": 0,
+            "color": "255;225;140",
+            "smoothed": true,
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "isOutlineEnabled": false,
+            "outlineThickness": 2,
+            "outlineColor": "0;0;0",
+            "isShadowEnabled": true,
+            "shadowColor": "255;180;60",
+            "shadowOpacity": 230,
+            "shadowAngle": 90,
+            "shadowDistance": 0,
+            "shadowBlurRadius": 10
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "HintText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "",
+            "font": "Rajdhani-Bold.ttf",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 22,
+            "lineHeight": 0,
+            "color": "170;200;235",
+            "smoothed": true,
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "isOutlineEnabled": false,
+            "outlineThickness": 2,
+            "outlineColor": "0;0;0",
+            "isShadowEnabled": true,
+            "shadowColor": "40;120;255",
+            "shadowOpacity": 230,
+            "shadowAngle": 90,
+            "shadowDistance": 0,
+            "shadowBlurRadius": 10
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "StartText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "",
+            "font": "Rajdhani-Bold.ttf",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 30,
+            "lineHeight": 0,
+            "color": "220;250;255",
+            "smoothed": true,
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "isOutlineEnabled": false,
+            "outlineThickness": 2,
+            "outlineColor": "0;0;0",
+            "isShadowEnabled": true,
+            "shadowColor": "40;220;255",
+            "shadowOpacity": 230,
+            "shadowAngle": 90,
+            "shadowDistance": 0,
+            "shadowBlurRadius": 10
+          }
+        },
+        {
+          "assetStoreId": "",
+          "name": "ToastText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "text": "",
+            "font": "Rajdhani-Bold.ttf",
+            "textAlignment": "center",
+            "verticalTextAlignment": "top",
+            "characterSize": 30,
+            "lineHeight": 0,
+            "color": "255;140;220",
+            "smoothed": true,
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "isOutlineEnabled": false,
+            "outlineThickness": 2,
+            "outlineColor": "0;0;0",
+            "isShadowEnabled": true,
+            "shadowColor": "255;60;200",
+            "shadowOpacity": 230,
+            "shadowAngle": 90,
+            "shadowDistance": 0,
+            "shadowBlurRadius": 10
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "BgTile"
+          },
+          {
+            "objectName": "Nebula"
+          },
+          {
+            "objectName": "Mote"
+          },
+          {
+            "objectName": "LevelArt"
+          },
+          {
+            "objectName": "PadGlow"
+          },
+          {
+            "objectName": "PadChevron"
+          },
+          {
+            "objectName": "PortalCore"
+          },
+          {
+            "objectName": "PortalRing"
+          },
+          {
+            "objectName": "PortalRing2"
+          },
+          {
+            "objectName": "Shard"
+          },
+          {
+            "objectName": "ShardIcon"
+          },
+          {
+            "objectName": "BhRange"
+          },
+          {
+            "objectName": "BhSwirl"
+          },
+          {
+            "objectName": "BhGlow"
+          },
+          {
+            "objectName": "BhDisk"
+          },
+          {
+            "objectName": "BhCore"
+          },
+          {
+            "objectName": "Trail"
+          },
+          {
+            "objectName": "Spark"
+          },
+          {
+            "objectName": "Ring"
+          },
+          {
+            "objectName": "OrbHalo"
+          },
+          {
+            "objectName": "Orb"
+          },
+          {
+            "objectName": "PreviewOrb"
+          },
+          {
+            "objectName": "TitlePhantom"
+          },
+          {
+            "objectName": "TitlePhoton"
+          },
+          {
+            "objectName": "TxtClear"
+          },
+          {
+            "objectName": "BtnRestart"
+          },
+          {
+            "objectName": "Flash"
+          },
+          {
+            "objectName": "LevelText"
+          },
+          {
+            "objectName": "ShardText"
+          },
+          {
+            "objectName": "HintText"
+          },
+          {
+            "objectName": "StartText"
+          },
+          {
+            "objectName": "ToastText"
+          }
+        ]
+      },
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 255,
+            "g": 230,
+            "r": 120,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "PHANTOM PHOTON - you are a photon of light that can only move along walls.\nRules: swipe / arrow keys along a wall you touch -> you slide, fly straight off the end and stick to the next wall you hit. Ramps (violet) mirror your flight 90 degrees. Pink launch pads: TAP / Space kicks you straight away from them. Black holes bend your flight and swallow you if you get too close (respawn at your last wall)."
+        },
+        {
+          "colorB": 255,
+          "colorG": 200,
+          "colorR": 40,
+          "creationTime": 0,
+          "name": "Game (JavaScript): input, movement sim, levels, effects, camera, UI",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 255,
+                "g": 230,
+                "r": 120,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Source files: src/sim.js (movement rules, shared with src/solve.js) + src/game_logic.js. Levels: src/levels.json. Regenerate with src/rebuild.sh. Tuning constants are at the top of sim.js (speed, gravity, swallow radius)."
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "// Movement simulation (src/sim.js) - shared with the Node level solver.\nconst PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {\n// ============================================================================\n// Phantom Photon - core movement simulation (pure JS, no GDevelop dependency).\n// The same code runs inside the game (JavaScript event) and in Node for the\n// level solver / tests (src/solve.js). The body of this file is wrapped in an\n// IIFE by build_project.py, so it ends with a `return`.\n// ============================================================================\nconst T = 48;                    // tile size (world px)\nconst H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)\nconst V0 = 260, VMAX = 960, ACC = 7000;   // launch speed, top speed (px/s), ease-in accel (px/s^2)\nconst PAD_V0 = 620;              // launch-pad kick starts faster\nconst G = 3.0e7;                 // black-hole gravity strength (px^3/s^2)\nconst G_RANGE = 3.6 * T;         // influence radius of a black hole\nconst KILL = 0.42 * T;           // swallow radius\nconst EXIT_R = 0.42 * T, SHARD_R = 0.6 * T;\nconst MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost\nconst DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };\nconst OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };\n// Ramps: letter = which corner of the tile is solid. Back (flat) sides, and mirror line.\nconst RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\\\' },\n                c: { solid: 'NW', back: 'LU', line: '/' }, d: { solid: 'NE', back: 'RU', line: '\\\\' } };\n\nfunction parseLevel(def) {\n  const rows = def.map.slice();\n  const L = { w: rows[0].length, h: rows.length, cells: [], start: null, exit: null, shards: [], holes: [], pads: [], ramps: [] };\n  for (let j = 0; j < L.h; j++) for (let i = 0; i < L.w; i++) {\n    const ch = rows[j][i] || '#';\n    let t = '.';\n    if (ch === '#') t = '#';\n    else if (ch === 'P') { t = 'P'; L.pads.push([i, j]); }\n    else if (RAMPS[ch]) { t = ch; L.ramps.push([i, j, ch]); }\n    else if (ch === 'S') L.start = [i, j];\n    else if (ch === 'E') L.exit = [i, j];\n    else if (ch === '*') L.shards.push([i, j]);\n    else if (ch === 'O') L.holes.push([i, j]);\n    L.cells.push(t);\n  }\n  return L;\n}\nfunction cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }\nconst isFlat = (t) => t === '#' || t === 'P';\nconst center = (i) => i * T + T / 2;\nconst toCell = (x) => Math.floor(x / T);\n\n// Does tile (i,j) present a flat, stickable face on `side` (the side facing the orb)?\nfunction faceFrom(L, i, j, side) {\n  const t = cell(L, i, j);\n  if (isFlat(t)) return true;\n  if (RAMPS[t]) return RAMPS[t].back.includes(side);\n  return false;\n}\n// Walls the orb (stuck in cell i,j) is touching: list of directions from orb to wall.\nfunction contacts(L, i, j) {\n  const out = [];\n  for (const d in DIRS) { const [dx, dy] = DIRS[d]; if (faceFrom(L, i + dx, j + dy, OPP[d])) out.push(d); }\n  return out;\n}\n// Movement rule: a swipe in `d` is legal only if it is parallel to a wall the orb touches\n// and the next tile in that direction is not a flat face.\nfunction checkMove(L, i, j, d) {\n  const c = contacts(L, i, j);\n  const horiz = d === 'L' || d === 'R';\n  const parallel = c.some((k) => horiz ? (k === 'U' || k === 'D') : (k === 'L' || k === 'R'));\n  if (c.includes(d)) return { ok: false, why: 'into' };\n  if (!parallel) return { ok: false, why: 'away' };\n  return { ok: true };\n}\n// Launch pad: returns the direction away from a pad the orb touches (prefer `prefer` = side of last impact).\nfunction padLaunchDir(L, i, j, prefer) {\n  const ds = Object.keys(DIRS).filter((d) => { const [dx, dy] = DIRS[d]; return cell(L, i + dx, j + dy) === 'P'; });\n  if (!ds.length) return null;\n  const d = ds.includes(prefer) ? prefer : ds[0];\n  return OPP[d];\n}\n\n// Is the orb box at (x,y) blocked by tile (i,j)? Ramps are only solid from their flat back sides.\nfunction tileBlocks(L, i, j, x, y) {\n  const t = cell(L, i, j);\n  if (isFlat(t)) return true;\n  if (!RAMPS[t]) return false;\n  const x0 = i * T, y0 = j * T, x1 = x0 + T, y1 = y0 + T, back = RAMPS[t].back;\n  if (x >= x1 && back.includes('R')) return true;\n  if (x <= x0 && back.includes('L')) return true;\n  if (y >= y1 && back.includes('D')) return true;\n  if (y <= y0 && back.includes('U')) return true;\n  return false;\n}\nfunction boxHit(L, x, y, refX, refY) {\n  const i0 = toCell(x - H), i1 = toCell(x + H), j0 = toCell(y - H), j1 = toCell(y + H);\n  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, refX, refY)) return [i, j];\n  return null;\n}\n\nfunction startFlight(st, d, kick) {\n  const [dx, dy] = DIRS[d];\n  st.mode = 'fly'; st.dir = d; st.t = 0; st.acc = 0;\n  st.speed = kick ? PAD_V0 : V0; st.vx = dx * st.speed; st.vy = dy * st.speed;\n  st.events = [];\n}\nfunction newState(L) {\n  const [i, j] = L.start;\n  return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j],\n           got: L.shards.map(() => false), events: [], t: 0 };\n}\n\n// Advance a flight by dt seconds (internally sub-stepped). Pushes events: shard, deflect, graze, stick, exit, swallow, lost.\nfunction step(L, st, dt) {\n  if (st.mode !== 'fly') return;\n  // fixed 600 Hz sub-steps (remainder carried over) so the game and the Node solver give identical paths\n  const h = 1 / 600;\n  st.acc = (st.acc || 0) + dt;\n  while (st.acc >= h - 1e-9 && st.mode === 'fly') {\n    st.acc -= h; st.t += h;\n    st.speed = Math.min(VMAX, st.speed + ACC * h);\n    // black-hole gravity\n    for (const [hi, hj] of L.holes) {\n      const hx = center(hi), hy = center(hj), ddx = hx - st.x, ddy = hy - st.y, dist = Math.hypot(ddx, ddy);\n      if (dist < KILL) { st.mode = 'dead'; st.hole = [hx, hy]; st.events.push({ type: 'swallow', x: hx, y: hy }); return; }\n      if (dist < G_RANGE) {\n        const fall = 1 - dist / G_RANGE;   // fades smoothly to 0 at the edge of the well\n        const a = G / Math.max(dist * dist, T * T * 0.5) * fall;\n        st.vx += a * ddx / dist * h; st.vy += a * ddy / dist * h;\n      }\n    }\n    const vl = Math.hypot(st.vx, st.vy) || 1; st.vx *= st.speed / vl; st.vy *= st.speed / vl;  // gravity bends, doesn't brake\n    // ramps: mirror when the orb's centre would cross the diagonal (checked before walls so the corner turn is clean)\n    let nx = st.x + st.vx * h, ny = st.y + st.vy * h;\n    const ci = toCell(nx), cj = toCell(ny), t = cell(L, ci, cj);\n    if (RAMPS[t] && !tileBlocks(L, ci, cj, st.x, st.y)) {\n      const u = (nx - ci * T) / T, v = (ny - cj * T) / T, R = RAMPS[t];\n      let inSolid;\n      if (R.line === '/') inSolid = R.solid === 'SE' ? u + v > 1 : u + v < 1;\n      else inSolid = R.solid === 'SW' ? v > u : v < u;\n      if (inSolid) {\n        if (R.line === '/') { nx = ci * T + (1 - v) * T; ny = cj * T + (1 - u) * T; const vx = st.vx; st.vx = -st.vy; st.vy = -vx; }\n        else { nx = ci * T + v * T; ny = cj * T + u * T; const vx = st.vx; st.vx = st.vy; st.vy = vx; }\n        st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');\n        st.events.push({ type: 'deflect', x: center(ci), y: center(cj), dir: st.dir });\n      }\n    }\n    // move X, then Y (axis-separated box collision). Head-on hit = stick; grazing hit = slide along the wall.\n    let hit = boxHit(L, nx, st.y, st.x, st.y);\n    if (hit) {\n      const sx = Math.sign(nx - st.x); nx = sx > 0 ? hit[0] * T - T / 2 : (hit[0] + 1) * T + T / 2;\n      if (Math.abs(st.vx) >= 0.5 * st.speed) { st.x = nx; return stick(L, st, sx > 0 ? 'R' : 'L'); }\n      st.vx = 0; st.events.push({ type: 'graze' });\n    }\n    st.x = nx;\n    hit = boxHit(L, st.x, ny, st.x, st.y);\n    if (hit) {\n      const sy = Math.sign(ny - st.y); ny = sy > 0 ? hit[1] * T - T / 2 : (hit[1] + 1) * T + T / 2;\n      if (Math.abs(st.vy) >= 0.5 * st.speed) { st.y = ny; return stick(L, st, sy > 0 ? 'D' : 'U'); }\n      st.vy = 0; st.events.push({ type: 'graze' });\n    }\n    st.y = ny;\n    if (st.vx === 0 && st.vy === 0) { return stick(L, st, null); }\n    // pickups / exit\n    L.shards.forEach(([si, sj], k) => {\n      if (!st.got[k] && Math.hypot(center(si) - st.x, center(sj) - st.y) < SHARD_R) { st.got[k] = true; st.events.push({ type: 'shard', k, x: center(si), y: center(sj) }); }\n    });\n    if (L.exit && Math.hypot(center(L.exit[0]) - st.x, center(L.exit[1]) - st.y) < EXIT_R) {\n      st.mode = 'exit'; st.events.push({ type: 'exit' }); return;\n    }\n    if (st.t > MAX_FLIGHT) { st.mode = 'dead'; st.hole = null; st.events.push({ type: 'lost' }); return; }\n  }\n}\n// Land: snap to the nearest empty tile centre along the wall that still has a flat face on the impact side.\nfunction stick(L, st, side) {\n  let i = toCell(st.x), j = toCell(st.y);\n  const cand = [];\n  for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {\n    const ci = i + di, cj = j + dj; if (cell(L, ci, cj) !== '.') continue;\n    let ok = true;\n    if (side) { const [dx, dy] = DIRS[side]; ok = faceFrom(L, ci + dx, cj + dy, OPP[side]); }\n    else ok = contacts(L, ci, cj).length > 0;\n    if (ok) cand.push([Math.hypot(center(ci) - st.x, center(cj) - st.y), ci, cj]);\n  }\n  cand.sort((a, b) => a[0] - b[0]);\n  if (cand.length) { i = cand[0][1]; j = cand[0][2]; }\n  const impactSpeed = st.speed;\n  st.mode = 'stuck'; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j];\n  st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX: st.x, fromY: st.y, impact: impactSpeed });\n  st.x = center(i); st.y = center(j);\n}\n// Run a whole move instantly (used by the solver/tests). Returns the final state + events.\nfunction simulate(L, st0, action) {\n  const st = JSON.parse(JSON.stringify(st0)); st.events = [];\n  if (st.mode !== 'stuck') return { ok: false, why: 'busy', st };\n  if (action === 'TAP') {\n    const d = padLaunchDir(L, st.i, st.j, st.normal);\n    if (!d) return { ok: false, why: 'nopad', st };\n    startFlight(st, d, true);\n  } else {\n    const c = checkMove(L, st.i, st.j, action);\n    if (!c.ok) return { ok: false, why: c.why, st };\n    startFlight(st, action, false);\n  }\n  const evs = [];\n  while (st.mode === 'fly') { step(L, st, 1 / 60); evs.push(...st.events); st.events = []; }\n  return { ok: true, st, events: evs };\n}\nreturn { T, H, V0, VMAX, ACC, G, G_RANGE, KILL, DIRS, OPP, RAMPS, parseLevel, cell, contacts, checkMove, padLaunchDir,\n         startFlight, newState, step, simulate, center, faceFrom };\n\n})());\n// ============================================================================\n// Phantom Photon - game logic (runs every frame from one JavaScript event).\n// The movement rules live in PPSim (src/sim.js, embedded above by build_project.py).\n// This file: input (swipe / tap / keys), level loading, camera fit, and all the juice\n// (trail, squash, sparks, shake, portal, black holes, pads, title, level clear).\n// ============================================================================\nconst SIM = PPSim;\nconst game = runtimeScene.getGame();\nconst im = game.getInputManager();\nconst T = SIM.T;\nconst rdt = Math.min(0.05, runtimeScene.getElapsedTime() / 1000);\nconst LEVELS = [{\"name\": \"First Light\", \"hint\": \"Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.\", \"map\": [\"###########\", \"#.........#\", \"#....E...*#\", \"#.........#\", \"##........#\", \"#..*..##..#\", \"#.........#\", \"#.........#\", \"#.........#\", \"#S...*....#\", \"###########\"]}, {\"name\": \"Angles\", \"hint\": \"Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.\", \"map\": [\"###########\", \"#..S.....d#\", \"#.........#\", \"#....#....#\", \"#...#E#...#\", \"#.........#\", \"#.........#\", \"#.........#\", \"#.........#\", \"#b.*.a...*#\", \"###########\"]}, {\"name\": \"Kick\", \"hint\": \"Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.\", \"map\": [\"###########\", \"#...*.#...#\", \"#.........#\", \"#....E....#\", \"#.........#\", \"#.........#\", \"#.........#\", \"#.........#\", \"#....S...*#\", \"#####P#####\", \"###########\"]}, {\"name\": \"Event Horizon\", \"hint\": \"Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.\", \"map\": [\"###########\", \"#S....#...#\", \"#.......*.#\", \"##......E.#\", \"#....*....#\", \"#....O....#\", \"#.........#\", \"#........##\", \"#.........#\", \"#...#.....#\", \"###########\"]}, {\"name\": \"Phantom Run\", \"hint\": \"Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.\", \"map\": [\"###########\", \"##.......##\", \"#........##\", \"#.........#\", \"#.......a.#\", \"#.O..##...#\", \"#.........#\", \"#...*.....#\", \"#.#...E.*.P\", \"#.#.......#\", \"#.S.*.....#\", \"###########\"]}];\nconst ART = {\"levelArtSize\": [[608, 608], [608, 608], [608, 608], [608, 608], [608, 656]], \"margin\": 40, \"tile\": 48, \"ss\": 2};\nconst ADD = 1;\nconst DIRV = SIM.DIRS;\n\nlet G = runtimeScene.__pp;\nlet st = null, L = null;\n// ------------------------------------------------------------------ helpers\nconst mk = (name, layer, x, y, z, blend) => {\n  const o = runtimeScene.createObject(name); if (!o) return null;\n  o.setLayer(layer || ''); o.setPosition(x || 0, y || 0); if (z !== undefined) o.setZOrder(z);\n  if (blend && o.setBlendMode) o.setBlendMode(ADD);\n  return o;\n};\nconst del = (o) => { if (o) o.deleteFromScene(runtimeScene); };\nconst rand = (a, b) => a + Math.random() * (b - a);\nconst lerp = (a, b, t) => a + (b - a) * t;\nconst ease = (t) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);\nconst cc = (i) => i * T + T / 2;\n\nif (!G) {\n  G = runtimeScene.__pp = {\n    level: 0, state: 'title', touches: {}, parts: [], motes: [], dyn: [], shake: 0, sx: 0, sy: 0, flash: 0,\n    buffered: null, bufferT: 0, titleT: 0, clearT: 0, dieT: 0, bump: null, squash: 0, squashV: 0, squashAxis: 'x',\n    vis: { x: 0, y: 0 }, trailAcc: 0, lastTrail: null, time: 0, moves: 0, deaths: 0, log: [], lastRes: [0, 0],\n    stats: { shards: 0 }, firstMove: false, padHintShown: false,\n  };\n  // static UI objects\n  G.ui = {\n    titleA: mk('TitlePhantom', 'UI', 0, 0, 50), titleB: mk('TitlePhoton', 'UI', 0, 0, 50),\n    start: mk('StartText', 'UI', 0, 0, 51), level: mk('LevelText', 'UI', 0, 0, 40), shards: mk('ShardText', 'UI', 0, 0, 40),\n    hint: mk('HintText', 'UI', 0, 0, 40), restart: mk('BtnRestart', 'UI', 0, 0, 40, true), clear: mk('TxtClear', 'UI', 0, 0, 60, true),\n    flash: mk('Flash', 'UI', 0, 0, 90), dim: mk('Flash', 'UI', 0, 0, 30), toast: mk('ToastText', 'UI', 0, 0, 45), shardIcon: mk('ShardIcon', 'UI', 0, 0, 41, true),\n  };\n  G.ui.flash.setOpacity(0); G.ui.dim.setColor('2;3;10'); G.ui.clear.setOpacity(0); G.ui.toast.setOpacity(0);\n  for (const k of ['titleA', 'titleB']) G.ui[k].setBlendMode(ADD);\n  // background\n  G.bg = mk('BgTile', 'Bg', -2112, -2112, 0); G.bg.setWidth(4992); G.bg.setHeight(4992);\n  G.neb = mk('Nebula', 'Bg', 0, 0, 1, true);\n  for (let k = 0; k < 46; k++) {\n    const o = mk('Mote', 'Bg', 0, 0, 2, true);\n    G.motes.push({ o, x: rand(-100, 700), y: rand(-100, 700), vx: rand(-6, 6), vy: rand(-10, -2), ph: rand(0, 6.28), s: rand(0.25, 0.8) });\n  }\n  // orb\n  G.halo = mk('OrbHalo', '', 0, 0, 30, true); G.orb = mk('Orb', '', 0, 0, 32, true);\n  // remove editor-preview instances placed in the scene for level 1 (the game rebuilds levels itself)\n  for (const n of ['LevelArt', 'PortalCore', 'PortalRing', 'PortalRing2', 'Shard', 'PadGlow', 'BhDisk', 'BhCore', 'BhGlow', 'BhSwirl', 'BhRange', 'PreviewOrb'])\n    for (const o of runtimeScene.getObjects(n).slice()) if (!o.__pp) del(o);\n  G.loadLevel = (n) => loadLevel(n);\n  const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : null;\n  G.startLevel = qs && qs.get('level') ? Math.max(0, Math.min(LEVELS.length - 1, (+qs.get('level')) - 1)) : 0;\n  G.skipTitle = !!(qs && qs.has('notitle'));\n  loadLevel(G.startLevel);\n  if (G.skipTitle) G.state = 'play';\n  window.__pp = G; window.__PPSim = SIM; window.__ppScene = runtimeScene;\n}\n\nfunction tag(o) { if (o) o.__pp = true; return o; }\nfunction loadLevel(n) {\n  for (const o of G.dyn) del(o); G.dyn = [];\n  for (const p of G.parts) del(p.o); G.parts = [];\n  G.level = n; const def = LEVELS[n]; L = SIM.parseLevel(def); G.L = L; G.def = def;\n  G.st = SIM.newState(L); st = G.st;\n  G.W = L.w * T; G.H = L.h * T;\n  const add = (name, x, y, z, blend) => { const o = tag(mk(name, '', x, y, z, blend)); G.dyn.push(o); return o; };\n  const art = add('LevelArt', G.W / 2, G.H / 2, 1); art.setAnimationName('L' + (n + 1)); art.setScale(0.5);\n  G.portal = L.exit ? { core: add('PortalCore', cc(L.exit[0]), cc(L.exit[1]), 5, true), r1: add('PortalRing', cc(L.exit[0]), cc(L.exit[1]), 6, true),\n                        r2: add('PortalRing2', cc(L.exit[0]), cc(L.exit[1]), 6, true) } : null;\n  G.shards = L.shards.map(([i, j], k) => ({ o: add('Shard', cc(i), cc(j), 8, true), i, j, k, got: false }));\n  G.pads = L.pads.map(([i, j]) => {\n    // the pad's face points toward its open neighbour\n    let face = 'U'; for (const d of ['U', 'D', 'L', 'R']) { const [dx, dy] = DIRV[d]; if (SIM.cell(L, i + dx, j + dy) === '.' ) { face = d; break; } }\n    const [dx, dy] = DIRV[face], ang = { U: 0, R: 90, D: 180, L: 270 }[face];\n    const g = add('PadGlow', cc(i) + dx * T / 2, cc(j) + dy * T / 2, 3, true); g.setAngle(ang); g.setScale(0.5);\n    const ch = add('PadChevron', cc(i) + dx * T, cc(j) + dy * T, 3, true); ch.setAngle(ang); ch.setScale(0.5);\n    return { i, j, face, g, ch, dx, dy, ang, boost: 0 };\n  });\n  G.holes = L.holes.map(([i, j]) => ({ x: cc(i), y: cc(j), range: add('BhRange', cc(i), cc(j), 2, true), swirl: add('BhSwirl', cc(i), cc(j), 3, true),\n                                        glow: add('BhGlow', cc(i), cc(j), 4, true), disk: add('BhDisk', cc(i), cc(j), 9), core: add('BhCore', cc(i), cc(j), 10), pulse: 0 }));\n  for (const h of G.holes) { for (const k of ['range', 'swirl', 'glow', 'disk', 'core']) h[k].setScale(0.5); h.disk.setBlendMode(ADD); }\n  G.vis.x = G.st.x; G.vis.y = G.st.y; G.orbScale = 0; G.spawnT = 0; G.squash = 0; G.squashV = 0;\n  G.buffered = null; G.bump = null; G.clearT = 0; G.dieT = 0; G.moves = 0;\n  G.ui.level.setString((n + 1) + ' / ' + LEVELS.length + '   ' + def.name.toUpperCase());\n  G.ui.hint.setString(def.hint || ''); G.hintA = 1;\n  G.log.push('load ' + (n + 1));\n  for (const m of G.motes) { m.x = rand(-80, G.W + 80); m.y = rand(-80, G.H + 80); }\n  ring(G.st.x, G.st.y, 0.5, [140, 240, 255]);\n}\n\n// ------------------------------------------------------------------ particles\nfunction part(name, x, y, o) {\n  const ob = mk(name, '', x, y, o.z || 20, true); if (!ob) return;\n  if (o.color) ob.setColor(o.color);\n  const p = Object.assign({ o: ob, x, y, vx: 0, vy: 0, life: 0.5, t: 0, s0: 0.5, s1: 0, a0: 255, drag: 3, sink: null }, o);\n  ob.setScale(p.s0); G.parts.push(p); return p;\n}\nfunction sparks(x, y, nx, ny, n, color, spd) {\n  for (let k = 0; k < n; k++) {\n    const base = (nx || ny) ? Math.atan2(ny, nx) : rand(0, 6.28), a = base + rand(-1.35, 1.35) * ((nx || ny) ? 1 : 3), v = rand(0.3, 1) * (spd || 420);\n    part('Spark', x, y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.25, 0.55), s0: rand(0.35, 0.7), s1: 0, drag: 5, color });\n  }\n}\nfunction ring(x, y, size, rgb) { part('Ring', x, y, { life: 0.38, s0: 0.03, s1: size * 0.42, drag: 0, color: rgb ? rgb.join(';') : null, z: 19 }); }\nfunction updateParts(dt) {\n  for (let k = G.parts.length - 1; k >= 0; k--) {\n    const p = G.parts[k]; p.t += dt; const u = p.t / p.life;\n    if (u >= 1) { del(p.o); G.parts.splice(k, 1); continue; }\n    if (p.sink) { // pulled toward a point (black-hole implode)\n      const dx = p.sink[0] - p.x, dy = p.sink[1] - p.y; p.vx += dx * 30 * dt - dy * 12 * dt; p.vy += dy * 30 * dt + dx * 12 * dt;\n    }\n    p.vx *= Math.exp(-p.drag * dt); p.vy *= Math.exp(-p.drag * dt); p.x += p.vx * dt; p.y += p.vy * dt;\n    p.o.setPosition(p.x, p.y); p.o.setScale(Math.max(0.001, lerp(p.s0, p.s1, p.lin ? u : ease(u)))); p.o.setOpacity(p.a0 * (1 - u * u));\n  }\n}\n\n// ------------------------------------------------------------------ input\nconst K = { L: [37, 65, 3037], R: [39, 68, 3039], U: [38, 87, 3038], D: [40, 83, 3040], TAP: [32, 13, 3013], RESTART: [82] };\nconst pressed = (arr) => arr.some((c) => im.wasKeyJustPressed(c));\nconst actions = [];\nfor (const a of ['L', 'R', 'U', 'D', 'TAP']) if (pressed(K[a])) actions.push({ a, src: 'key' });\nif (pressed(K.RESTART)) actions.push({ a: 'RESTART', src: 'key' });\n// swipes: measured in CSS pixels so they feel the same on every screen\nconst cssW = (typeof window !== 'undefined' ? window.innerWidth : 800) || 800;\nconst gpx = game.getGameResolutionWidth() / cssW;            // game px per CSS px\nconst SWIPE_MIN = 22 * gpx, TAP_MAX = 14 * gpx;\nfor (const id of im.getStartedTouchIdentifiers()) G.touches[id] = { x0: im.getTouchX(id), y0: im.getTouchY(id), t0: G.time, used: false };\nfor (const id of im.getAllTouchIdentifiers()) {\n  const t = G.touches[id]; if (!t) continue;\n  const dx = im.getTouchX(id) - t.x0, dy = im.getTouchY(id) - t.y0, ad = Math.max(Math.abs(dx), Math.abs(dy));\n  if (!t.used && ad >= SWIPE_MIN) {             // fire as soon as the finger has travelled far enough (dominant axis)\n    t.used = true; actions.push({ a: Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy > 0 ? 'D' : 'U'), src: 'swipe' });\n  }\n  if (im.hasTouchEnded(id)) {\n    if (!t.used && ad < TAP_MAX && G.time - t.t0 < 0.4) {\n      // tap: restart button or launch-pad kick\n      const ui = runtimeScene.getLayer('UI'); const p = ui.convertCoords(t.x0, t.y0, 0);\n      const b = G.ui.restart; const bx = b.getCenterXInScene(), by = b.getCenterYInScene();\n      actions.push({ a: Math.hypot(p[0] - bx, p[1] - by) < 44 ? 'RESTART' : 'TAP', src: 'tap' });\n    }\n    delete G.touches[id];\n  }\n}\nfor (const id in G.touches) if (!im.getAllTouchIdentifiers().includes(+id)) delete G.touches[id];\n\nG.time += rdt;\nst = G.st; L = G.L;\n// ------------------------------------------------------------------ actions\nfunction tryAction(a, src) {\n  if (a === 'RESTART') { G.log.push('restart'); G.deaths = 0; loadLevel(G.level); G.state = 'play'; return; }\n  if (G.state === 'title') { G.state = 'play'; G.titleT = 0; if (src === 'tap') return; }\n  if (G.state === 'end') { if (a === 'TAP') { G.state = 'play'; loadLevel(0); } return; }\n  if (G.state !== 'play') return;\n  if (st.mode === 'fly') { G.buffered = a; G.bufferT = 0.22; return; }    // input buffering while flying\n  if (st.mode !== 'stuck') return;\n  if (a === 'TAP') {\n    const d = SIM.padLaunchDir(L, st.i, st.j, st.normal);\n    if (!d) { G.bump = { d: null, t: 0, why: 'nopad' }; G.log.push('tap-nopad'); return; }\n    SIM.startFlight(st, d, true); G.moves++; G.log.push('kick ' + d);\n    const [dx, dy] = DIRV[d]; sparks(st.x - dx * T / 2, st.y - dy * T / 2, dx, dy, 16, '255;80;210', 520); ring(st.x - dx * T / 2, st.y - dy * T / 2, 0.7, [255, 80, 210]);\n    G.shake = Math.max(G.shake, 5); for (const p of G.pads) if (Math.abs(p.i - st.i) + Math.abs(p.j - st.j) <= 1) p.boost = 1;\n    onLaunch(); return;\n  }\n  const c = SIM.checkMove(L, st.i, st.j, a);\n  if (!c.ok) { G.bump = { d: a, t: 0, why: c.why }; G.log.push('reject ' + a + ' ' + c.why); if (c.why === 'into') G.shake = Math.max(G.shake, 1.5); return; }\n  SIM.startFlight(st, a, false); G.moves++; G.log.push('move ' + a); onLaunch();\n}\nfunction onLaunch() { G.firstMove = true; G.lastTrail = [st.x, st.y]; G.squash = -0.35; G.squashV = 0; }\nfor (const ac of actions) tryAction(ac.a, ac.src);\nif (G.bufferT > 0) G.bufferT -= rdt;\n\n// ------------------------------------------------------------------ simulation + events\nif (st.mode === 'fly' && (G.state === 'play')) {\n  SIM.step(L, st, rdt);\n  for (const e of st.events) handleEvent(e);\n  st.events = [];\n  if (st.mode === 'stuck' && G.buffered && G.bufferT > 0) { const b = G.buffered; G.buffered = null; tryAction(b, 'buffer'); }\n}\nfunction handleEvent(e) {\n  if (e.type === 'stick') {\n    const [dx, dy] = e.side ? DIRV[e.side] : [0, 0];\n    const k = Math.min(1, e.impact / SIM.VMAX);\n    const wx = e.fromX + dx * T / 2, wy = e.fromY + dy * T / 2;\n    sparks(wx, wy, -dx, -dy, Math.round(8 + 10 * k), null, 200 + 300 * k); ring(wx, wy, 0.35 + 0.35 * k, [120, 230, 255]);\n    G.shake = Math.max(G.shake, 2 + 4.5 * k); G.squash = 1 * k + 0.2; G.squashV = 0; G.squashAxis = (dx !== 0) ? 'x' : 'y';\n    G.impactDir = [dx, dy]; G.log.push('stick ' + e.i + ',' + e.j);\n    if (e.side) { const [px, py] = [e.i + dx, e.j + dy]; if (SIM.cell(L, px, py) === 'P') { for (const p of G.pads) if (p.i === px && p.j === py) p.boost = 1; showToast('TAP TO LAUNCH', 1.6, '255;120;220'); } }\n  } else if (e.type === 'deflect') {\n    sparks(e.x, e.y, 0, 0, 10, '190;120;255', 260); ring(e.x, e.y, 0.45, [190, 120, 255]); G.shake = Math.max(G.shake, 2);\n    G.squash = 0.5; G.squashAxis = (e.dir === 'L' || e.dir === 'R') ? 'y' : 'x'; G.log.push('deflect ' + e.dir);\n  } else if (e.type === 'graze') {\n    if (!G.lastGraze || G.time - G.lastGraze > 0.15) { sparks(st.x, st.y, 0, 0, 4, null, 120); G.lastGraze = G.time; }\n  } else if (e.type === 'shard') {\n    const s = G.shards[e.k]; s.got = true; G.stats.shards++;\n    sparks(e.x, e.y, 0, 0, 16, '255;215;90', 300); ring(e.x, e.y, 0.6, [255, 215, 90]); G.log.push('shard ' + e.k);\n  } else if (e.type === 'exit') {\n    G.state = 'clear'; G.clearT = 0; G.log.push('exit'); G.exitFrom = [st.x, st.y];\n  } else if (e.type === 'swallow' || e.type === 'lost') {\n    G.state = 'dying'; G.dieT = 0; G.deaths++; G.dieFrom = [st.x, st.y]; G.dieHole = e.type === 'swallow' ? [e.x, e.y] : null;\n    G.log.push(e.type); G.shake = Math.max(G.shake, 6);\n    if (G.dieHole) for (let k = 0; k < 26; k++) { const a = rand(0, 6.28), r = rand(30, 90);\n      part('Spark', e.x + Math.cos(a) * r, e.y + Math.sin(a) * r, { life: 0.6, s0: rand(0.3, 0.6), s1: 0, drag: 2, sink: [e.x, e.y], color: '255;150;120' }); }\n  }\n}\nfunction showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(color); G.toastT = dur; }\n\n// ------------------------------------------------------------------ state animations\nif (G.state === 'clear') {\n  G.clearT += rdt; const t = G.clearT, P = L.exit;\n  const px = cc(P[0]), py = cc(P[1]);\n  G.vis.x = lerp(G.vis.x, px, 1 - Math.pow(0.0001, rdt)); G.vis.y = lerp(G.vis.y, py, 1 - Math.pow(0.0001, rdt));\n  G.orbScale = Math.max(0, 1 - t / 0.35);\n  if (t - rdt < 0.3 && t >= 0.3) { G.flash = 1; sparks(px, py, 0, 0, 30, '120;255;170', 520); ring(px, py, 1.4, [120, 255, 170]); G.shake = 6; G.clearShown = true; }\n  if (t > 1.6) {\n    if (G.level + 1 < LEVELS.length) { loadLevel(G.level + 1); G.state = 'play'; G.flash = 0.8; }\n    else { G.state = 'end'; G.flash = 0.8; }\n  }\n} else if (G.state === 'dying') {\n  G.dieT += rdt; const t = G.dieT;\n  if (G.dieHole) {   // spiral into the hole\n    const [hx, hy] = G.dieHole, a0 = Math.atan2(G.dieFrom[1] - hy, G.dieFrom[0] - hx), r0 = Math.hypot(G.dieFrom[0] - hx, G.dieFrom[1] - hy);\n    const u = Math.min(1, t / 0.55), r = r0 * (1 - ease(u)), a = a0 + u * 7;\n    G.vis.x = hx + Math.cos(a) * r; G.vis.y = hy + Math.sin(a) * r; G.orbScale = Math.max(0, 1 - u);\n    for (const h of G.holes) if (h.x === hx && h.y === hy) h.pulse = Math.max(h.pulse, u < 1 ? 0.3 : 0);\n    if (t - rdt < 0.55 && t >= 0.55) { G.flash = 0.45; for (const h of G.holes) if (h.x === hx && h.y === hy) h.pulse = 1; ring(hx, hy, 1.2, [255, 110, 150]); G.shake = 7; showToast('SWALLOWED', 1.2, '255;120;160'); }\n  } else { G.orbScale = Math.max(0, 1 - t / 0.3); }\n  if (t > 1.05) {    // respawn at the last spot the orb was stuck to\n    const [i, j] = st.lastStuck; Object.assign(st, { mode: 'stuck', i, j, x: cc(i), y: cc(j), vx: 0, vy: 0, speed: 0, events: [] });\n    G.vis.x = st.x; G.vis.y = st.y; G.orbScale = 0; G.spawnT = 0; G.state = 'play'; ring(st.x, st.y, 0.6, [140, 240, 255]); G.log.push('respawn ' + i + ',' + j);\n  }\n}\n\n// ------------------------------------------------------------------ orb visuals\nif (G.state === 'play' || G.state === 'title' || G.state === 'end') {\n  if (G.orbScale < 1) { G.spawnT += rdt; G.orbScale = Math.min(1, ease(G.spawnT / 0.35) * 1.0); }\n  if (st.mode === 'fly') { G.vis.x = st.x; G.vis.y = st.y; }\n  else {\n    // hug the wall(s) it is stuck to, ease from the impact point to the snapped tile centre\n    let hx = 0, hy = 0; for (const d of SIM.contacts(L, st.i, st.j)) { hx += DIRV[d][0]; hy += DIRV[d][1]; }\n    const hug = 7, tx = st.x + Math.sign(hx) * hug, ty = st.y + Math.sign(hy) * hug, k = 1 - Math.pow(0.000002, rdt);\n    G.vis.x = lerp(G.vis.x, tx, k); G.vis.y = lerp(G.vis.y, ty, k);\n  }\n}\n// squash spring\nG.squashV += (-G.squash * 520 - G.squashV * 22) * rdt; G.squash += G.squashV * rdt;\nlet ox = 0, oy = 0;\nif (G.bump) {     // illegal move: little wiggle (toward the swipe for \"into\", sideways shiver for \"away\")\n  G.bump.t += rdt; const u = G.bump.t / 0.32, amp = 5 * (1 - u) * Math.sin(u * Math.PI * 5);\n  if (G.bump.d) { const [dx, dy] = DIRV[G.bump.d]; if (G.bump.why === 'into') { ox = dx * Math.abs(amp); oy = dy * Math.abs(amp); } else { ox = dx * amp * 0.8; oy = dy * amp * 0.8; } }\n  else { G.squash = Math.max(G.squash, 0.15 * (1 - u)); }\n  if (u >= 1) G.bump = null;\n}\nconst orb = G.orb, halo = G.halo, sp = st.mode === 'fly' ? st.speed / SIM.VMAX : 0;\nconst pulse = 1 + 0.06 * Math.sin(G.time * 3.2);\nlet sxs = 0.5 * G.orbScale * pulse, sys = sxs, ang = 0;\nif (st.mode === 'fly' && G.state === 'play') { ang = Math.atan2(st.vy, st.vx) * 180 / Math.PI; sxs *= 1 + 0.45 * sp; sys *= 1 - 0.22 * sp; }\nelse { const q = G.squash; if (G.squashAxis === 'x') { sxs *= 1 - 0.42 * q; sys *= 1 + 0.3 * q; } else { sxs *= 1 + 0.3 * q; sys *= 1 - 0.42 * q; } }\norb.setPosition(G.vis.x + ox, G.vis.y + oy); orb.setAngle(ang); orb.setScaleX(Math.max(0.001, sxs)); orb.setScaleY(Math.max(0.001, sys));\norb.setColor(G.bump ? '255;170;190' : '255;255;255');\nhalo.setPosition(G.vis.x + ox, G.vis.y + oy); halo.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.1 * Math.sin(G.time * 2.1) + 0.25 * sp)));\nhalo.setOpacity(200 + 55 * sp);\n// light trail\nif (st.mode === 'fly' && G.state === 'play') {\n  const [lx, ly] = G.lastTrail || [st.x, st.y]; const dist = Math.hypot(st.x - lx, st.y - ly), stepD = 3.5;\n  for (let s = stepD; s <= dist; s += stepD) {\n    const u = s / dist, x = lerp(lx, st.x, u), y = lerp(ly, st.y, u);\n    const tp = part('Trail', x, y, { life: 0.42, s0: 0.62, s1: 0.04, drag: 0, a0: 200, z: 25, color: '150;225;255' }); if (tp) tp.lin = true;\n    G.trailN = (G.trailN || 0) + 1;\n    if (G.trailN % 4 === 0) { const t2 = part('OrbHalo', x, y, { life: 0.5, s0: 0.16, s1: 0.02, drag: 0, a0: 90, z: 24 }); if (t2) t2.lin = true; }\n  }\n  if (dist >= stepD) G.lastTrail = [st.x, st.y];\n} else if (G.state === 'play' && Math.random() < rdt * 3) {\n  part('Spark', G.vis.x + rand(-8, 8), G.vis.y + rand(-8, 8), { vx: rand(-15, 15), vy: rand(-35, -10), life: 0.9, s0: 0.25, s1: 0, drag: 0.5, a0: 160 });\n}\nupdateParts(rdt);\n\n// ------------------------------------------------------------------ world objects animation\nif (G.portal) {\n  const p = G.portal, s = 0.5 * (1 + 0.08 * Math.sin(G.time * 4)) * (G.state === 'clear' ? 1 + 0.6 * ease(G.clearT / 0.3) : 1);\n  p.core.setScale(s); p.r1.setScale(0.5 * (1 + 0.04 * Math.sin(G.time * 2))); p.r2.setScale(0.5);\n  p.r1.setAngle(G.time * 60); p.r2.setAngle(-G.time * 110);\n}\nfor (const s of G.shards) {\n  if (s.got) { if (s.o.getOpacity() > 0) { s.o.setOpacity(Math.max(0, s.o.getOpacity() - rdt * 900)); s.o.setScale(s.o.getScaleX() + rdt * 2); } continue; }\n  s.o.setPosition(cc(s.i), cc(s.j) + Math.sin(G.time * 2.5 + s.k) * 3); s.o.setScale(0.5 * (1 + 0.1 * Math.sin(G.time * 5 + s.k)));\n}\nfor (const p of G.pads) {\n  p.boost = Math.max(0, p.boost - rdt * 1.5);\n  const onIt = st.mode === 'stuck' && st.i === p.i + p.dx && st.j === p.j + p.dy;\n  p.g.setOpacity(Math.min(255, 150 + 90 * Math.sin(G.time * 5) + (onIt ? 60 : 0) + 120 * p.boost)); p.g.setScaleX(0.5 * (1 + 0.6 * p.boost));\n  const u = (G.time * 0.9) % 1; p.ch.setPosition(cc(p.i) + p.dx * (T * 0.55 + u * 26), cc(p.j) + p.dy * (T * 0.55 + u * 26));\n  p.ch.setOpacity((onIt ? 255 : 150) * Math.sin(u * Math.PI));\n}\nfor (const h of G.holes) {\n  h.pulse = Math.max(0, h.pulse - rdt * 1.6);\n  h.disk.setAngle(G.time * 140); h.swirl.setAngle(G.time * 40); h.range.setAngle(-G.time * 6);\n  h.disk.setScale(0.5 * (1 + 0.05 * Math.sin(G.time * 6) + 0.4 * h.pulse)); h.core.setScale(0.5 * (1 + 0.3 * h.pulse));\n  h.glow.setScale(0.5 * (1 + 0.15 * Math.sin(G.time * 1.7) + 0.6 * h.pulse));\n  h.range.setOpacity(st.mode === 'fly' ? 255 : 130 + 40 * Math.sin(G.time * 2));\n}\n// ambient motes (pulled into black holes)\nfor (const m of G.motes) {\n  m.ph += rdt; m.x += m.vx * rdt; m.y += m.vy * rdt;\n  for (const h of G.holes) { const dx = h.x - m.x, dy = h.y - m.y, d = Math.hypot(dx, dy) || 1;\n    if (d < 180) { m.x += (dx / d * 40 - dy / d * 60) * rdt * (1 - d / 180); m.y += (dy / d * 40 + dx / d * 60) * rdt * (1 - d / 180); }\n    if (d < 14) { m.x = rand(-80, G.W + 80); m.y = G.H + 60; } }\n  if (m.y < -100) { m.y = G.H + 80; m.x = rand(-80, G.W + 80); }\n  if (m.x < -120) m.x = G.W + 100; if (m.x > G.W + 120) m.x = -100;\n  m.o.setPosition(m.x, m.y); m.o.setScale(m.s * 0.5); m.o.setOpacity(70 + 70 * Math.sin(m.ph * 1.3));\n}\n\n// ------------------------------------------------------------------ resolution + camera fit (portrait & landscape)\nif (typeof window !== 'undefined') {\n  const cw = window.innerWidth || 800, ch = window.innerHeight || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);\n  let h = Math.round(Math.min(ch * dpr, Math.sqrt(2.2e6 * ch / cw))); h = Math.max(480, h);\n  const key = cw + 'x' + ch + ':' + h;\n  if (key !== G.resKey) { G.resKey = key; game.setGameResolutionSize(Math.round(h * cw / ch), h); }\n}\nconst rw = game.getGameResolutionWidth(), rh = game.getGameResolutionHeight();\nconst uiS = Math.min(rw, rh) / 720;\nconst hudTop = 120 * uiS, hudBot = 90 * uiS;          // keep the level clear of the HUD\nconst zoom = Math.min((rw - 24 * uiS) / (G.W + 16), (rh - hudTop - hudBot) / (G.H + 16));\nG.shake *= Math.exp(-9 * rdt); if (G.shake < 0.05) G.shake = 0;\nconst shx = (Math.random() * 2 - 1) * G.shake, shy = (Math.random() * 2 - 1) * G.shake;\nconst camX = G.W / 2 + shx, camY = G.H / 2 - (hudTop - hudBot) / 2 / zoom + shy;\nfor (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(zoom); l.setCameraX(camX); l.setCameraY(camY); }\nG.zoom = zoom;\nG.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);\n// black-hole lensing on the background grid (BulgePinch effect on the Bg layer)\nconst bgL = runtimeScene.getLayer('Bg');\nif (G.holes.length) {\n  const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;\n  bgL.enableEffect('Lens', true);\n  bgL.setEffectDoubleParameter('Lens', 'centerX', sx / rw); bgL.setEffectDoubleParameter('Lens', 'centerY', sy / rh);\n  bgL.setEffectDoubleParameter('Lens', 'radius', 150 * zoom); bgL.setEffectDoubleParameter('Lens', 'strength', -0.55 - 0.3 * h.pulse);\n} else bgL.enableEffect('Lens', false);\n\n// ------------------------------------------------------------------ UI layout\nconst ui = runtimeScene.getLayer('UI'); ui.setCameraZoom(uiS); ui.setCameraX(rw / 2 / uiS); ui.setCameraY(rh / 2 / uiS);\nconst UW = rw / uiS, UH = rh / uiS;\nG.ui.flash.setPosition(-10, -10); G.ui.flash.setWidth(UW + 20); G.ui.flash.setHeight(UH + 20);\nG.ui.dim.setPosition(-10, -10); G.ui.dim.setWidth(UW + 20); G.ui.dim.setHeight(UH + 20); G.ui.dim.setOpacity(((G.state === 'title' || G.state === 'end') ? 170 : 0) * (1 - (G.state === 'end' ? 0 : G.titleT || 0)));\nG.flash = Math.max(0, G.flash - rdt * 2.2); G.ui.flash.setOpacity(255 * G.flash * G.flash);\n// title: big card at start, then shrinks to a tiny neon logo at the top\nconst titleTarget = (G.state === 'title') ? 0 : 1; G.titleT = lerp(G.titleT || 0, titleTarget, 1 - Math.pow(0.002, rdt));\nconst tt = G.titleT, bigS = Math.min(0.62, (UW - 40) / 980), smallS = 0.17;\nconst tS = lerp(bigS, smallS, tt), tY = lerp(UH * 0.36, 26, tt);\nconst tA = G.ui.titleA, tB = G.ui.titleB;\ntA.setScale(tS); tB.setScale(tS);\nconst gap = 6 * tS / 0.62;\ntA.setPosition(UW / 2 - tA.getWidth() / 2 - (tt > 0.5 ? tB.getWidth() / 2 * 0 : 0), tY - tA.getHeight() + gap * 8);\ntB.setPosition(UW / 2 - tB.getWidth() / 2, tY + gap * 2);\nif (tt > 0.02) { // side by side when small\n  const w = tA.getWidth() + tB.getWidth() - 40 * tS;\n  const ax = lerp(UW / 2 - tA.getWidth() / 2, UW / 2 - w / 2, tt), bx = lerp(UW / 2 - tB.getWidth() / 2, UW / 2 - w / 2 + tA.getWidth() - 40 * tS, tt);\n  const ay = lerp(tY - tA.getHeight() + gap * 8, tY - tA.getHeight() / 2, tt), by = lerp(tY + gap * 2, tY - tB.getHeight() / 2, tt);\n  tA.setPosition(ax, ay); tB.setPosition(bx, by);\n}\nconst flick = 0.9 + 0.1 * Math.sin(G.time * 23) * Math.sin(G.time * 7.3);\ntA.setOpacity(255 * flick); tB.setOpacity(255 * (0.92 + 0.08 * Math.sin(G.time * 17)));\nG.ui.start.setString(G.state === 'end' ? 'ALL LEVELS CLEAR  -  ' + G.stats.shards + ' SHARDS\\nTAP / SPACE TO PLAY AGAIN' : 'SWIPE TO PLAY\\nARROWS / WASD  -  SPACE TO LAUNCH');\nconst showStart = G.state === 'title' || G.state === 'end';\nG.ui.start.setOpacity(showStart ? 160 + 95 * Math.sin(G.time * 4) : 0);\nG.ui.start.setPosition(UW / 2 - G.ui.start.getWidth() / 2, G.state === 'end' ? UH * 0.42 : tB.getY() + tB.getHeight() + 10);\nif (G.state === 'end') { tA.setOpacity(0); tB.setOpacity(0); }\nconst hudA = G.state === 'title' ? 0 : 255;\nG.ui.level.setOpacity(hudA); G.ui.level.setPosition(UW / 2 - G.ui.level.getWidth() / 2, 52);\nconst got = G.shards.filter((s) => s.got).length;\nG.ui.shards.setString(G.shards.length ? (got + ' / ' + G.shards.length) : ''); G.ui.shards.setOpacity(hudA);\nG.ui.shards.setPosition(UW / 2 - G.ui.shards.getWidth() / 2 + 12, 82);\nG.ui.shardIcon.setScale(0.3); G.ui.shardIcon.setPosition(UW / 2 - G.ui.shards.getWidth() / 2 - 8, 82 + G.ui.shards.getHeight() / 2); G.ui.shardIcon.setOpacity(G.shards.length ? hudA : 0);\nG.ui.restart.setScale(0.34); G.ui.restart.setPosition(UW - 44, 44); G.ui.restart.setOpacity(G.state === 'title' ? 0 : 200);\nG.hintA = (G.firstMove && G.moves >= 2) ? Math.max(0.35, G.hintA - rdt * 0.5) : 1;\nG.ui.hint.setWrapping(true); G.ui.hint.setWrappingWidth(Math.min(UW - 40, 620));\nG.ui.hint.setOpacity((G.state === 'title' ? 0 : 230) * G.hintA); G.ui.hint.setPosition(UW / 2 - G.ui.hint.getWidth() / 2, UH - 30 - G.ui.hint.getHeight());\nconst cl = G.ui.clear; const ct = G.state === 'clear' ? G.clearT - 0.3 : -1;\ncl.setScale(0.5 * (ct > 0 ? 1 + 0.25 * (1 - ease(ct / 0.4)) : 1) * Math.min(1, (UW - 40) / 620)); cl.setOpacity(ct > 0 ? 255 * Math.min(1, ct * 5) * (ct > 1.0 ? Math.max(0, 1 - (ct - 1.0) * 4) : 1) : 0);\ncl.setPosition(UW / 2 - cl.getWidth() / 2, UH * 0.42 - cl.getHeight() / 2);\nG.toastT = Math.max(0, (G.toastT || 0) - rdt);\nG.ui.toast.setOpacity(255 * Math.min(1, G.toastT * 3)); G.ui.toast.setPosition(UW / 2 - G.ui.toast.getWidth() / 2, UH - 92 - G.ui.hint.getHeight());\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "Bg",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "BulgePinch",
+              "name": "Lens",
+              "doubleParameters": {
+                "centerX": 0.5,
+                "centerY": 0.5,
+                "radius": 150,
+                "strength": -0.5
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "AdvancedBloom",
+              "name": "Bloom",
+              "doubleParameters": {
+                "threshold": 0.32,
+                "bloomScale": 1.15,
+                "brightness": 1.0,
+                "blur": 5,
+                "quality": 5,
+                "padding": 0
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "UI",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": [
+            {
+              "effectType": "AdvancedBloom",
+              "name": "UiBloom",
+              "doubleParameters": {
+                "threshold": 0.45,
+                "bloomScale": 0.8,
+                "brightness": 1.0,
+                "blur": 4,
+                "quality": 4,
+                "padding": 0
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ]
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Animation",
+          "type": "AnimatableCapability::AnimatableBehavior"
+        },
+        {
+          "name": "Effect",
+          "type": "EffectCapability::EffectBehavior"
+        },
+        {
+          "name": "Flippable",
+          "type": "FlippableCapability::FlippableBehavior"
+        },
+        {
+          "name": "Opacity",
+          "type": "OpacityCapability::OpacityBehavior"
+        },
+        {
+          "name": "Text",
+          "type": "TextContainerCapability::TextContainerBehavior"
+        },
+        {
+          "name": "Resizable",
+          "type": "ResizableCapability::ResizableBehavior"
+        },
+        {
+          "name": "Scale",
+          "type": "ScalableCapability::ScalableBehavior"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "tests": []
+}

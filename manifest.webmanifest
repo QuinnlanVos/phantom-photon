@@ -1,0 +1,12 @@
+{
+  "name": "Phantom Photon",
+  "short_name": "Phantom Photon",
+  "id": "com.phantomphoton.game",
+  "description": "Neon puzzle-action: you are a photon that can only move along walls. Swipe to slide, fly until you hit the next wall.",
+  "orientation": "any",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": []
+}
