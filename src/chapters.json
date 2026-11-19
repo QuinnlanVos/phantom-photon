@@ -1,0 +1,268 @@
+[
+ {
+  "id": "awakening",
+  "name": "Awakening",
+  "sub": "The tutorial: learn to move like light.",
+  "dark": false,
+  "levels": [
+   {
+    "name": "First Light",
+    "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.",
+    "map": [
+     "###########",
+     "#.........#",
+     "#....E...*#",
+     "#.........#",
+     "##........#",
+     "#..*..##..#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#S...*....#",
+     "###########"
+    ]
+   },
+   {
+    "name": "Angles",
+    "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.",
+    "map": [
+     "###########",
+     "#..S.....d#",
+     "#.........#",
+     "#....#....#",
+     "#...#E#...#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#b.*.a...*#",
+     "###########"
+    ]
+   },
+   {
+    "name": "Kick",
+    "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.",
+    "map": [
+     "###########",
+     "#...*.#...#",
+     "#.........#",
+     "#....E....#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#....S...*#",
+     "#####P#####",
+     "###########"
+    ]
+   },
+   {
+    "name": "Event Horizon",
+    "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.",
+    "map": [
+     "###########",
+     "#S....#...#",
+     "#.......*.#",
+     "##......E.#",
+     "#....*....#",
+     "#....O....#",
+     "#.........#",
+     "#........##",
+     "#.........#",
+     "#...#.....#",
+     "###########"
+    ]
+   },
+   {
+    "name": "Phantom Run",
+    "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.",
+    "map": [
+     "###########",
+     "##.......##",
+     "#........##",
+     "#.........#",
+     "#.......a.#",
+     "#.O..##...#",
+     "#.........#",
+     "#...*.....#",
+     "#.#...E.*.P",
+     "#.#.......#",
+     "#.S.*.....#",
+     "###########"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "abyss",
+  "name": "The Abyss",
+  "sub": "Total darkness. Your light shows the way.",
+  "dark": true,
+  "levels": [
+   {
+    "name": "Reflections",
+    "hint": "Silver mirrors bounce your light - you can't cling to them. Diagonal mirrors turn you 90\u00b0.",
+    "map": [
+     "###########",
+     "#.....#...#",
+     "#.M...S.*.#",
+     "#.........#",
+     "#...M##...#",
+     "#.........#",
+     "#....#.*..#",
+     "###..#m.###",
+     "#*........#",
+     "#.....m#..#",
+     "#..E.....##",
+     "###########"
+    ]
+   },
+   {
+    "name": "Drift",
+    "hint": "Neon platforms slide on their tracks. Stick to one and ride it - then time your launch.",
+    "period": 4,
+    "map": [
+     "###########",
+     "#...#.....#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#.........#",
+     "#..*......#",
+     "#.....*.E.#",
+     "#.........#",
+     "#S........#",
+     "###########"
+    ],
+    "movers": [
+     {
+      "i": 2,
+      "j": 3,
+      "w": 2,
+      "h": 1,
+      "axis": "y",
+      "range": 6,
+      "phase": 0
+     }
+    ]
+   },
+   {
+    "name": "Solar Flare",
+    "hint": "Stars burn. Their glow lights the dark - just don't touch them.",
+    "map": [
+     "###########",
+     "###.X...b.#",
+     "#..*...*E.#",
+     "#.........#",
+     "#.....#..S#",
+     "#...*.....#",
+     "#....#....#",
+     "#......#.X#",
+     "#...##....#",
+     "#.........#",
+     "#...#.....#",
+     "###########"
+    ]
+   },
+   {
+    "name": "Murk",
+    "hint": "Gas clouds swallow light. Faint outlines show where they drift.",
+    "map": [
+     "###########",
+     "#...#M.M.S#",
+     "#..mE.....#",
+     "#....n#...#",
+     "##......#.#",
+     "#.....*...#",
+     "#.........#",
+     "#........*#",
+     "#.........#",
+     "#..*#.....#",
+     "##.....#..#",
+     "###########"
+    ],
+    "clouds": [
+     {
+      "i": 5,
+      "j": 1,
+      "w": 4,
+      "h": 4
+     },
+     {
+      "i": 1,
+      "j": 6,
+      "w": 4,
+      "h": 4
+     }
+    ]
+   },
+   {
+    "name": "Event Horizon",
+    "hint": "Everything at once. Read the light, then move.",
+    "map": [
+     "############",
+     "#..........#",
+     "#.#........#",
+     "##...c.....P",
+     "##.##...*.O#",
+     "#......*...#",
+     "#S....M....#",
+     "#.....#....#",
+     "#.###......#",
+     "#...#...E..#",
+     "#.....*.#..#",
+     "#X....m....#",
+     "############"
+    ],
+    "clouds": [
+     {
+      "i": 6,
+      "j": 7,
+      "w": 5,
+      "h": 4
+     }
+    ]
+   },
+   {
+    "name": "Singularity",
+    "hint": "Ride the drift, catch the mirror - and mind the star.",
+    "period": 4,
+    "map": [
+     "############",
+     "#...#......#",
+     "#..........#",
+     "#..........#",
+     "#..........#",
+     "#..........#",
+     "#......*.n.#",
+     "#.........X#",
+     "#.......*..#",
+     "#..........#",
+     "#........E.#",
+     "#S..*....#.#",
+     "############"
+    ],
+    "movers": [
+     {
+      "i": 2,
+      "j": 3,
+      "w": 2,
+      "h": 1,
+      "axis": "y",
+      "range": 4,
+      "phase": 0
+     }
+    ],
+    "clouds": [
+     {
+      "i": 5,
+      "j": 2,
+      "w": 3,
+      "h": 5
+     }
+    ]
+   }
+  ]
+ }
+]

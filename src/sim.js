@@ -1,0 +1,311 @@
+// ============================================================================
+// Phantom Photon - core movement simulation (pure JS, no GDevelop dependency).
+// The same code runs inside the game (JavaScript event) and in Node for the
+// level solver / tests (src/solve.js). The body of this file is wrapped in an
+// IIFE by build_project.py, so it ends with a `return`.
+// Tiles: '#' wall  'P' launch pad  'a'-'d' ramps  'M' mirror block  'm' '/' mirror  'n' '\' mirror
+//        'O' black hole  'X' burning star  'E' exit  '*' shard  'S' start   (+ level.movers: moving platforms)
+// ============================================================================
+const T = 48;                    // tile size (world px)
+const H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)
+const V0 = 260, VMAX = 960, ACC = 7000;   // launch speed, top speed (px/s), ease-in accel (px/s^2)
+const PAD_V0 = 620;              // launch-pad kick starts faster
+const G = 3.0e7;                 // black-hole gravity strength (px^3/s^2)
+const G_RANGE = 3.6 * T;         // influence radius of a black hole
+const KILL = 0.42 * T;           // swallow radius
+const EXIT_R = 0.42 * T, SHARD_R = 0.6 * T;
+const STAR_R = 0.8 * T;          // a burning star consumes the orb inside this radius
+const MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost
+const SUB = 1 / 600;             // fixed sub-step (game and solver produce identical paths)
+const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
+const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
+const RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\' },
+                c: { solid: 'NW', back: 'LU', line: '/' }, d: { solid: 'NE', back: 'RU', line: '\\' } };
+const DIAG_MIRRORS = { m: '/', n: '\\' };
+
+function parseLevel(def) {
+  const rows = def.map.slice();
+  const L = { w: rows[0].length, h: rows.length, cells: [], start: null, exit: null, shards: [], holes: [], pads: [], ramps: [],
+              mirrors: [], stars: [], movers: [], period: def.period || 4 };
+  for (let j = 0; j < L.h; j++) for (let i = 0; i < L.w; i++) {
+    const ch = rows[j][i] || '#';
+    let t = '.';
+    if (ch === '#') t = '#';
+    else if (ch === 'P') { t = 'P'; L.pads.push([i, j]); }
+    else if (ch === 'M') { t = 'M'; L.mirrors.push([i, j, 'M']); }
+    else if (DIAG_MIRRORS[ch]) { t = ch; L.mirrors.push([i, j, ch]); }
+    else if (RAMPS[ch]) { t = ch; L.ramps.push([i, j, ch]); }
+    else if (ch === 'S') L.start = [i, j];
+    else if (ch === 'E') L.exit = [i, j];
+    else if (ch === '*') L.shards.push([i, j]);
+    else if (ch === 'O') L.holes.push([i, j]);
+    else if (ch === 'X') L.stars.push([i, j]);
+    L.cells.push(t);
+  }
+  // moving platform: {i, j, w, h (tiles), axis 'x'|'y', range (tiles, +/-), phase 0..1}; ping-pongs with ease over L.period
+  for (const m of (def.movers || [])) L.movers.push(Object.assign({ w: 1, h: 1, axis: 'x', range: 2, phase: 0 }, m));
+  return L;
+}
+function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
+const isFlat = (t) => t === '#' || t === 'P';
+const center = (i) => i * T + T / 2;
+const toCell = (x) => Math.floor(x / T);
+
+// ---------------------------------------------------------------- moving platforms
+function moverOffset(L, m, time) {       // tiles along its axis
+  const u = time / L.period + m.phase;
+  return m.range * (0.5 - 0.5 * Math.cos(2 * Math.PI * u));
+}
+function moverRect(L, m, time) {
+  const o = moverOffset(L, m, time) * T;
+  const x0 = m.i * T + (m.axis === 'x' ? o : 0), y0 = m.j * T + (m.axis === 'y' ? o : 0);
+  return { x0, y0, x1: x0 + m.w * T, y1: y0 + m.h * T };
+}
+const overlap = (x, y, r) => x + H > r.x0 && x - H < r.x1 && y + H > r.y0 && y - H < r.y1;
+
+// Does tile (i,j) present a flat, stickable face on `side` (the side facing the orb)?
+function faceFrom(L, i, j, side) {
+  const t = cell(L, i, j);
+  if (isFlat(t)) return true;
+  if (RAMPS[t]) return RAMPS[t].back.includes(side);
+  return false;                           // empty tiles and mirrors: nothing to stick to
+}
+// Walls the orb (stuck in cell i,j) is touching: list of directions from orb to wall.
+function contacts(L, i, j) {
+  const out = [];
+  for (const d in DIRS) { const [dx, dy] = DIRS[d]; if (faceFrom(L, i + dx, j + dy, OPP[d])) out.push(d); }
+  return out;
+}
+function stuckContacts(L, st) { return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
+// Movement rule: a swipe in `d` is legal only if it is parallel to a wall the orb touches
+// and it is not straight into a wall face.
+function checkMove(L, st, d) {
+  if (typeof st === 'number') { st = { i: arguments[1], j: arguments[2], ride: null }; d = arguments[3]; }   // legacy (L, i, j, d)
+  const c = stuckContacts(L, st);
+  const horiz = d === 'L' || d === 'R';
+  const parallel = c.some((k) => horiz ? (k === 'U' || k === 'D') : (k === 'L' || k === 'R'));
+  if (c.includes(d)) return { ok: false, why: 'into' };
+  if (!parallel) return { ok: false, why: 'away' };
+  return { ok: true };
+}
+// Launch pad: returns the direction away from a pad the orb touches (prefer `prefer` = side of last impact).
+function padLaunchDir(L, i, j, prefer) {
+  if (typeof i === 'object') { const st = i; if (st.ride) return null; prefer = st.normal; j = st.j; i = st.i; }
+  const ds = Object.keys(DIRS).filter((d) => { const [dx, dy] = DIRS[d]; return cell(L, i + dx, j + dy) === 'P'; });
+  if (!ds.length) return null;
+  const d = ds.includes(prefer) ? prefer : ds[0];
+  return OPP[d];
+}
+
+// Is the orb box at (x,y) blocked by tile (i,j)? Ramps are only solid from their flat back sides.
+function tileBlocks(L, i, j, x, y) {
+  const t = cell(L, i, j);
+  if (isFlat(t) || t === 'M') return true;
+  if (!RAMPS[t]) return false;
+  const x0 = i * T, y0 = j * T, x1 = x0 + T, y1 = y0 + T, back = RAMPS[t].back;
+  if (x >= x1 && back.includes('R')) return true;
+  if (x <= x0 && back.includes('L')) return true;
+  if (y >= y1 && back.includes('D')) return true;
+  if (y <= y0 && back.includes('U')) return true;
+  return false;
+}
+// first blocking rect for the orb box at (x,y): {x0,y0,x1,y1, mirror, mover}
+let GHOST = -1;   // the platform the orb just launched from: ignored until the orb has cleared it
+function boxHit(L, x, y, refX, refY, time) {
+  const i0 = toCell(x - H), i1 = toCell(x + H), j0 = toCell(y - H), j1 = toCell(y + H);
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, refX, refY))
+    return { x0: i * T, y0: j * T, x1: i * T + T, y1: j * T + T, mirror: cell(L, i, j) === 'M', mover: -1 };
+  for (let k = 0; k < L.movers.length; k++) { if (k === GHOST) continue; const r = moverRect(L, L.movers[k], time); if (overlap(x, y, r)) return Object.assign(r, { mirror: false, mover: k }); }
+  return null;
+}
+
+function startFlight(st, d, kick, L) {
+  const [dx, dy] = DIRS[d];
+  st.ghost = -1;
+  if (st.ride && L) st.ghost = st.ride.m;
+  if (st.ride && L) {   // leaving a moving platform: line up with the nearest free lane across the launch direction
+    GHOST = st.ghost;
+    const v = dx ? st.y : st.x, c0 = toCell(v), cands = [c0 - 1, c0, c0 + 1].sort((a, b) => Math.abs(center(a) - v) - Math.abs(center(b) - v));
+    for (const c of cands) {
+      const x = dx ? st.x : center(c), y = dx ? center(c) : st.y;
+      if (!boxHit(L, x, y, x, y, st.time)) { st.x = x; st.y = y; break; }
+    }
+    GHOST = -1;
+    st.ride = null;
+  } else if (st.ride) st.ride = null;
+  st.mode = 'fly'; st.dir = d; st.t = 0; st.acc = 0;
+  st.speed = kick ? PAD_V0 : V0; st.vx = dx * st.speed; st.vy = dy * st.speed;
+  st.events = [];
+}
+function newState(L) {
+  const [i, j] = L.start;
+  return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j], ride: null,
+           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0 };
+}
+
+// Advance the world by dt seconds in fixed sub-steps: moving platforms (carrying a riding orb) and the orb's flight.
+// Pushes events: shard, deflect, mirror, graze, stick, exit, swallow, burn, crush, lost.
+function step(L, st, dt) {
+  st.acc = (st.acc || 0) + dt;
+  while (st.acc >= SUB - 1e-9 && (st.mode === 'fly' || st.mode === 'stuck')) {
+    st.acc -= SUB; st.time = (st.time || 0) + SUB;
+    if (st.mode === 'stuck') { stuckSub(L, st); continue; }
+    flySub(L, st, SUB);
+  }
+}
+function stuckSub(L, st) {
+  if (!L.movers.length) return;
+  if (st.ride) {
+    const r = moverRect(L, L.movers[st.ride.m], st.time);
+    st.x = r.x0 + st.ride.rx; st.y = r.y0 + st.ride.ry;
+    // carried into a static wall -> crushed
+    const i0 = toCell(st.x - H + 1), i1 = toCell(st.x + H - 1), j0 = toCell(st.y - H + 1), j1 = toCell(st.y + H - 1);
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, st.x, st.y)) { die(st, 'crush', st.x, st.y); return; }
+    pickups(L, st);
+  } else {
+    for (let k = 0; k < L.movers.length; k++) if (overlap(st.x, st.y, moverRect(L, L.movers[k], st.time))) { die(st, 'crush', st.x, st.y); return; }
+  }
+}
+function die(st, type, x, y) { st.mode = 'dead'; st.hole = type === 'swallow' ? [x, y] : null; st.deathType = type; st.ride = null; st.events.push({ type, x, y }); }
+function pickups(L, st) {
+  L.shards.forEach(([si, sj], k) => {
+    if (!st.got[k] && Math.hypot(center(si) - st.x, center(sj) - st.y) < SHARD_R) { st.got[k] = true; st.events.push({ type: 'shard', k, x: center(si), y: center(sj) }); }
+  });
+  if (L.exit && Math.hypot(center(L.exit[0]) - st.x, center(L.exit[1]) - st.y) < EXIT_R) { st.mode = 'exit'; st.ride = null; st.events.push({ type: 'exit' }); }
+}
+function flySub(L, st, h) {
+  st.t += h;
+  if (st.ghost >= 0) {   // launched off a platform: it can't re-catch the orb until the orb is clear of it along the flight
+    const r = moverRect(L, L.movers[st.ghost], st.time);
+    const clear = st.vx !== 0 ? (st.x - H >= r.x1 || st.x + H <= r.x0) : (st.y - H >= r.y1 || st.y + H <= r.y0);
+    if (clear || st.t > 0.6) st.ghost = -1;
+  }
+  GHOST = st.ghost >= 0 ? st.ghost : -1;
+  const res = flySub2(L, st, h);
+  GHOST = -1;
+  return res;
+}
+function flySub2(L, st, h) {
+  // a moving platform swept into the flying orb: it catches the orb (pushed out on the shallowest side)
+  for (let k = 0; k < L.movers.length; k++) {
+    if (k === GHOST) continue;
+    const r = moverRect(L, L.movers[k], st.time);
+    if (!overlap(st.x, st.y, r)) continue;
+    const pen = { R: st.x + H - r.x0, L: r.x1 - (st.x - H), D: st.y + H - r.y0, U: r.y1 - (st.y - H) };
+    const side = Object.keys(pen).sort((a, b) => pen[a] - pen[b])[0];
+    if (side === 'R') st.x = r.x0 - T / 2; else if (side === 'L') st.x = r.x1 + T / 2; else if (side === 'D') st.y = r.y0 - T / 2; else st.y = r.y1 + T / 2;
+    return stick(L, st, side, Object.assign(r, { mover: k, mirror: false }));
+  }
+  st.speed = Math.min(VMAX, st.speed + ACC * h);
+  for (const [hi, hj] of L.holes) {         // black-hole gravity
+    const hx = center(hi), hy = center(hj), ddx = hx - st.x, ddy = hy - st.y, dist = Math.hypot(ddx, ddy);
+    if (dist < KILL) return die(st, 'swallow', hx, hy);
+    if (dist < G_RANGE) {
+      const fall = 1 - dist / G_RANGE;      // fades smoothly to 0 at the edge of the well
+      const a = G / Math.max(dist * dist, T * T * 0.5) * fall;
+      st.vx += a * ddx / dist * h; st.vy += a * ddy / dist * h;
+    }
+  }
+  for (const [si, sj] of L.stars) if (Math.hypot(center(si) - st.x, center(sj) - st.y) < STAR_R) return die(st, 'burn', st.x, st.y);
+  const vl = Math.hypot(st.vx, st.vy) || 1; st.vx *= st.speed / vl; st.vy *= st.speed / vl;  // gravity bends, doesn't brake
+  // ramps and diagonal mirrors: reflect when the orb's centre would cross the diagonal
+  let nx = st.x + st.vx * h, ny = st.y + st.vy * h;
+  const ci = toCell(nx), cj = toCell(ny), t = cell(L, ci, cj);
+  if (RAMPS[t] && !tileBlocks(L, ci, cj, st.x, st.y)) {
+    const u = (nx - ci * T) / T, v = (ny - cj * T) / T, R = RAMPS[t];
+    let inSolid;
+    if (R.line === '/') inSolid = R.solid === 'SE' ? u + v > 1 : u + v < 1;
+    else inSolid = R.solid === 'SW' ? v > u : v < u;
+    if (inSolid) { [nx, ny] = reflectDiag(st, R.line, ci, cj, u, v); st.events.push({ type: 'deflect', x: center(ci), y: center(cj), dir: st.dir }); }
+  } else if (DIAG_MIRRORS[t]) {
+    const line = DIAG_MIRRORS[t], u = (nx - ci * T) / T, v = (ny - cj * T) / T;
+    const pu = (st.x - ci * T) / T, pv = (st.y - cj * T) / T;      // previous position in this tile's coordinates
+    const s1 = line === '/' ? u + v - 1 : v - u, s0 = line === '/' ? pu + pv - 1 : pv - pu;
+    if (s0 !== 0 && Math.sign(s1) !== Math.sign(s0)) { [nx, ny] = reflectDiag(st, line, ci, cj, u, v); st.events.push({ type: 'mirror', x: center(ci), y: center(cj), dir: st.dir }); }
+  }
+  // move X, then Y (axis-separated box collision). Head-on hit = stick (or bounce off a mirror); grazing hit = slide.
+  let hit = boxHit(L, nx, st.y, st.x, st.y, st.time);
+  if (hit) {
+    const sx = Math.sign(nx - st.x) || Math.sign(st.vx); nx = sx > 0 ? hit.x0 - T / 2 : hit.x1 + T / 2;
+    if (hit.mirror) { st.vx = -st.vx; st.events.push({ type: 'mirror', x: sx > 0 ? hit.x0 : hit.x1, y: st.y, dir: st.vx > 0 ? 'R' : 'L' }); }
+    else if (Math.abs(st.vx) >= 0.5 * st.speed) { st.x = nx; return stick(L, st, sx > 0 ? 'R' : 'L', hit); }
+    else { st.vx = 0; st.events.push({ type: 'graze' }); }
+  }
+  st.x = nx;
+  hit = boxHit(L, st.x, ny, st.x, st.y, st.time);
+  if (hit) {
+    const sy = Math.sign(ny - st.y) || Math.sign(st.vy); ny = sy > 0 ? hit.y0 - T / 2 : hit.y1 + T / 2;
+    if (hit.mirror) { st.vy = -st.vy; st.events.push({ type: 'mirror', x: st.x, y: sy > 0 ? hit.y0 : hit.y1, dir: st.vy > 0 ? 'D' : 'U' }); }
+    else if (Math.abs(st.vy) >= 0.5 * st.speed) { st.y = ny; return stick(L, st, sy > 0 ? 'D' : 'U', hit); }
+    else { st.vy = 0; st.events.push({ type: 'graze' }); }
+  }
+  st.y = ny;
+  if (st.vx === 0 && st.vy === 0) { return stick(L, st, null, null); }
+  st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
+  pickups(L, st);
+  if (st.mode === 'fly' && st.t > MAX_FLIGHT) die(st, 'lost', st.x, st.y);
+}
+function reflectDiag(st, line, ci, cj, u, v) {
+  let nx, ny;
+  if (line === '/') { nx = ci * T + (1 - v) * T; ny = cj * T + (1 - u) * T; const vx = st.vx; st.vx = -st.vy; st.vy = -vx; }
+  else { nx = ci * T + v * T; ny = cj * T + u * T; const vx = st.vx; st.vx = st.vy; st.vy = vx; }
+  st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
+  return [nx, ny];
+}
+// Land: on a static wall snap to the nearest empty tile centre along it; on a moving platform attach to it (snapped to its tiles).
+function stick(L, st, side, hit) {
+  const impactSpeed = st.speed, fromX = st.x, fromY = st.y;
+  if (hit && hit.mover >= 0) {
+    const m = L.movers[hit.mover], r = hit;
+    let rx = st.x - r.x0, ry = st.y - r.y0;
+    if (side === 'L' || side === 'R') ry = Math.min(m.h - 1, Math.max(0, Math.round((ry - T / 2) / T))) * T + T / 2;
+    else rx = Math.min(m.w - 1, Math.max(0, Math.round((rx - T / 2) / T))) * T + T / 2;
+    st.mode = 'stuck'; st.ride = { m: hit.mover, rx, ry, side }; st.normal = side; st.vx = st.vy = 0; st.speed = 0;
+    st.x = r.x0 + rx; st.y = r.y0 + ry; st.i = toCell(st.x); st.j = toCell(st.y);
+    st.events.push({ type: 'stick', side, mover: hit.mover, i: st.i, j: st.j, x: st.x, y: st.y, fromX, fromY, impact: impactSpeed });
+    return;
+  }
+  let i = toCell(st.x), j = toCell(st.y);
+  const cand = [];
+  for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+    const ci = i + di, cj = j + dj; if (cell(L, ci, cj) !== '.') continue;
+    let ok = true;
+    if (side) { const [dx, dy] = DIRS[side]; ok = faceFrom(L, ci + dx, cj + dy, OPP[side]); }
+    else ok = contacts(L, ci, cj).length > 0;
+    if (ok) cand.push([Math.hypot(center(ci) - st.x, center(cj) - st.y), ci, cj]);
+  }
+  cand.sort((a, b) => a[0] - b[0]);
+  if (cand.length) { i = cand[0][1]; j = cand[0][2]; }
+  st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j];
+  st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX, fromY, impact: impactSpeed });
+  st.x = center(i); st.y = center(j);
+  pickups(L, st);
+}
+function respawn(L, st) {
+  const [i, j] = st.lastStuck;
+  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, events: [] });
+}
+function clone(st) { const s = JSON.parse(JSON.stringify(st)); s.events = []; return s; }
+// Run a whole move instantly (used by the solver/tests). `wait` seconds pass first (moving platforms keep moving).
+function simulate(L, st0, action, wait) {
+  const st = clone(st0);
+  if (wait) { step(L, st, wait); if (st.mode !== 'stuck') return { ok: true, st, events: st.events.splice(0) }; }
+  const pre = st.events.splice(0);
+  if (st.mode !== 'stuck') return { ok: false, why: 'busy', st };
+  if (action === 'WAIT') return { ok: true, st, events: pre };
+  if (action === 'TAP') {
+    const d = padLaunchDir(L, st);
+    if (!d) return { ok: false, why: 'nopad', st };
+    startFlight(st, d, true, L);
+  } else {
+    const c = checkMove(L, st, action);
+    if (!c.ok) return { ok: false, why: c.why, st };
+    startFlight(st, action, false, L);
+  }
+  const evs = pre;
+  while (st.mode === 'fly') { step(L, st, 1 / 60); evs.push(...st.events); st.events = []; }
+  evs.push(...st.events); st.events = [];
+  return { ok: true, st, events: evs };
+}
+return { T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+         padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };

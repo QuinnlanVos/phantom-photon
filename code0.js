@@ -1,73 +1,141 @@
-gdjs.GameCode = {};
-gdjs.GameCode.localVariables = [];
-gdjs.GameCode.idToCallbackMap = new Map();
-gdjs.GameCode.GDBgTileObjects1= [];
-gdjs.GameCode.GDBgTileObjects2= [];
-gdjs.GameCode.GDNebulaObjects1= [];
-gdjs.GameCode.GDNebulaObjects2= [];
-gdjs.GameCode.GDMoteObjects1= [];
-gdjs.GameCode.GDMoteObjects2= [];
-gdjs.GameCode.GDLevelArtObjects1= [];
-gdjs.GameCode.GDLevelArtObjects2= [];
-gdjs.GameCode.GDPadGlowObjects1= [];
-gdjs.GameCode.GDPadGlowObjects2= [];
-gdjs.GameCode.GDPadChevronObjects1= [];
-gdjs.GameCode.GDPadChevronObjects2= [];
-gdjs.GameCode.GDPortalCoreObjects1= [];
-gdjs.GameCode.GDPortalCoreObjects2= [];
-gdjs.GameCode.GDPortalRingObjects1= [];
-gdjs.GameCode.GDPortalRingObjects2= [];
-gdjs.GameCode.GDPortalRing2Objects1= [];
-gdjs.GameCode.GDPortalRing2Objects2= [];
-gdjs.GameCode.GDShardObjects1= [];
-gdjs.GameCode.GDShardObjects2= [];
-gdjs.GameCode.GDShardIconObjects1= [];
-gdjs.GameCode.GDShardIconObjects2= [];
-gdjs.GameCode.GDBhRangeObjects1= [];
-gdjs.GameCode.GDBhRangeObjects2= [];
-gdjs.GameCode.GDBhSwirlObjects1= [];
-gdjs.GameCode.GDBhSwirlObjects2= [];
-gdjs.GameCode.GDBhGlowObjects1= [];
-gdjs.GameCode.GDBhGlowObjects2= [];
-gdjs.GameCode.GDBhDiskObjects1= [];
-gdjs.GameCode.GDBhDiskObjects2= [];
-gdjs.GameCode.GDBhCoreObjects1= [];
-gdjs.GameCode.GDBhCoreObjects2= [];
-gdjs.GameCode.GDTrailObjects1= [];
-gdjs.GameCode.GDTrailObjects2= [];
-gdjs.GameCode.GDSparkObjects1= [];
-gdjs.GameCode.GDSparkObjects2= [];
-gdjs.GameCode.GDRingObjects1= [];
-gdjs.GameCode.GDRingObjects2= [];
-gdjs.GameCode.GDOrbHaloObjects1= [];
-gdjs.GameCode.GDOrbHaloObjects2= [];
-gdjs.GameCode.GDOrbObjects1= [];
-gdjs.GameCode.GDOrbObjects2= [];
-gdjs.GameCode.GDPreviewOrbObjects1= [];
-gdjs.GameCode.GDPreviewOrbObjects2= [];
-gdjs.GameCode.GDTitlePhantomObjects1= [];
-gdjs.GameCode.GDTitlePhantomObjects2= [];
-gdjs.GameCode.GDTitlePhotonObjects1= [];
-gdjs.GameCode.GDTitlePhotonObjects2= [];
-gdjs.GameCode.GDTxtClearObjects1= [];
-gdjs.GameCode.GDTxtClearObjects2= [];
-gdjs.GameCode.GDBtnRestartObjects1= [];
-gdjs.GameCode.GDBtnRestartObjects2= [];
-gdjs.GameCode.GDFlashObjects1= [];
-gdjs.GameCode.GDFlashObjects2= [];
-gdjs.GameCode.GDLevelTextObjects1= [];
-gdjs.GameCode.GDLevelTextObjects2= [];
-gdjs.GameCode.GDShardTextObjects1= [];
-gdjs.GameCode.GDShardTextObjects2= [];
-gdjs.GameCode.GDHintTextObjects1= [];
-gdjs.GameCode.GDHintTextObjects2= [];
-gdjs.GameCode.GDStartTextObjects1= [];
-gdjs.GameCode.GDStartTextObjects2= [];
-gdjs.GameCode.GDToastTextObjects1= [];
-gdjs.GameCode.GDToastTextObjects2= [];
+gdjs.MenuCode = {};
+gdjs.MenuCode.localVariables = [];
+gdjs.MenuCode.idToCallbackMap = new Map();
+gdjs.MenuCode.GDBgTileObjects1= [];
+gdjs.MenuCode.GDBgTileObjects2= [];
+gdjs.MenuCode.GDNebulaObjects1= [];
+gdjs.MenuCode.GDNebulaObjects2= [];
+gdjs.MenuCode.GDMoteObjects1= [];
+gdjs.MenuCode.GDMoteObjects2= [];
+gdjs.MenuCode.GDLevelArtObjects1= [];
+gdjs.MenuCode.GDLevelArtObjects2= [];
+gdjs.MenuCode.GDPadGlowObjects1= [];
+gdjs.MenuCode.GDPadGlowObjects2= [];
+gdjs.MenuCode.GDPadChevronObjects1= [];
+gdjs.MenuCode.GDPadChevronObjects2= [];
+gdjs.MenuCode.GDPortalCoreObjects1= [];
+gdjs.MenuCode.GDPortalCoreObjects2= [];
+gdjs.MenuCode.GDPortalRingObjects1= [];
+gdjs.MenuCode.GDPortalRingObjects2= [];
+gdjs.MenuCode.GDPortalRing2Objects1= [];
+gdjs.MenuCode.GDPortalRing2Objects2= [];
+gdjs.MenuCode.GDShardObjects1= [];
+gdjs.MenuCode.GDShardObjects2= [];
+gdjs.MenuCode.GDShardIconObjects1= [];
+gdjs.MenuCode.GDShardIconObjects2= [];
+gdjs.MenuCode.GDBhRangeObjects1= [];
+gdjs.MenuCode.GDBhRangeObjects2= [];
+gdjs.MenuCode.GDBhSwirlObjects1= [];
+gdjs.MenuCode.GDBhSwirlObjects2= [];
+gdjs.MenuCode.GDBhGlowObjects1= [];
+gdjs.MenuCode.GDBhGlowObjects2= [];
+gdjs.MenuCode.GDBhDiskObjects1= [];
+gdjs.MenuCode.GDBhDiskObjects2= [];
+gdjs.MenuCode.GDBhCoreObjects1= [];
+gdjs.MenuCode.GDBhCoreObjects2= [];
+gdjs.MenuCode.GDTrailObjects1= [];
+gdjs.MenuCode.GDTrailObjects2= [];
+gdjs.MenuCode.GDSparkObjects1= [];
+gdjs.MenuCode.GDSparkObjects2= [];
+gdjs.MenuCode.GDRingObjects1= [];
+gdjs.MenuCode.GDRingObjects2= [];
+gdjs.MenuCode.GDOrbHaloObjects1= [];
+gdjs.MenuCode.GDOrbHaloObjects2= [];
+gdjs.MenuCode.GDOrbObjects1= [];
+gdjs.MenuCode.GDOrbObjects2= [];
+gdjs.MenuCode.GDPreviewOrbObjects1= [];
+gdjs.MenuCode.GDPreviewOrbObjects2= [];
+gdjs.MenuCode.GDTitlePhantomObjects1= [];
+gdjs.MenuCode.GDTitlePhantomObjects2= [];
+gdjs.MenuCode.GDTitlePhotonObjects1= [];
+gdjs.MenuCode.GDTitlePhotonObjects2= [];
+gdjs.MenuCode.GDTxtClearObjects1= [];
+gdjs.MenuCode.GDTxtClearObjects2= [];
+gdjs.MenuCode.GDBtnRestartObjects1= [];
+gdjs.MenuCode.GDBtnRestartObjects2= [];
+gdjs.MenuCode.GDFlashObjects1= [];
+gdjs.MenuCode.GDFlashObjects2= [];
+gdjs.MenuCode.GDLevelTextObjects1= [];
+gdjs.MenuCode.GDLevelTextObjects2= [];
+gdjs.MenuCode.GDShardTextObjects1= [];
+gdjs.MenuCode.GDShardTextObjects2= [];
+gdjs.MenuCode.GDHintTextObjects1= [];
+gdjs.MenuCode.GDHintTextObjects2= [];
+gdjs.MenuCode.GDStartTextObjects1= [];
+gdjs.MenuCode.GDStartTextObjects2= [];
+gdjs.MenuCode.GDToastTextObjects1= [];
+gdjs.MenuCode.GDToastTextObjects2= [];
+gdjs.MenuCode.GDBtnPillObjects1= [];
+gdjs.MenuCode.GDBtnPillObjects2= [];
+gdjs.MenuCode.GDBtnPillSObjects1= [];
+gdjs.MenuCode.GDBtnPillSObjects2= [];
+gdjs.MenuCode.GDBtnGlowObjects1= [];
+gdjs.MenuCode.GDBtnGlowObjects2= [];
+gdjs.MenuCode.GDBtnGlowSObjects1= [];
+gdjs.MenuCode.GDBtnGlowSObjects2= [];
+gdjs.MenuCode.GDBtnRoundObjects1= [];
+gdjs.MenuCode.GDBtnRoundObjects2= [];
+gdjs.MenuCode.GDBtnRoundGlowObjects1= [];
+gdjs.MenuCode.GDBtnRoundGlowObjects2= [];
+gdjs.MenuCode.GDIcBackObjects1= [];
+gdjs.MenuCode.GDIcBackObjects2= [];
+gdjs.MenuCode.GDIcLeftObjects1= [];
+gdjs.MenuCode.GDIcLeftObjects2= [];
+gdjs.MenuCode.GDIcRightObjects1= [];
+gdjs.MenuCode.GDIcRightObjects2= [];
+gdjs.MenuCode.GDIcLockObjects1= [];
+gdjs.MenuCode.GDIcLockObjects2= [];
+gdjs.MenuCode.GDIcCheckObjects1= [];
+gdjs.MenuCode.GDIcCheckObjects2= [];
+gdjs.MenuCode.GDIcRestartObjects1= [];
+gdjs.MenuCode.GDIcRestartObjects2= [];
+gdjs.MenuCode.GDIcPlayObjects1= [];
+gdjs.MenuCode.GDIcPlayObjects2= [];
+gdjs.MenuCode.GDNodeFillObjects1= [];
+gdjs.MenuCode.GDNodeFillObjects2= [];
+gdjs.MenuCode.GDSoftObjects1= [];
+gdjs.MenuCode.GDSoftObjects2= [];
+gdjs.MenuCode.GDSparkWObjects1= [];
+gdjs.MenuCode.GDSparkWObjects2= [];
+gdjs.MenuCode.GDRingWObjects1= [];
+gdjs.MenuCode.GDRingWObjects2= [];
+gdjs.MenuCode.GDTrailWObjects1= [];
+gdjs.MenuCode.GDTrailWObjects2= [];
+gdjs.MenuCode.GDCardObjects1= [];
+gdjs.MenuCode.GDCardObjects2= [];
+gdjs.MenuCode.GDBtnTextObjects1= [];
+gdjs.MenuCode.GDBtnTextObjects2= [];
+gdjs.MenuCode.GDBtnTextSObjects1= [];
+gdjs.MenuCode.GDBtnTextSObjects2= [];
+gdjs.MenuCode.GDHeadTextObjects1= [];
+gdjs.MenuCode.GDHeadTextObjects2= [];
+gdjs.MenuCode.GDSubTextObjects1= [];
+gdjs.MenuCode.GDSubTextObjects2= [];
+gdjs.MenuCode.GDChapterTextObjects1= [];
+gdjs.MenuCode.GDChapterTextObjects2= [];
+gdjs.MenuCode.GDNodeTextObjects1= [];
+gdjs.MenuCode.GDNodeTextObjects2= [];
+gdjs.MenuCode.GDStarCoreObjects1= [];
+gdjs.MenuCode.GDStarCoreObjects2= [];
+gdjs.MenuCode.GDStarCoronaObjects1= [];
+gdjs.MenuCode.GDStarCoronaObjects2= [];
+gdjs.MenuCode.GDStarGlowObjects1= [];
+gdjs.MenuCode.GDStarGlowObjects2= [];
+gdjs.MenuCode.GDMoverObjects1= [];
+gdjs.MenuCode.GDMoverObjects2= [];
+gdjs.MenuCode.GDTrackDotObjects1= [];
+gdjs.MenuCode.GDTrackDotObjects2= [];
+gdjs.MenuCode.GDCloudObjects1= [];
+gdjs.MenuCode.GDCloudObjects2= [];
+gdjs.MenuCode.GDCloudPuffObjects1= [];
+gdjs.MenuCode.GDCloudPuffObjects2= [];
+gdjs.MenuCode.GDCloudBlockObjects1= [];
+gdjs.MenuCode.GDCloudBlockObjects2= [];
+gdjs.MenuCode.GDLightObjects1= [];
+gdjs.MenuCode.GDLightObjects2= [];
 
 
-gdjs.GameCode.userFunc0x906d00 = function GDJSInlineCode(runtimeScene) {
+gdjs.MenuCode.userFunc0x940898 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -76,6 +144,8 @@ const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
 // The same code runs inside the game (JavaScript event) and in Node for the
 // level solver / tests (src/solve.js). The body of this file is wrapped in an
 // IIFE by build_project.py, so it ends with a `return`.
+// Tiles: '#' wall  'P' launch pad  'a'-'d' ramps  'M' mirror block  'm' '/' mirror  'n' '\' mirror
+//        'O' black hole  'X' burning star  'E' exit  '*' shard  'S' start   (+ level.movers: moving platforms)
 // ============================================================================
 const T = 48;                    // tile size (world px)
 const H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)
@@ -85,28 +155,36 @@ const G = 3.0e7;                 // black-hole gravity strength (px^3/s^2)
 const G_RANGE = 3.6 * T;         // influence radius of a black hole
 const KILL = 0.42 * T;           // swallow radius
 const EXIT_R = 0.42 * T, SHARD_R = 0.6 * T;
+const STAR_R = 0.8 * T;          // a burning star consumes the orb inside this radius
 const MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost
+const SUB = 1 / 600;             // fixed sub-step (game and solver produce identical paths)
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
-// Ramps: letter = which corner of the tile is solid. Back (flat) sides, and mirror line.
 const RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\' },
                 c: { solid: 'NW', back: 'LU', line: '/' }, d: { solid: 'NE', back: 'RU', line: '\\' } };
+const DIAG_MIRRORS = { m: '/', n: '\\' };
 
 function parseLevel(def) {
   const rows = def.map.slice();
-  const L = { w: rows[0].length, h: rows.length, cells: [], start: null, exit: null, shards: [], holes: [], pads: [], ramps: [] };
+  const L = { w: rows[0].length, h: rows.length, cells: [], start: null, exit: null, shards: [], holes: [], pads: [], ramps: [],
+              mirrors: [], stars: [], movers: [], period: def.period || 4 };
   for (let j = 0; j < L.h; j++) for (let i = 0; i < L.w; i++) {
     const ch = rows[j][i] || '#';
     let t = '.';
     if (ch === '#') t = '#';
     else if (ch === 'P') { t = 'P'; L.pads.push([i, j]); }
+    else if (ch === 'M') { t = 'M'; L.mirrors.push([i, j, 'M']); }
+    else if (DIAG_MIRRORS[ch]) { t = ch; L.mirrors.push([i, j, ch]); }
     else if (RAMPS[ch]) { t = ch; L.ramps.push([i, j, ch]); }
     else if (ch === 'S') L.start = [i, j];
     else if (ch === 'E') L.exit = [i, j];
     else if (ch === '*') L.shards.push([i, j]);
     else if (ch === 'O') L.holes.push([i, j]);
+    else if (ch === 'X') L.stars.push([i, j]);
     L.cells.push(t);
   }
+  // moving platform: {i, j, w, h (tiles), axis 'x'|'y', range (tiles, +/-), phase 0..1}; ping-pongs with ease over L.period
+  for (const m of (def.movers || [])) L.movers.push(Object.assign({ w: 1, h: 1, axis: 'x', range: 2, phase: 0 }, m));
   return L;
 }
 function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
@@ -114,12 +192,24 @@ const isFlat = (t) => t === '#' || t === 'P';
 const center = (i) => i * T + T / 2;
 const toCell = (x) => Math.floor(x / T);
 
+// ---------------------------------------------------------------- moving platforms
+function moverOffset(L, m, time) {       // tiles along its axis
+  const u = time / L.period + m.phase;
+  return m.range * (0.5 - 0.5 * Math.cos(2 * Math.PI * u));
+}
+function moverRect(L, m, time) {
+  const o = moverOffset(L, m, time) * T;
+  const x0 = m.i * T + (m.axis === 'x' ? o : 0), y0 = m.j * T + (m.axis === 'y' ? o : 0);
+  return { x0, y0, x1: x0 + m.w * T, y1: y0 + m.h * T };
+}
+const overlap = (x, y, r) => x + H > r.x0 && x - H < r.x1 && y + H > r.y0 && y - H < r.y1;
+
 // Does tile (i,j) present a flat, stickable face on `side` (the side facing the orb)?
 function faceFrom(L, i, j, side) {
   const t = cell(L, i, j);
   if (isFlat(t)) return true;
   if (RAMPS[t]) return RAMPS[t].back.includes(side);
-  return false;
+  return false;                           // empty tiles and mirrors: nothing to stick to
 }
 // Walls the orb (stuck in cell i,j) is touching: list of directions from orb to wall.
 function contacts(L, i, j) {
@@ -127,10 +217,12 @@ function contacts(L, i, j) {
   for (const d in DIRS) { const [dx, dy] = DIRS[d]; if (faceFrom(L, i + dx, j + dy, OPP[d])) out.push(d); }
   return out;
 }
+function stuckContacts(L, st) { return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
 // Movement rule: a swipe in `d` is legal only if it is parallel to a wall the orb touches
-// and the next tile in that direction is not a flat face.
-function checkMove(L, i, j, d) {
-  const c = contacts(L, i, j);
+// and it is not straight into a wall face.
+function checkMove(L, st, d) {
+  if (typeof st === 'number') { st = { i: arguments[1], j: arguments[2], ride: null }; d = arguments[3]; }   // legacy (L, i, j, d)
+  const c = stuckContacts(L, st);
   const horiz = d === 'L' || d === 'R';
   const parallel = c.some((k) => horiz ? (k === 'U' || k === 'D') : (k === 'L' || k === 'R'));
   if (c.includes(d)) return { ok: false, why: 'into' };
@@ -139,6 +231,7 @@ function checkMove(L, i, j, d) {
 }
 // Launch pad: returns the direction away from a pad the orb touches (prefer `prefer` = side of last impact).
 function padLaunchDir(L, i, j, prefer) {
+  if (typeof i === 'object') { const st = i; if (st.ride) return null; prefer = st.normal; j = st.j; i = st.i; }
   const ds = Object.keys(DIRS).filter((d) => { const [dx, dy] = DIRS[d]; return cell(L, i + dx, j + dy) === 'P'; });
   if (!ds.length) return null;
   const d = ds.includes(prefer) ? prefer : ds[0];
@@ -148,7 +241,7 @@ function padLaunchDir(L, i, j, prefer) {
 // Is the orb box at (x,y) blocked by tile (i,j)? Ramps are only solid from their flat back sides.
 function tileBlocks(L, i, j, x, y) {
   const t = cell(L, i, j);
-  if (isFlat(t)) return true;
+  if (isFlat(t) || t === 'M') return true;
   if (!RAMPS[t]) return false;
   const x0 = i * T, y0 = j * T, x1 = x0 + T, y1 = y0 + T, back = RAMPS[t].back;
   if (x >= x1 && back.includes('R')) return true;
@@ -157,87 +250,162 @@ function tileBlocks(L, i, j, x, y) {
   if (y <= y0 && back.includes('U')) return true;
   return false;
 }
-function boxHit(L, x, y, refX, refY) {
+// first blocking rect for the orb box at (x,y): {x0,y0,x1,y1, mirror, mover}
+let GHOST = -1;   // the platform the orb just launched from: ignored until the orb has cleared it
+function boxHit(L, x, y, refX, refY, time) {
   const i0 = toCell(x - H), i1 = toCell(x + H), j0 = toCell(y - H), j1 = toCell(y + H);
-  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, refX, refY)) return [i, j];
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, refX, refY))
+    return { x0: i * T, y0: j * T, x1: i * T + T, y1: j * T + T, mirror: cell(L, i, j) === 'M', mover: -1 };
+  for (let k = 0; k < L.movers.length; k++) { if (k === GHOST) continue; const r = moverRect(L, L.movers[k], time); if (overlap(x, y, r)) return Object.assign(r, { mirror: false, mover: k }); }
   return null;
 }
 
-function startFlight(st, d, kick) {
+function startFlight(st, d, kick, L) {
   const [dx, dy] = DIRS[d];
+  st.ghost = -1;
+  if (st.ride && L) st.ghost = st.ride.m;
+  if (st.ride && L) {   // leaving a moving platform: line up with the nearest free lane across the launch direction
+    GHOST = st.ghost;
+    const v = dx ? st.y : st.x, c0 = toCell(v), cands = [c0 - 1, c0, c0 + 1].sort((a, b) => Math.abs(center(a) - v) - Math.abs(center(b) - v));
+    for (const c of cands) {
+      const x = dx ? st.x : center(c), y = dx ? center(c) : st.y;
+      if (!boxHit(L, x, y, x, y, st.time)) { st.x = x; st.y = y; break; }
+    }
+    GHOST = -1;
+    st.ride = null;
+  } else if (st.ride) st.ride = null;
   st.mode = 'fly'; st.dir = d; st.t = 0; st.acc = 0;
   st.speed = kick ? PAD_V0 : V0; st.vx = dx * st.speed; st.vy = dy * st.speed;
   st.events = [];
 }
 function newState(L) {
   const [i, j] = L.start;
-  return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j],
-           got: L.shards.map(() => false), events: [], t: 0 };
+  return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j], ride: null,
+           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0 };
 }
 
-// Advance a flight by dt seconds (internally sub-stepped). Pushes events: shard, deflect, graze, stick, exit, swallow, lost.
+// Advance the world by dt seconds in fixed sub-steps: moving platforms (carrying a riding orb) and the orb's flight.
+// Pushes events: shard, deflect, mirror, graze, stick, exit, swallow, burn, crush, lost.
 function step(L, st, dt) {
-  if (st.mode !== 'fly') return;
-  // fixed 600 Hz sub-steps (remainder carried over) so the game and the Node solver give identical paths
-  const h = 1 / 600;
   st.acc = (st.acc || 0) + dt;
-  while (st.acc >= h - 1e-9 && st.mode === 'fly') {
-    st.acc -= h; st.t += h;
-    st.speed = Math.min(VMAX, st.speed + ACC * h);
-    // black-hole gravity
-    for (const [hi, hj] of L.holes) {
-      const hx = center(hi), hy = center(hj), ddx = hx - st.x, ddy = hy - st.y, dist = Math.hypot(ddx, ddy);
-      if (dist < KILL) { st.mode = 'dead'; st.hole = [hx, hy]; st.events.push({ type: 'swallow', x: hx, y: hy }); return; }
-      if (dist < G_RANGE) {
-        const fall = 1 - dist / G_RANGE;   // fades smoothly to 0 at the edge of the well
-        const a = G / Math.max(dist * dist, T * T * 0.5) * fall;
-        st.vx += a * ddx / dist * h; st.vy += a * ddy / dist * h;
-      }
-    }
-    const vl = Math.hypot(st.vx, st.vy) || 1; st.vx *= st.speed / vl; st.vy *= st.speed / vl;  // gravity bends, doesn't brake
-    // ramps: mirror when the orb's centre would cross the diagonal (checked before walls so the corner turn is clean)
-    let nx = st.x + st.vx * h, ny = st.y + st.vy * h;
-    const ci = toCell(nx), cj = toCell(ny), t = cell(L, ci, cj);
-    if (RAMPS[t] && !tileBlocks(L, ci, cj, st.x, st.y)) {
-      const u = (nx - ci * T) / T, v = (ny - cj * T) / T, R = RAMPS[t];
-      let inSolid;
-      if (R.line === '/') inSolid = R.solid === 'SE' ? u + v > 1 : u + v < 1;
-      else inSolid = R.solid === 'SW' ? v > u : v < u;
-      if (inSolid) {
-        if (R.line === '/') { nx = ci * T + (1 - v) * T; ny = cj * T + (1 - u) * T; const vx = st.vx; st.vx = -st.vy; st.vy = -vx; }
-        else { nx = ci * T + v * T; ny = cj * T + u * T; const vx = st.vx; st.vx = st.vy; st.vy = vx; }
-        st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
-        st.events.push({ type: 'deflect', x: center(ci), y: center(cj), dir: st.dir });
-      }
-    }
-    // move X, then Y (axis-separated box collision). Head-on hit = stick; grazing hit = slide along the wall.
-    let hit = boxHit(L, nx, st.y, st.x, st.y);
-    if (hit) {
-      const sx = Math.sign(nx - st.x); nx = sx > 0 ? hit[0] * T - T / 2 : (hit[0] + 1) * T + T / 2;
-      if (Math.abs(st.vx) >= 0.5 * st.speed) { st.x = nx; return stick(L, st, sx > 0 ? 'R' : 'L'); }
-      st.vx = 0; st.events.push({ type: 'graze' });
-    }
-    st.x = nx;
-    hit = boxHit(L, st.x, ny, st.x, st.y);
-    if (hit) {
-      const sy = Math.sign(ny - st.y); ny = sy > 0 ? hit[1] * T - T / 2 : (hit[1] + 1) * T + T / 2;
-      if (Math.abs(st.vy) >= 0.5 * st.speed) { st.y = ny; return stick(L, st, sy > 0 ? 'D' : 'U'); }
-      st.vy = 0; st.events.push({ type: 'graze' });
-    }
-    st.y = ny;
-    if (st.vx === 0 && st.vy === 0) { return stick(L, st, null); }
-    // pickups / exit
-    L.shards.forEach(([si, sj], k) => {
-      if (!st.got[k] && Math.hypot(center(si) - st.x, center(sj) - st.y) < SHARD_R) { st.got[k] = true; st.events.push({ type: 'shard', k, x: center(si), y: center(sj) }); }
-    });
-    if (L.exit && Math.hypot(center(L.exit[0]) - st.x, center(L.exit[1]) - st.y) < EXIT_R) {
-      st.mode = 'exit'; st.events.push({ type: 'exit' }); return;
-    }
-    if (st.t > MAX_FLIGHT) { st.mode = 'dead'; st.hole = null; st.events.push({ type: 'lost' }); return; }
+  while (st.acc >= SUB - 1e-9 && (st.mode === 'fly' || st.mode === 'stuck')) {
+    st.acc -= SUB; st.time = (st.time || 0) + SUB;
+    if (st.mode === 'stuck') { stuckSub(L, st); continue; }
+    flySub(L, st, SUB);
   }
 }
-// Land: snap to the nearest empty tile centre along the wall that still has a flat face on the impact side.
-function stick(L, st, side) {
+function stuckSub(L, st) {
+  if (!L.movers.length) return;
+  if (st.ride) {
+    const r = moverRect(L, L.movers[st.ride.m], st.time);
+    st.x = r.x0 + st.ride.rx; st.y = r.y0 + st.ride.ry;
+    // carried into a static wall -> crushed
+    const i0 = toCell(st.x - H + 1), i1 = toCell(st.x + H - 1), j0 = toCell(st.y - H + 1), j1 = toCell(st.y + H - 1);
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (tileBlocks(L, i, j, st.x, st.y)) { die(st, 'crush', st.x, st.y); return; }
+    pickups(L, st);
+  } else {
+    for (let k = 0; k < L.movers.length; k++) if (overlap(st.x, st.y, moverRect(L, L.movers[k], st.time))) { die(st, 'crush', st.x, st.y); return; }
+  }
+}
+function die(st, type, x, y) { st.mode = 'dead'; st.hole = type === 'swallow' ? [x, y] : null; st.deathType = type; st.ride = null; st.events.push({ type, x, y }); }
+function pickups(L, st) {
+  L.shards.forEach(([si, sj], k) => {
+    if (!st.got[k] && Math.hypot(center(si) - st.x, center(sj) - st.y) < SHARD_R) { st.got[k] = true; st.events.push({ type: 'shard', k, x: center(si), y: center(sj) }); }
+  });
+  if (L.exit && Math.hypot(center(L.exit[0]) - st.x, center(L.exit[1]) - st.y) < EXIT_R) { st.mode = 'exit'; st.ride = null; st.events.push({ type: 'exit' }); }
+}
+function flySub(L, st, h) {
+  st.t += h;
+  if (st.ghost >= 0) {   // launched off a platform: it can't re-catch the orb until the orb is clear of it along the flight
+    const r = moverRect(L, L.movers[st.ghost], st.time);
+    const clear = st.vx !== 0 ? (st.x - H >= r.x1 || st.x + H <= r.x0) : (st.y - H >= r.y1 || st.y + H <= r.y0);
+    if (clear || st.t > 0.6) st.ghost = -1;
+  }
+  GHOST = st.ghost >= 0 ? st.ghost : -1;
+  const res = flySub2(L, st, h);
+  GHOST = -1;
+  return res;
+}
+function flySub2(L, st, h) {
+  // a moving platform swept into the flying orb: it catches the orb (pushed out on the shallowest side)
+  for (let k = 0; k < L.movers.length; k++) {
+    if (k === GHOST) continue;
+    const r = moverRect(L, L.movers[k], st.time);
+    if (!overlap(st.x, st.y, r)) continue;
+    const pen = { R: st.x + H - r.x0, L: r.x1 - (st.x - H), D: st.y + H - r.y0, U: r.y1 - (st.y - H) };
+    const side = Object.keys(pen).sort((a, b) => pen[a] - pen[b])[0];
+    if (side === 'R') st.x = r.x0 - T / 2; else if (side === 'L') st.x = r.x1 + T / 2; else if (side === 'D') st.y = r.y0 - T / 2; else st.y = r.y1 + T / 2;
+    return stick(L, st, side, Object.assign(r, { mover: k, mirror: false }));
+  }
+  st.speed = Math.min(VMAX, st.speed + ACC * h);
+  for (const [hi, hj] of L.holes) {         // black-hole gravity
+    const hx = center(hi), hy = center(hj), ddx = hx - st.x, ddy = hy - st.y, dist = Math.hypot(ddx, ddy);
+    if (dist < KILL) return die(st, 'swallow', hx, hy);
+    if (dist < G_RANGE) {
+      const fall = 1 - dist / G_RANGE;      // fades smoothly to 0 at the edge of the well
+      const a = G / Math.max(dist * dist, T * T * 0.5) * fall;
+      st.vx += a * ddx / dist * h; st.vy += a * ddy / dist * h;
+    }
+  }
+  for (const [si, sj] of L.stars) if (Math.hypot(center(si) - st.x, center(sj) - st.y) < STAR_R) return die(st, 'burn', st.x, st.y);
+  const vl = Math.hypot(st.vx, st.vy) || 1; st.vx *= st.speed / vl; st.vy *= st.speed / vl;  // gravity bends, doesn't brake
+  // ramps and diagonal mirrors: reflect when the orb's centre would cross the diagonal
+  let nx = st.x + st.vx * h, ny = st.y + st.vy * h;
+  const ci = toCell(nx), cj = toCell(ny), t = cell(L, ci, cj);
+  if (RAMPS[t] && !tileBlocks(L, ci, cj, st.x, st.y)) {
+    const u = (nx - ci * T) / T, v = (ny - cj * T) / T, R = RAMPS[t];
+    let inSolid;
+    if (R.line === '/') inSolid = R.solid === 'SE' ? u + v > 1 : u + v < 1;
+    else inSolid = R.solid === 'SW' ? v > u : v < u;
+    if (inSolid) { [nx, ny] = reflectDiag(st, R.line, ci, cj, u, v); st.events.push({ type: 'deflect', x: center(ci), y: center(cj), dir: st.dir }); }
+  } else if (DIAG_MIRRORS[t]) {
+    const line = DIAG_MIRRORS[t], u = (nx - ci * T) / T, v = (ny - cj * T) / T;
+    const pu = (st.x - ci * T) / T, pv = (st.y - cj * T) / T;      // previous position in this tile's coordinates
+    const s1 = line === '/' ? u + v - 1 : v - u, s0 = line === '/' ? pu + pv - 1 : pv - pu;
+    if (s0 !== 0 && Math.sign(s1) !== Math.sign(s0)) { [nx, ny] = reflectDiag(st, line, ci, cj, u, v); st.events.push({ type: 'mirror', x: center(ci), y: center(cj), dir: st.dir }); }
+  }
+  // move X, then Y (axis-separated box collision). Head-on hit = stick (or bounce off a mirror); grazing hit = slide.
+  let hit = boxHit(L, nx, st.y, st.x, st.y, st.time);
+  if (hit) {
+    const sx = Math.sign(nx - st.x) || Math.sign(st.vx); nx = sx > 0 ? hit.x0 - T / 2 : hit.x1 + T / 2;
+    if (hit.mirror) { st.vx = -st.vx; st.events.push({ type: 'mirror', x: sx > 0 ? hit.x0 : hit.x1, y: st.y, dir: st.vx > 0 ? 'R' : 'L' }); }
+    else if (Math.abs(st.vx) >= 0.5 * st.speed) { st.x = nx; return stick(L, st, sx > 0 ? 'R' : 'L', hit); }
+    else { st.vx = 0; st.events.push({ type: 'graze' }); }
+  }
+  st.x = nx;
+  hit = boxHit(L, st.x, ny, st.x, st.y, st.time);
+  if (hit) {
+    const sy = Math.sign(ny - st.y) || Math.sign(st.vy); ny = sy > 0 ? hit.y0 - T / 2 : hit.y1 + T / 2;
+    if (hit.mirror) { st.vy = -st.vy; st.events.push({ type: 'mirror', x: st.x, y: sy > 0 ? hit.y0 : hit.y1, dir: st.vy > 0 ? 'D' : 'U' }); }
+    else if (Math.abs(st.vy) >= 0.5 * st.speed) { st.y = ny; return stick(L, st, sy > 0 ? 'D' : 'U', hit); }
+    else { st.vy = 0; st.events.push({ type: 'graze' }); }
+  }
+  st.y = ny;
+  if (st.vx === 0 && st.vy === 0) { return stick(L, st, null, null); }
+  st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
+  pickups(L, st);
+  if (st.mode === 'fly' && st.t > MAX_FLIGHT) die(st, 'lost', st.x, st.y);
+}
+function reflectDiag(st, line, ci, cj, u, v) {
+  let nx, ny;
+  if (line === '/') { nx = ci * T + (1 - v) * T; ny = cj * T + (1 - u) * T; const vx = st.vx; st.vx = -st.vy; st.vy = -vx; }
+  else { nx = ci * T + v * T; ny = cj * T + u * T; const vx = st.vx; st.vx = st.vy; st.vy = vx; }
+  st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
+  return [nx, ny];
+}
+// Land: on a static wall snap to the nearest empty tile centre along it; on a moving platform attach to it (snapped to its tiles).
+function stick(L, st, side, hit) {
+  const impactSpeed = st.speed, fromX = st.x, fromY = st.y;
+  if (hit && hit.mover >= 0) {
+    const m = L.movers[hit.mover], r = hit;
+    let rx = st.x - r.x0, ry = st.y - r.y0;
+    if (side === 'L' || side === 'R') ry = Math.min(m.h - 1, Math.max(0, Math.round((ry - T / 2) / T))) * T + T / 2;
+    else rx = Math.min(m.w - 1, Math.max(0, Math.round((rx - T / 2) / T))) * T + T / 2;
+    st.mode = 'stuck'; st.ride = { m: hit.mover, rx, ry, side }; st.normal = side; st.vx = st.vy = 0; st.speed = 0;
+    st.x = r.x0 + rx; st.y = r.y0 + ry; st.i = toCell(st.x); st.j = toCell(st.y);
+    st.events.push({ type: 'stick', side, mover: hit.mover, i: st.i, j: st.j, x: st.x, y: st.y, fromX, fromY, impact: impactSpeed });
+    return;
+  }
   let i = toCell(st.x), j = toCell(st.y);
   const cand = [];
   for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
@@ -249,582 +417,754 @@ function stick(L, st, side) {
   }
   cand.sort((a, b) => a[0] - b[0]);
   if (cand.length) { i = cand[0][1]; j = cand[0][2]; }
-  const impactSpeed = st.speed;
-  st.mode = 'stuck'; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j];
-  st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX: st.x, fromY: st.y, impact: impactSpeed });
+  st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j];
+  st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX, fromY, impact: impactSpeed });
   st.x = center(i); st.y = center(j);
+  pickups(L, st);
 }
-// Run a whole move instantly (used by the solver/tests). Returns the final state + events.
-function simulate(L, st0, action) {
-  const st = JSON.parse(JSON.stringify(st0)); st.events = [];
+function respawn(L, st) {
+  const [i, j] = st.lastStuck;
+  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, events: [] });
+}
+function clone(st) { const s = JSON.parse(JSON.stringify(st)); s.events = []; return s; }
+// Run a whole move instantly (used by the solver/tests). `wait` seconds pass first (moving platforms keep moving).
+function simulate(L, st0, action, wait) {
+  const st = clone(st0);
+  if (wait) { step(L, st, wait); if (st.mode !== 'stuck') return { ok: true, st, events: st.events.splice(0) }; }
+  const pre = st.events.splice(0);
   if (st.mode !== 'stuck') return { ok: false, why: 'busy', st };
+  if (action === 'WAIT') return { ok: true, st, events: pre };
   if (action === 'TAP') {
-    const d = padLaunchDir(L, st.i, st.j, st.normal);
+    const d = padLaunchDir(L, st);
     if (!d) return { ok: false, why: 'nopad', st };
-    startFlight(st, d, true);
+    startFlight(st, d, true, L);
   } else {
-    const c = checkMove(L, st.i, st.j, action);
+    const c = checkMove(L, st, action);
     if (!c.ok) return { ok: false, why: c.why, st };
-    startFlight(st, action, false);
+    startFlight(st, action, false, L);
   }
-  const evs = [];
+  const evs = pre;
   while (st.mode === 'fly') { step(L, st, 1 / 60); evs.push(...st.events); st.events = []; }
+  evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { T, H, V0, VMAX, ACC, G, G_RANGE, KILL, DIRS, OPP, RAMPS, parseLevel, cell, contacts, checkMove, padLaunchDir,
-         startFlight, newState, step, simulate, center, faceFrom };
+return { T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+         padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };
+
+})());
+// Shared library (src/lib.js): chapters, progress, buttons, particles, transitions.
+const LIB = gdjs.__PPLib || (gdjs.__PPLib = (function () {
+// ============================================================================
+// Phantom Photon - shared runtime library (created once, stored on gdjs.__PPLib).
+// Used by all three scenes: Menu, LevelSelect, Game.
+// progress (localStorage), navigation, per-scene context: resolution, UI layer, input,
+// particles (capped), juicy neon buttons, scene transitions.
+// ============================================================================
+const LIB = {};
+LIB.CHAPTERS = [{"id": "awakening", "name": "Awakening", "sub": "The tutorial: learn to move like light.", "dark": false, "levels": [{"name": "First Light", "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.", "map": ["###########", "#.........#", "#....E...*#", "#.........#", "##........#", "#..*..##..#", "#.........#", "#.........#", "#.........#", "#S...*....#", "###########"]}, {"name": "Angles", "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.", "map": ["###########", "#..S.....d#", "#.........#", "#....#....#", "#...#E#...#", "#.........#", "#.........#", "#.........#", "#.........#", "#b.*.a...*#", "###########"]}, {"name": "Kick", "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.", "map": ["###########", "#...*.#...#", "#.........#", "#....E....#", "#.........#", "#.........#", "#.........#", "#.........#", "#....S...*#", "#####P#####", "###########"]}, {"name": "Event Horizon", "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.", "map": ["###########", "#S....#...#", "#.......*.#", "##......E.#", "#....*....#", "#....O....#", "#.........#", "#........##", "#.........#", "#...#.....#", "###########"]}, {"name": "Phantom Run", "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.", "map": ["###########", "##.......##", "#........##", "#.........#", "#.......a.#", "#.O..##...#", "#.........#", "#...*.....#", "#.#...E.*.P", "#.#.......#", "#.S.*.....#", "###########"]}]}, {"id": "abyss", "name": "The Abyss", "sub": "Total darkness. Your light shows the way.", "dark": true, "levels": [{"name": "Reflections", "hint": "Silver mirrors bounce your light - you can't cling to them. Diagonal mirrors turn you 90\u00b0.", "map": ["###########", "#.....#...#", "#.M...S.*.#", "#.........#", "#...M##...#", "#.........#", "#....#.*..#", "###..#m.###", "#*........#", "#.....m#..#", "#..E.....##", "###########"]}, {"name": "Drift", "hint": "Neon platforms slide on their tracks. Stick to one and ride it - then time your launch.", "period": 4, "map": ["###########", "#...#.....#", "#.........#", "#.........#", "#.........#", "#.........#", "#.........#", "#..*......#", "#.....*.E.#", "#.........#", "#S........#", "###########"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 6, "phase": 0}]}, {"name": "Solar Flare", "hint": "Stars burn. Their glow lights the dark - just don't touch them.", "map": ["###########", "###.X...b.#", "#..*...*E.#", "#.........#", "#.....#..S#", "#...*.....#", "#....#....#", "#......#.X#", "#...##....#", "#.........#", "#...#.....#", "###########"]}, {"name": "Murk", "hint": "Gas clouds swallow light. Faint outlines show where they drift.", "map": ["###########", "#...#M.M.S#", "#..mE.....#", "#....n#...#", "##......#.#", "#.....*...#", "#.........#", "#........*#", "#.........#", "#..*#.....#", "##.....#..#", "###########"], "clouds": [{"i": 5, "j": 1, "w": 4, "h": 4}, {"i": 1, "j": 6, "w": 4, "h": 4}]}, {"name": "Event Horizon", "hint": "Everything at once. Read the light, then move.", "map": ["############", "#..........#", "#.#........#", "##...c.....P", "##.##...*.O#", "#......*...#", "#S....M....#", "#.....#....#", "#.###......#", "#...#...E..#", "#.....*.#..#", "#X....m....#", "############"], "clouds": [{"i": 6, "j": 7, "w": 5, "h": 4}]}, {"name": "Singularity", "hint": "Ride the drift, catch the mirror - and mind the star.", "period": 4, "map": ["############", "#...#......#", "#..........#", "#..........#", "#..........#", "#..........#", "#......*.n.#", "#.........X#", "#.......*..#", "#..........#", "#........E.#", "#S..*....#.#", "############"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 4, "phase": 0}], "clouds": [{"i": 5, "j": 2, "w": 3, "h": 5}]}]}];
+LIB.ART = {"levelArtSize": [[608, 608], [608, 608], [608, 608], [608, 608], [608, 656], [608, 656], [608, 656], [608, 656], [608, 656], [656, 704], [656, 704]], "movers": {"2x1": [136, 88]}, "clouds": {"1": [244, 244], "2": [244, 244], "3": [292, 244], "4": [196, 292]}, "cloudIndex": {"8:0": 1, "8:1": 2, "9:0": 3, "10:0": 4}, "margin": 40, "tile": 48, "ss": 2};
+LIB.PALETTE = ['120;240;255', '255;90;210', '180;120;255', '120;255;170', '255;210;90', '255;140;80'];
+const KEY = 'phantomPhoton.progress.v1';
+const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : new URLSearchParams('');
+LIB.qs = qs;
+LIB.debugUnlock = qs.has('unlock');
+LIB.prog = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || { done: {} }; } catch (e) { return { done: {} }; } })();
+if (!LIB.prog.done) LIB.prog.done = {};
+LIB.save = () => { try { localStorage.setItem(KEY, JSON.stringify(LIB.prog)); } catch (e) {} };
+LIB.id = (c, l) => (c + 1) + '-' + (l + 1);
+LIB.isDone = (c, l) => !!LIB.prog.done[LIB.id(c, l)];
+LIB.chapterDone = (c) => LIB.CHAPTERS[c].levels.every((_, l) => LIB.isDone(c, l));
+LIB.chapterUnlocked = (c) => LIB.debugUnlock || c === 0 || LIB.chapterDone(c - 1);
+LIB.levelUnlocked = (c, l) => LIB.chapterUnlocked(c) && (LIB.debugUnlock || l === 0 || LIB.isDone(c, l - 1) || LIB.isDone(c, l));
+LIB.complete = (c, l, shards, of, moves) => {
+  const id = LIB.id(c, l), prev = LIB.prog.done[id];
+  LIB.prog.done[id] = { shards: Math.max(shards, prev ? prev.shards : 0), of, moves: prev ? Math.min(prev.moves || 999, moves) : moves };
+  LIB.save();
+};
+LIB.shardsIn = (c) => { let got = 0, of = 0; LIB.CHAPTERS[c].levels.forEach((lv, l) => { const n = lv.map.join('').split('*').length - 1; of += n; const d = LIB.prog.done[LIB.id(c, l)]; if (d) got += d.shards; }); return [got, of]; };
+LIB.nav = gdjs.__ppNav || (gdjs.__ppNav = { chapter: 0, level: 0, from: null });
+LIB.globalIndex = (c, l) => { let k = 0; for (let i = 0; i < c; i++) k += LIB.CHAPTERS[i].levels.length; return k + l; };
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+const easeBack = (t) => { t = clamp(t, 0, 1); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+Object.assign(LIB, { rand, lerp, clamp, ease, easeBack });
+
+// ---------------------------------------------------------------- per-scene context
+LIB.ctx = function (scene) {
+  if (scene.__ppC) return scene.__ppC;
+  const game = scene.getGame(), im = game.getInputManager();
+  const C = scene.__ppC = { scene, game, im, time: 0, rdt: 0, parts: [], buttons: [], shake: 0, focus: -1, keyNav: false,
+                             ptr: { x: -999, y: -999, down: false, pressed: false, released: false, x0: 0, y0: 0, t0: 0, moved: 0 }, trans: null, log: [] };
+  C.mk = (name, layer, x, y, z, add) => {
+    const o = scene.createObject(name); if (!o) return null;
+    o.setLayer(layer || ''); o.setPosition(x || 0, y || 0); if (z !== undefined) o.setZOrder(z);
+    if (add && o.setBlendMode) o.setBlendMode(1);
+    return o;
+  };
+  C.del = (o) => { if (o) o.deleteFromScene(scene); };
+  // --- resolution: fill the window at up to ~2.2 MP, UI layer in "720 units" on the short side
+  C.fit = () => {
+    if (typeof window !== 'undefined') {
+      const cw = window.innerWidth || 800, ch = window.innerHeight || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let h = Math.round(Math.min(ch * dpr, Math.sqrt(2.2e6 * ch / cw))); h = Math.max(480, h);
+      const key = cw + 'x' + ch + ':' + h;
+      if (key !== C.resKey) { C.resKey = key; game.setGameResolutionSize(Math.round(h * cw / ch), h); }
+    }
+    C.rw = game.getGameResolutionWidth(); C.rh = game.getGameResolutionHeight();
+    C.uiS = Math.min(C.rw, C.rh) / 720; C.UW = C.rw / C.uiS; C.UH = C.rh / C.uiS; C.portrait = C.UH >= C.UW;
+    const ui = scene.getLayer('UI'); ui.setCameraZoom(C.uiS); ui.setCameraX(C.UW / 2); ui.setCameraY(C.UH / 2);
+  };
+  // --- pointer (mouse, and touch which GDevelop mirrors onto the mouse) in UI units
+  C.toUI = (cx, cy) => scene.getLayer('UI').convertCoords(cx, cy, 0);
+  C.input = () => {
+    const p = C.ptr, ui = scene.getLayer('UI');
+    let down = im.isMouseButtonPressed(0), cx = im.getCursorX(), cy = im.getCursorY();
+    const tids = im.getAllTouchIdentifiers();
+    if (tids.length) { down = true; cx = im.getTouchX(tids[0]); cy = im.getTouchY(tids[0]); }
+    const q = ui.convertCoords(cx, cy, 0);
+    const moved = Math.hypot(q[0] - p.x, q[1] - p.y) > 0.5;
+    if (moved && !down) C.keyNav = false;
+    p.x = q[0]; p.y = q[1]; p.pressed = down && !p.down; p.released = !down && p.down; p.down = down;
+    if (p.pressed) { p.x0 = p.x; p.y0 = p.y; p.t0 = C.time; p.moved = 0; C.keyNav = false; }
+    if (down) p.moved = Math.max(p.moved, Math.hypot(p.x - p.x0, p.y - p.y0));
+    if (!down && !p.released && !tids.length && im.isMouseButtonReleased && false) p.released = true;
+  };
+  C.key = (codes) => codes.some((c) => im.wasKeyJustPressed(c));
+  C.K = { L: [37, 65], R: [39, 68], U: [38, 87], D: [40, 83], OK: [13, 32], BACK: [27, 8] };
+  // --- particles (one capped pool per scene)
+  C.MAXP = 420;
+  C.part = (name, layer, x, y, o) => {
+    if (C.parts.length >= C.MAXP) { const old = C.parts.shift(); C.del(old.o); }
+    const ob = C.mk(name, layer, x, y, o.z || 20, true); if (!ob) return null;
+    if (o.color) ob.setColor(o.color);
+    const p = Object.assign({ o: ob, x, y, vx: 0, vy: 0, life: 0.5, t: 0, s0: 0.5, s1: 0, a0: 255, drag: 3, sink: null, lin: false, grav: 0 }, o);
+    ob.setScale(p.s0); C.parts.push(p); return p;
+  };
+  C.burst = (layer, x, y, n, color, spd, size, nx, ny) => {
+    for (let k = 0; k < n; k++) {
+      const dir = (nx || ny) ? Math.atan2(ny, nx) + rand(-1.2, 1.2) : rand(0, 6.28), v = rand(0.3, 1) * (spd || 400);
+      C.part('SparkW', layer, x, y, { vx: Math.cos(dir) * v, vy: Math.sin(dir) * v, life: rand(0.3, 0.6), s0: rand(0.4, 0.8) * (size || 1), s1: 0, drag: 4.5, color, z: 60 });
+    }
+  };
+  C.ripple = (layer, x, y, size, color, life) => C.part('RingW', layer, x, y, { life: life || 0.45, s0: 0.05, s1: size, drag: 0, color, z: 59, a0: 230 });
+  C.updateParts = (dt) => {
+    for (let k = C.parts.length - 1; k >= 0; k--) {
+      const p = C.parts[k]; p.t += dt; const u = p.t / p.life;
+      if (u >= 1) { C.del(p.o); C.parts.splice(k, 1); continue; }
+      if (p.sink) { const dx = p.sink[0] - p.x, dy = p.sink[1] - p.y; p.vx += dx * 30 * dt - dy * 12 * dt; p.vy += dy * 30 * dt + dx * 12 * dt; }
+      p.vy += p.grav * dt;
+      p.vx *= Math.exp(-p.drag * dt); p.vy *= Math.exp(-p.drag * dt); p.x += p.vx * dt; p.y += p.vy * dt;
+      p.o.setPosition(p.x, p.y); p.o.setScale(Math.max(0.001, lerp(p.s0, p.s1, p.lin ? u : ease(u)))); p.o.setOpacity(p.a0 * (1 - u * u));
+    }
+  };
+  // --- juicy neon buttons (UI layer). opts: {w:'big'|'small'|'round', label, icon, color, x, y, delay, onPress}
+  C.button = (opts) => {
+    const kind = opts.kind || 'big', big = kind === 'big';
+    const b = Object.assign({ kind, x: 0, y: 0, s: 0, sv: 0, sx: 1, sy: 1, sxv: 0, syv: 0, hover: 0, press: false, flare: 0, born: C.time, delay: 0,
+                              enabled: true, visible: true, color: '120;240;255', scale: 1, wob: 0, id: C.buttons.length }, opts);
+    const z = opts.z || 70;
+    b.glow = C.mk(kind === 'round' ? 'BtnRoundGlow' : (big ? 'BtnGlow' : 'BtnGlowS'), 'UI', 0, 0, z, true);
+    b.bg = C.mk(kind === 'round' ? 'BtnRound' : (big ? 'BtnPill' : 'BtnPillS'), 'UI', 0, 0, z + 1, true);
+    b.lbl = opts.label ? C.mk(big ? 'BtnText' : 'BtnTextS', 'UI', 0, 0, z + 3) : null;
+    if (b.lbl) b.lbl.setString(opts.label);
+    b.ic = opts.icon ? C.mk(opts.icon, 'UI', 0, 0, z + 4, true) : null;
+    b.pool = opts.pool !== false ? C.mk('Soft', opts.poolLayer || 'Bg', 0, 0, 50, true) : null;      // the button's light spilling onto the scene
+    b.refl = (big && opts.reflect !== false) ? C.mk(kind === 'round' ? 'BtnRoundGlow' : 'BtnGlow', 'UI', 0, 0, z - 1, true) : null;   // mirror reflection under it
+    b.hw = kind === 'round' ? 52 : (big ? 260 : 150); b.hh = kind === 'round' ? 52 : (big ? 65 : 50);
+    C.buttons.push(b); return b;
+  };
+  C.hit = (b, x, y) => {
+    const s = b.scale;
+    if (b.kind === 'round') return Math.hypot(x - b.x, y - b.y) < (b.hw + 8) * s;
+    return Math.abs(x - b.x) < (b.hw + 10) * s && Math.abs(y - b.y) < (b.hh + 10) * s;
+  };
+  C.activate = (b, src) => {
+    b.sv += 9; b.sxv -= 6; b.syv += 6; b.flare = 1; C.shake = Math.max(C.shake, b.kind === 'big' ? 7 : 4);
+    const S = b.scale;
+    C.burst('UI', b.x, b.y, b.kind === 'big' ? 26 : 14, b.color, b.kind === 'big' ? 620 : 420, 1.1);
+    C.ripple('UI', b.x, b.y, (b.kind === 'big' ? 2.5 : 1.6) * S, b.color, 0.55);
+    C.ripple('UI', b.x, b.y, (b.kind === 'big' ? 2.2 : 1.3) * S, '255;255;255', 0.35);
+    C.log.push('press ' + (b.name || b.label || b.icon) + ' ' + (src || ''));
+    if (b.onPress) b.onPress(b, src);
+  };
+  C.updateButtons = (dt) => {
+    const p = C.ptr;
+    // keyboard focus
+    const vis = C.buttons.filter((b) => b.visible && b.enabled && !b.noFocus);
+    let navd = null;
+    if (!C.trans && !C.modalKeys) for (const d of ['L', 'R', 'U', 'D']) if (C.key(C.K[d])) navd = d;
+    if (navd && vis.length && C.buttonNav !== false) {
+      C.keyNav = true;
+      const cur = C.buttons[C.focus];
+      if (!cur || !cur.visible || !cur.enabled || cur.noFocus) C.focus = (C.defaultFocus && C.defaultFocus.visible) ? C.defaultFocus.id : vis[0].id;
+      else {
+        const [dx, dy] = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] }[navd];
+        let best = null, bd = 1e9;
+        for (const b of vis) { if (b === cur) continue; const vx = b.x - cur.x, vy = b.y - cur.y, along = vx * dx + vy * dy; if (along <= 4) continue;
+          const d = along + Math.abs(vx * dy + vy * dx) * 2.5; if (d < bd) { bd = d; best = b; } }
+        if (best) C.focus = best.id;
+      }
+      const f = C.buttons[C.focus]; if (f) { f.sv += 3; f.flare = Math.max(f.flare, 0.4); }
+    }
+    if (!C.trans && C.key(C.K.OK) && !C.modalKeys) {
+      const f = C.buttons[C.focus] || (C.defaultFocus && C.defaultFocus.visible ? C.defaultFocus : null);
+      if (f && f.visible && f.enabled) { f.press = true; f.pressKeyT = 0.09; C.focus = f.id; }
+    }
+    for (const b of C.buttons) {
+      const age = C.time - b.born - b.delay;
+      const S = b.scale;
+      // staggered bouncy entrance
+      const tgtS = !b.visible ? 0 : (age < 0 ? 0 : 1);
+      const over = b.visible && (C.hit(b, p.x, p.y) && !C.trans && (p.down || !C.isTouch)) || (C.keyNav && C.focus === b.id);
+      b.hover = lerp(b.hover, over ? 1 : 0, 1 - Math.pow(0.0005, dt));
+      if (!C.trans && b.visible && b.enabled) {
+        if (p.pressed && C.hit(b, p.x, p.y)) { b.press = true; b.pressPtr = true; b.sxv += 4; b.syv -= 4; }
+        if (b.pressPtr && p.released) { b.press = false; b.pressPtr = false; if (C.hit(b, p.x, p.y) && p.moved < 40) C.activate(b, 'pointer'); }
+        if (b.pressPtr && !C.hit(b, p.x, p.y) && p.moved > 40) { b.press = false; b.pressPtr = false; }
+        if (b.pressKeyT !== undefined) { b.pressKeyT -= dt; if (b.pressKeyT <= 0) { b.pressKeyT = undefined; b.press = false; C.activate(b, 'key'); } }
+      } else { b.press = false; b.pressPtr = false; }
+      const pr = b.press ? 1 : 0;
+      const tScale = tgtS * (1 + 0.07 * b.hover - 0.06 * pr);
+      const tsx = 1 + 0.10 * pr, tsy = 1 - 0.12 * pr;               // press: squash wide/flat; release springs back with overshoot
+      b.sv += ((tScale - b.s) * 260 - b.sv * 14) * dt; b.s += b.sv * dt;
+      b.sxv += ((tsx - b.sx) * 420 - b.sxv * 16) * dt; b.sx += b.sxv * dt;
+      b.syv += ((tsy - b.sy) * 420 - b.syv * 16) * dt; b.sy += b.syv * dt;
+      b.flare = Math.max(0, b.flare - dt * 2.2);
+      const breathe = 0.5 + 0.5 * Math.sin(C.time * 2.4 + b.id * 0.9);
+      const sc = Math.max(0.001, b.s) * S, x = b.x, y = b.y + (b.rise || 0) * (1 - clamp(age / 0.5, 0, 1)) * 0;
+      const half = b.kind === 'big' ? 0.5 : 0.5;
+      b.bg.setScaleX(half * sc * b.sx); b.bg.setScaleY(half * sc * b.sy); b.bg.setPosition(x, y); b.bg.setColor(b.color);
+      b.bg.setOpacity(b.visible ? (b.enabled ? 255 : 110) * (b.dim || 1) : 0);
+      const ga = (b.enabled ? 1 : 0.35) * (0.45 + 0.25 * breathe + 0.35 * b.hover + 0.6 * b.flare + 0.3 * pr);
+      b.glow.setPosition(x, y); b.glow.setScaleX(half * sc * b.sx * (1 + 0.08 * breathe + 0.25 * b.flare)); b.glow.setScaleY(half * sc * b.sy * (1 + 0.08 * breathe + 0.35 * b.flare));
+      b.glow.setColor(b.color); b.glow.setOpacity(255 * clamp(ga * (b.dim || 1), 0, 1) * (b.visible ? 1 : 0));
+      if (b.lbl) {
+        b.lbl.setScaleX(sc * b.sx); b.lbl.setScaleY(sc * b.sy);
+        b.lbl.setPosition(x - b.lbl.getWidth() / 2, y - b.lbl.getHeight() / 2 + 2 * sc);
+        b.lbl.setOpacity(b.visible ? (b.enabled ? 255 : 120) : 0);
+      }
+      if (b.ic) { b.ic.setPosition(x + (b.icDx || 0) * sc, y); b.ic.setScaleX(0.5 * sc * b.sx * (b.icS || 1)); b.ic.setScaleY(0.5 * sc * b.sy * (b.icS || 1)); b.ic.setColor(b.icColor || '255;255;255'); b.ic.setOpacity(b.visible ? (b.enabled ? 255 : 110) : 0); }
+      if (b.pool) {   // light pool cast on the scene behind (world layer shares UI units in menu/select)
+        const wp = C.uiToWorld ? C.uiToWorld(x, y) : [x, y];
+        b.pool.setPosition(wp[0], wp[1] + (b.poolDy || 0)); b.pool.setColor(b.color);
+        b.pool.setScaleX(sc * (b.kind === 'big' ? 2.8 : 1.6) * (1 + 0.6 * b.flare)); b.pool.setScaleY(sc * (b.kind === 'big' ? 1.1 : 0.9) * (1 + 0.6 * b.flare));
+        b.pool.setOpacity((b.visible ? 1 : 0) * 255 * clamp(0.07 + 0.05 * breathe + 0.12 * b.hover + 0.5 * b.flare, 0, 1));
+      }
+      if (b.refl) {   // faint mirrored reflection below the button, like neon on a glossy floor
+        b.refl.setPosition(x, y + b.hh * 2.1 * sc); b.refl.setColor(b.color);
+        b.refl.setScaleX(half * sc * b.sx * 1.05); b.refl.setScaleY(-half * sc * b.sy * 0.55);
+        b.refl.setOpacity((b.visible ? 1 : 0) * 255 * clamp(0.10 + 0.08 * breathe + 0.12 * b.hover + 0.35 * b.flare, 0, 1));
+      }
+    }
+  };
+  // --- transitions: out (cover) -> change scene; the next scene starts covered and reveals
+  C.cover = C.mk('Flash', 'UI', 0, 0, 200); C.cover.setColor('2;3;10');
+  C.white = C.mk('Flash', 'UI', 0, 0, 201); C.white.setOpacity(0);
+  const inn = gdjs.__ppTrans; gdjs.__ppTrans = null;
+  C.reveal = { t: 0, dur: inn ? inn.revealDur || 0.5 : 0.45, white: inn ? inn.white || 0 : 0, kind: inn ? inn.kind : 'fade' };
+  C.go = (target, kind, opts) => {
+    if (C.trans) return;
+    C.trans = Object.assign({ target, kind: kind || 'fade', t: 0, dur: 0.55 }, opts || {});
+    C.log.push('go ' + target);
+    try { window.__ppNavLog = (window.__ppNavLog || []).concat([target]); } catch (e) {}
+  };
+  C.updateTrans = (dt) => {
+    const W = C.UW + 40, H = C.UH + 40;
+    for (const o of [C.cover, C.white]) { o.setPosition(-20, -20); o.setWidth(W); o.setHeight(H); }
+    let a = 0, wa = 0;
+    if (C.reveal) {
+      C.reveal.t += dt; const u = C.reveal.t / C.reveal.dur;
+      a = 1 - ease(u); wa = C.reveal.white * Math.max(0, 1 - u * 1.6);
+      if (u >= 1) C.reveal = null;
+    }
+    if (C.trans) {
+      const T = C.trans; T.t += dt; const u = clamp(T.t / T.dur, 0, 1);
+      if (T.kind === 'zoom') { a = Math.max(a, clamp((u - 0.55) / 0.45, 0, 1)); wa = Math.max(wa, clamp((u - 0.7) / 0.3, 0, 1) * 0.9); }
+      else if (T.kind === 'flash') { wa = Math.max(wa, u); a = Math.max(a, u * 0.6); }
+      else a = Math.max(a, ease(u));
+      if (T.t >= T.dur + 0.04 && !T.fired) {
+        T.fired = true;
+        gdjs.__ppTrans = { kind: T.kind, white: T.kind === 'zoom' || T.kind === 'flash' ? 0.9 : 0, revealDur: T.kind === 'zoom' ? 0.7 : 0.45 };
+        C.scene.requestChange(gdjs.SceneChangeRequest.REPLACE_SCENE, T.target);
+      }
+    }
+    C.cover.setOpacity(255 * clamp(a, 0, 1)); C.white.setOpacity(255 * clamp(wa, 0, 1));
+  };
+  C.isTouch = (typeof navigator !== 'undefined') && (navigator.maxTouchPoints > 0) && /Mobi|iPhone|Android|iPad/.test(navigator.userAgent || '');
+  // --- shared animated background (Bg layer): grid, nebula, drifting motes
+  C.bg = (count) => {
+    C.bgT = C.mk('BgTile', 'Bg', -2112, -2112, 0); C.bgT.setWidth(4992); C.bgT.setHeight(4992);
+    C.neb = C.mk('Nebula', 'Bg', 0, 0, 1, true);
+    C.motes = [];
+    for (let k = 0; k < (count || 40); k++) {
+      const o = C.mk('Mote', 'Bg', 0, 0, 2, true);
+      C.motes.push({ o, x: rand(0, 1400), y: rand(0, 1400), vx: rand(-6, 6), vy: rand(-12, -3), ph: rand(0, 6.28), s: rand(0.25, 0.8) });
+    }
+  };
+  C.updateMotes = (dt, W, H, sinks) => {
+    for (const m of C.motes) {
+      m.ph += dt; m.x += m.vx * dt; m.y += m.vy * dt;
+      for (const h of sinks || []) { const dx = h[0] - m.x, dy = h[1] - m.y, d = Math.hypot(dx, dy) || 1, R = h[2] || 220;
+        if (d < R) { m.x += (dx / d * 50 - dy / d * 80) * dt * (1 - d / R); m.y += (dy / d * 50 + dx / d * 80) * dt * (1 - d / R); }
+        if (d < 16) { m.x = rand(0, W); m.y = H + 40; } }
+      if (m.y < -60) { m.y = H + 50; m.x = rand(-40, W + 40); }
+      if (m.x < -80) m.x = W + 60; if (m.x > W + 80) m.x = -60;
+      m.o.setPosition(m.x, m.y); m.o.setScale(m.s * 0.5); m.o.setOpacity(70 + 70 * Math.sin(m.ph * 1.3));
+    }
+  };
+  C.frame = () => {
+    C.rdt = Math.min(0.05, scene.getElapsedTime() / 1000); C.time += C.rdt;
+    C.fit(); C.input();
+  };
+  C.shakeOffset = () => {
+    C.shake *= Math.exp(-10 * C.rdt); if (C.shake < 0.05) C.shake = 0;
+    return [(Math.random() * 2 - 1) * C.shake, (Math.random() * 2 - 1) * C.shake];
+  };
+  try { window.__PPLib = LIB; } catch (e) {}
+  return C;
+};
+return LIB;
 
 })());
 // ============================================================================
-// Phantom Photon - game logic (runs every frame from one JavaScript event).
-// The movement rules live in PPSim (src/sim.js, embedded above by build_project.py).
-// This file: input (swipe / tap / keys), level loading, camera fit, and all the juice
-// (trail, squash, sparks, shake, portal, black holes, pads, title, level clear).
+// Phantom Photon - MAIN MENU: photons stream across the screen, a black hole bends
+// (slingshots / swallows) them, flickering neon logo, juicy PLAY button -> Level Select.
 // ============================================================================
-const SIM = PPSim;
-const game = runtimeScene.getGame();
-const im = game.getInputManager();
-const T = SIM.T;
-const rdt = Math.min(0.05, runtimeScene.getElapsedTime() / 1000);
-const LEVELS = [{"name": "First Light", "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.", "map": ["###########", "#.........#", "#....E...*#", "#.........#", "##........#", "#..*..##..#", "#.........#", "#.........#", "#.........#", "#S...*....#", "###########"]}, {"name": "Angles", "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.", "map": ["###########", "#..S.....d#", "#.........#", "#....#....#", "#...#E#...#", "#.........#", "#.........#", "#.........#", "#.........#", "#b.*.a...*#", "###########"]}, {"name": "Kick", "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.", "map": ["###########", "#...*.#...#", "#.........#", "#....E....#", "#.........#", "#.........#", "#.........#", "#.........#", "#....S...*#", "#####P#####", "###########"]}, {"name": "Event Horizon", "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.", "map": ["###########", "#S....#...#", "#.......*.#", "##......E.#", "#....*....#", "#....O....#", "#.........#", "#........##", "#.........#", "#...#.....#", "###########"]}, {"name": "Phantom Run", "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.", "map": ["###########", "##.......##", "#........##", "#.........#", "#.......a.#", "#.O..##...#", "#.........#", "#...*.....#", "#.#...E.*.P", "#.#.......#", "#.S.*.....#", "###########"]}];
-const ART = {"levelArtSize": [[608, 608], [608, 608], [608, 608], [608, 608], [608, 656]], "margin": 40, "tile": 48, "ss": 2};
-const ADD = 1;
-const DIRV = SIM.DIRS;
-
-let G = runtimeScene.__pp;
-let st = null, L = null;
-// ------------------------------------------------------------------ helpers
-const mk = (name, layer, x, y, z, blend) => {
-  const o = runtimeScene.createObject(name); if (!o) return null;
-  o.setLayer(layer || ''); o.setPosition(x || 0, y || 0); if (z !== undefined) o.setZOrder(z);
-  if (blend && o.setBlendMode) o.setBlendMode(ADD);
-  return o;
-};
-const del = (o) => { if (o) o.deleteFromScene(runtimeScene); };
-const rand = (a, b) => a + Math.random() * (b - a);
-const lerp = (a, b, t) => a + (b - a) * t;
-const ease = (t) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
-const cc = (i) => i * T + T / 2;
-
-if (!G) {
-  G = runtimeScene.__pp = {
-    level: 0, state: 'title', touches: {}, parts: [], motes: [], dyn: [], shake: 0, sx: 0, sy: 0, flash: 0,
-    buffered: null, bufferT: 0, titleT: 0, clearT: 0, dieT: 0, bump: null, squash: 0, squashV: 0, squashAxis: 'x',
-    vis: { x: 0, y: 0 }, trailAcc: 0, lastTrail: null, time: 0, moves: 0, deaths: 0, log: [], lastRes: [0, 0],
-    stats: { shards: 0 }, firstMove: false, padHintShown: false,
-  };
-  // static UI objects
-  G.ui = {
-    titleA: mk('TitlePhantom', 'UI', 0, 0, 50), titleB: mk('TitlePhoton', 'UI', 0, 0, 50),
-    start: mk('StartText', 'UI', 0, 0, 51), level: mk('LevelText', 'UI', 0, 0, 40), shards: mk('ShardText', 'UI', 0, 0, 40),
-    hint: mk('HintText', 'UI', 0, 0, 40), restart: mk('BtnRestart', 'UI', 0, 0, 40, true), clear: mk('TxtClear', 'UI', 0, 0, 60, true),
-    flash: mk('Flash', 'UI', 0, 0, 90), dim: mk('Flash', 'UI', 0, 0, 30), toast: mk('ToastText', 'UI', 0, 0, 45), shardIcon: mk('ShardIcon', 'UI', 0, 0, 41, true),
-  };
-  G.ui.flash.setOpacity(0); G.ui.dim.setColor('2;3;10'); G.ui.clear.setOpacity(0); G.ui.toast.setOpacity(0);
-  for (const k of ['titleA', 'titleB']) G.ui[k].setBlendMode(ADD);
-  // background
-  G.bg = mk('BgTile', 'Bg', -2112, -2112, 0); G.bg.setWidth(4992); G.bg.setHeight(4992);
-  G.neb = mk('Nebula', 'Bg', 0, 0, 1, true);
-  for (let k = 0; k < 46; k++) {
-    const o = mk('Mote', 'Bg', 0, 0, 2, true);
-    G.motes.push({ o, x: rand(-100, 700), y: rand(-100, 700), vx: rand(-6, 6), vy: rand(-10, -2), ph: rand(0, 6.28), s: rand(0.25, 0.8) });
-  }
-  // orb
-  G.halo = mk('OrbHalo', '', 0, 0, 30, true); G.orb = mk('Orb', '', 0, 0, 32, true);
-  // remove editor-preview instances placed in the scene for level 1 (the game rebuilds levels itself)
-  for (const n of ['LevelArt', 'PortalCore', 'PortalRing', 'PortalRing2', 'Shard', 'PadGlow', 'BhDisk', 'BhCore', 'BhGlow', 'BhSwirl', 'BhRange', 'PreviewOrb'])
-    for (const o of runtimeScene.getObjects(n).slice()) if (!o.__pp) del(o);
-  G.loadLevel = (n) => loadLevel(n);
-  const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : null;
-  G.startLevel = qs && qs.get('level') ? Math.max(0, Math.min(LEVELS.length - 1, (+qs.get('level')) - 1)) : 0;
-  G.skipTitle = !!(qs && qs.has('notitle'));
-  loadLevel(G.startLevel);
-  if (G.skipTitle) G.state = 'play';
-  window.__pp = G; window.__PPSim = SIM; window.__ppScene = runtimeScene;
-}
-
-function tag(o) { if (o) o.__pp = true; return o; }
-function loadLevel(n) {
-  for (const o of G.dyn) del(o); G.dyn = [];
-  for (const p of G.parts) del(p.o); G.parts = [];
-  G.level = n; const def = LEVELS[n]; L = SIM.parseLevel(def); G.L = L; G.def = def;
-  G.st = SIM.newState(L); st = G.st;
-  G.W = L.w * T; G.H = L.h * T;
-  const add = (name, x, y, z, blend) => { const o = tag(mk(name, '', x, y, z, blend)); G.dyn.push(o); return o; };
-  const art = add('LevelArt', G.W / 2, G.H / 2, 1); art.setAnimationName('L' + (n + 1)); art.setScale(0.5);
-  G.portal = L.exit ? { core: add('PortalCore', cc(L.exit[0]), cc(L.exit[1]), 5, true), r1: add('PortalRing', cc(L.exit[0]), cc(L.exit[1]), 6, true),
-                        r2: add('PortalRing2', cc(L.exit[0]), cc(L.exit[1]), 6, true) } : null;
-  G.shards = L.shards.map(([i, j], k) => ({ o: add('Shard', cc(i), cc(j), 8, true), i, j, k, got: false }));
-  G.pads = L.pads.map(([i, j]) => {
-    // the pad's face points toward its open neighbour
-    let face = 'U'; for (const d of ['U', 'D', 'L', 'R']) { const [dx, dy] = DIRV[d]; if (SIM.cell(L, i + dx, j + dy) === '.' ) { face = d; break; } }
-    const [dx, dy] = DIRV[face], ang = { U: 0, R: 90, D: 180, L: 270 }[face];
-    const g = add('PadGlow', cc(i) + dx * T / 2, cc(j) + dy * T / 2, 3, true); g.setAngle(ang); g.setScale(0.5);
-    const ch = add('PadChevron', cc(i) + dx * T, cc(j) + dy * T, 3, true); ch.setAngle(ang); ch.setScale(0.5);
-    return { i, j, face, g, ch, dx, dy, ang, boost: 0 };
-  });
-  G.holes = L.holes.map(([i, j]) => ({ x: cc(i), y: cc(j), range: add('BhRange', cc(i), cc(j), 2, true), swirl: add('BhSwirl', cc(i), cc(j), 3, true),
-                                        glow: add('BhGlow', cc(i), cc(j), 4, true), disk: add('BhDisk', cc(i), cc(j), 9), core: add('BhCore', cc(i), cc(j), 10), pulse: 0 }));
-  for (const h of G.holes) { for (const k of ['range', 'swirl', 'glow', 'disk', 'core']) h[k].setScale(0.5); h.disk.setBlendMode(ADD); }
-  G.vis.x = G.st.x; G.vis.y = G.st.y; G.orbScale = 0; G.spawnT = 0; G.squash = 0; G.squashV = 0;
-  G.buffered = null; G.bump = null; G.clearT = 0; G.dieT = 0; G.moves = 0;
-  G.ui.level.setString((n + 1) + ' / ' + LEVELS.length + '   ' + def.name.toUpperCase());
-  G.ui.hint.setString(def.hint || ''); G.hintA = 1;
-  G.log.push('load ' + (n + 1));
-  for (const m of G.motes) { m.x = rand(-80, G.W + 80); m.y = rand(-80, G.H + 80); }
-  ring(G.st.x, G.st.y, 0.5, [140, 240, 255]);
-}
-
-// ------------------------------------------------------------------ particles
-function part(name, x, y, o) {
-  const ob = mk(name, '', x, y, o.z || 20, true); if (!ob) return;
-  if (o.color) ob.setColor(o.color);
-  const p = Object.assign({ o: ob, x, y, vx: 0, vy: 0, life: 0.5, t: 0, s0: 0.5, s1: 0, a0: 255, drag: 3, sink: null }, o);
-  ob.setScale(p.s0); G.parts.push(p); return p;
-}
-function sparks(x, y, nx, ny, n, color, spd) {
-  for (let k = 0; k < n; k++) {
-    const base = (nx || ny) ? Math.atan2(ny, nx) : rand(0, 6.28), a = base + rand(-1.35, 1.35) * ((nx || ny) ? 1 : 3), v = rand(0.3, 1) * (spd || 420);
-    part('Spark', x, y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.25, 0.55), s0: rand(0.35, 0.7), s1: 0, drag: 5, color });
-  }
-}
-function ring(x, y, size, rgb) { part('Ring', x, y, { life: 0.38, s0: 0.03, s1: size * 0.42, drag: 0, color: rgb ? rgb.join(';') : null, z: 19 }); }
-function updateParts(dt) {
-  for (let k = G.parts.length - 1; k >= 0; k--) {
-    const p = G.parts[k]; p.t += dt; const u = p.t / p.life;
-    if (u >= 1) { del(p.o); G.parts.splice(k, 1); continue; }
-    if (p.sink) { // pulled toward a point (black-hole implode)
-      const dx = p.sink[0] - p.x, dy = p.sink[1] - p.y; p.vx += dx * 30 * dt - dy * 12 * dt; p.vy += dy * 30 * dt + dx * 12 * dt;
+const C = LIB.ctx(runtimeScene); C.frame();
+const { rand, lerp, clamp, ease } = LIB;
+let M = runtimeScene.__menu;
+if (!M) {
+  // deep links for testing / sharing: ?select -> level select, ?level=N[&ch=C] -> straight into a level
+  const qs = LIB.qs;
+  if (!gdjs.__ppDeepDone && (qs.has('level') || qs.has('select'))) {
+    gdjs.__ppDeepDone = true;
+    if (qs.has('level')) {
+      const c = clamp((+qs.get('ch') || 1) - 1, 0, LIB.CHAPTERS.length - 1);
+      LIB.nav.chapter = c; LIB.nav.level = clamp((+qs.get('level') || 1) - 1, 0, LIB.CHAPTERS[c].levels.length - 1);
+      runtimeScene.requestChange(gdjs.SceneChangeRequest.REPLACE_SCENE, 'Game'); return;
     }
-    p.vx *= Math.exp(-p.drag * dt); p.vy *= Math.exp(-p.drag * dt); p.x += p.vx * dt; p.y += p.vy * dt;
-    p.o.setPosition(p.x, p.y); p.o.setScale(Math.max(0.001, lerp(p.s0, p.s1, p.lin ? u : ease(u)))); p.o.setOpacity(p.a0 * (1 - u * u));
+    if (qs.has('ch')) LIB.nav.chapter = clamp((+qs.get('ch') || 1) - 1, 0, LIB.CHAPTERS.length - 1);
+    runtimeScene.requestChange(gdjs.SceneChangeRequest.REPLACE_SCENE, 'LevelSelect'); return;
   }
+  M = runtimeScene.__menu = { photons: [], spawnT: 0, flick: 1, stutter: 0, nextStutter: 2, pulse: 0, swallowed: 0, slung: 0, zoom: 1, logoIn: 0 };
+  C.bg(50);
+  M.bh = { range: C.mk('BhRange', '', 0, 0, 2, true), swirl: C.mk('BhSwirl', '', 0, 0, 3, true), glow: C.mk('BhGlow', '', 0, 0, 4, true),
+           disk: C.mk('BhDisk', '', 0, 0, 9, true), core: C.mk('BhCore', '', 0, 0, 10), halo: C.mk('Soft', '', 0, 0, 1, true) };
+  M.bh.halo.setColor('255;70;140');
+  M.logoGlow = C.mk('Soft', 'UI', 0, 0, 48, true);
+  M.logoGlow2 = C.mk('Soft', 'UI', 0, 0, 48, true);
+  M.tA = C.mk('TitlePhantom', 'UI', 0, 0, 50, true); M.tB = C.mk('TitlePhoton', 'UI', 0, 0, 50, true);
+  M.tag = C.mk('SubText', 'UI', 0, 0, 52); M.tag.setString('A PUZZLE OF LIGHT');
+  M.foot = C.mk('SubText', 'UI', 0, 0, 52);
+  const [g1, o1] = LIB.shardsIn(0); const done = Object.keys(LIB.prog.done).length;
+  M.foot.setString(done ? ('PROGRESS  ' + done + ' LEVELS CLEARED') : 'SWIPE  ·  ARROWS  ·  TAP');
+  M.play = C.button({ kind: 'big', label: 'PLAY', color: '120;240;255', delay: 0.55, name: 'play', poolLayer: '',
+    onPress: () => { M.leaving = 0; C.go('LevelSelect', 'zoom', { dur: 0.95 }); } });
+  C.defaultFocus = M.play; C.focus = M.play.id;
+  window.__ppMenu = M; window.__ppC = C; window.__ppScene = runtimeScene; window.__PPLib = LIB;
+  // pre-warm with a few photons already in flight
+  M.prewarm = true;
 }
-
-// ------------------------------------------------------------------ input
-const K = { L: [37, 65, 3037], R: [39, 68, 3039], U: [38, 87, 3038], D: [40, 83, 3040], TAP: [32, 13, 3013], RESTART: [82] };
-const pressed = (arr) => arr.some((c) => im.wasKeyJustPressed(c));
-const actions = [];
-for (const a of ['L', 'R', 'U', 'D', 'TAP']) if (pressed(K[a])) actions.push({ a, src: 'key' });
-if (pressed(K.RESTART)) actions.push({ a: 'RESTART', src: 'key' });
-// swipes: measured in CSS pixels so they feel the same on every screen
-const cssW = (typeof window !== 'undefined' ? window.innerWidth : 800) || 800;
-const gpx = game.getGameResolutionWidth() / cssW;            // game px per CSS px
-const SWIPE_MIN = 22 * gpx, TAP_MAX = 14 * gpx;
-for (const id of im.getStartedTouchIdentifiers()) G.touches[id] = { x0: im.getTouchX(id), y0: im.getTouchY(id), t0: G.time, used: false };
-for (const id of im.getAllTouchIdentifiers()) {
-  const t = G.touches[id]; if (!t) continue;
-  const dx = im.getTouchX(id) - t.x0, dy = im.getTouchY(id) - t.y0, ad = Math.max(Math.abs(dx), Math.abs(dy));
-  if (!t.used && ad >= SWIPE_MIN) {             // fire as soon as the finger has travelled far enough (dominant axis)
-    t.used = true; actions.push({ a: Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy > 0 ? 'D' : 'U'), src: 'swipe' });
-  }
-  if (im.hasTouchEnded(id)) {
-    if (!t.used && ad < TAP_MAX && G.time - t.t0 < 0.4) {
-      // tap: restart button or launch-pad kick
-      const ui = runtimeScene.getLayer('UI'); const p = ui.convertCoords(t.x0, t.y0, 0);
-      const b = G.ui.restart; const bx = b.getCenterXInScene(), by = b.getCenterYInScene();
-      actions.push({ a: Math.hypot(p[0] - bx, p[1] - by) < 44 ? 'RESTART' : 'TAP', src: 'tap' });
-    }
-    delete G.touches[id];
-  }
+const dt = C.rdt, UW = C.UW, UH = C.UH;
+// ---------------------------------------------------------------- layout
+const bx = UW / 2, by = C.portrait ? UH * 0.53 : UH * 0.55;
+M.bx = bx; M.by = by;
+const bhS = C.portrait ? 0.62 : 0.55;
+const GM = 1.05e7, SWALLOW = 24, SOFT = 900;
+// ---------------------------------------------------------------- photons
+function spawnPhoton(warm) {
+  if (M.photons.length >= 16) return;
+  const edge = Math.floor(rand(0, 4)), m = 40;
+  let x, y; if (edge === 0) { x = -m; y = rand(0, UH); } else if (edge === 1) { x = UW + m; y = rand(0, UH); } else if (edge === 2) { x = rand(0, UW); y = -m; } else { x = rand(0, UW); y = UH + m; }
+  const toB = Math.atan2(by - y, bx - x), b = rand(-1, 1) * Math.min(UW, UH) * 0.42, d = Math.hypot(bx - x, by - y);
+  const ang = toB + Math.atan2(b, d), v = rand(260, 420);
+  const color = LIB.PALETTE[Math.floor(rand(0, LIB.PALETTE.length))];
+  const head = C.mk('SparkW', '', x, y, 30, true), halo = C.mk('Soft', '', x, y, 29, true);
+  head.setColor(color); halo.setColor(color);
+  const p = { a0: ang, x, y, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, color, head, halo, lx: x, ly: y, s: rand(0.8, 1.3), minR: 1e9, age: 0, ph: rand(0, 6) };
+  M.photons.push(p);
+  if (warm) { for (let k = 0; k < 40; k++) stepPhoton(p, 1 / 60); p.lx = p.x; p.ly = p.y; }
 }
-for (const id in G.touches) if (!im.getAllTouchIdentifiers().includes(+id)) delete G.touches[id];
-
-G.time += rdt;
-st = G.st; L = G.L;
-// ------------------------------------------------------------------ actions
-function tryAction(a, src) {
-  if (a === 'RESTART') { G.log.push('restart'); G.deaths = 0; loadLevel(G.level); G.state = 'play'; return; }
-  if (G.state === 'title') { G.state = 'play'; G.titleT = 0; if (src === 'tap') return; }
-  if (G.state === 'end') { if (a === 'TAP') { G.state = 'play'; loadLevel(0); } return; }
-  if (G.state !== 'play') return;
-  if (st.mode === 'fly') { G.buffered = a; G.bufferT = 0.22; return; }    // input buffering while flying
-  if (st.mode !== 'stuck') return;
-  if (a === 'TAP') {
-    const d = SIM.padLaunchDir(L, st.i, st.j, st.normal);
-    if (!d) { G.bump = { d: null, t: 0, why: 'nopad' }; G.log.push('tap-nopad'); return; }
-    SIM.startFlight(st, d, true); G.moves++; G.log.push('kick ' + d);
-    const [dx, dy] = DIRV[d]; sparks(st.x - dx * T / 2, st.y - dy * T / 2, dx, dy, 16, '255;80;210', 520); ring(st.x - dx * T / 2, st.y - dy * T / 2, 0.7, [255, 80, 210]);
-    G.shake = Math.max(G.shake, 5); for (const p of G.pads) if (Math.abs(p.i - st.i) + Math.abs(p.j - st.j) <= 1) p.boost = 1;
-    onLaunch(); return;
-  }
-  const c = SIM.checkMove(L, st.i, st.j, a);
-  if (!c.ok) { G.bump = { d: a, t: 0, why: c.why }; G.log.push('reject ' + a + ' ' + c.why); if (c.why === 'into') G.shake = Math.max(G.shake, 1.5); return; }
-  SIM.startFlight(st, a, false); G.moves++; G.log.push('move ' + a); onLaunch();
+function stepPhoton(p, h) {
+  const dx = bx - p.x, dy = by - p.y, r2 = dx * dx + dy * dy + SOFT, r = Math.sqrt(r2);
+  const a = GM * M.zoomPull / r2;
+  p.vx += dx / r * a * h; p.vy += dy / r * a * h;
+  const sp = Math.hypot(p.vx, p.vy), cap = 1400; if (sp > cap) { p.vx *= cap / sp; p.vy *= cap / sp; }
+  p.x += p.vx * h; p.y += p.vy * h; p.age += h; p.minR = Math.min(p.minR, r);
 }
-function onLaunch() { G.firstMove = true; G.lastTrail = [st.x, st.y]; G.squash = -0.35; G.squashV = 0; }
-for (const ac of actions) tryAction(ac.a, ac.src);
-if (G.bufferT > 0) G.bufferT -= rdt;
-
-// ------------------------------------------------------------------ simulation + events
-if (st.mode === 'fly' && (G.state === 'play')) {
-  SIM.step(L, st, rdt);
-  for (const e of st.events) handleEvent(e);
-  st.events = [];
-  if (st.mode === 'stuck' && G.buffered && G.bufferT > 0) { const b = G.buffered; G.buffered = null; tryAction(b, 'buffer'); }
-}
-function handleEvent(e) {
-  if (e.type === 'stick') {
-    const [dx, dy] = e.side ? DIRV[e.side] : [0, 0];
-    const k = Math.min(1, e.impact / SIM.VMAX);
-    const wx = e.fromX + dx * T / 2, wy = e.fromY + dy * T / 2;
-    sparks(wx, wy, -dx, -dy, Math.round(8 + 10 * k), null, 200 + 300 * k); ring(wx, wy, 0.35 + 0.35 * k, [120, 230, 255]);
-    G.shake = Math.max(G.shake, 2 + 4.5 * k); G.squash = 1 * k + 0.2; G.squashV = 0; G.squashAxis = (dx !== 0) ? 'x' : 'y';
-    G.impactDir = [dx, dy]; G.log.push('stick ' + e.i + ',' + e.j);
-    if (e.side) { const [px, py] = [e.i + dx, e.j + dy]; if (SIM.cell(L, px, py) === 'P') { for (const p of G.pads) if (p.i === px && p.j === py) p.boost = 1; showToast('TAP TO LAUNCH', 1.6, '255;120;220'); } }
-  } else if (e.type === 'deflect') {
-    sparks(e.x, e.y, 0, 0, 10, '190;120;255', 260); ring(e.x, e.y, 0.45, [190, 120, 255]); G.shake = Math.max(G.shake, 2);
-    G.squash = 0.5; G.squashAxis = (e.dir === 'L' || e.dir === 'R') ? 'y' : 'x'; G.log.push('deflect ' + e.dir);
-  } else if (e.type === 'graze') {
-    if (!G.lastGraze || G.time - G.lastGraze > 0.15) { sparks(st.x, st.y, 0, 0, 4, null, 120); G.lastGraze = G.time; }
-  } else if (e.type === 'shard') {
-    const s = G.shards[e.k]; s.got = true; G.stats.shards++;
-    sparks(e.x, e.y, 0, 0, 16, '255;215;90', 300); ring(e.x, e.y, 0.6, [255, 215, 90]); G.log.push('shard ' + e.k);
-  } else if (e.type === 'exit') {
-    G.state = 'clear'; G.clearT = 0; G.log.push('exit'); G.exitFrom = [st.x, st.y];
-  } else if (e.type === 'swallow' || e.type === 'lost') {
-    G.state = 'dying'; G.dieT = 0; G.deaths++; G.dieFrom = [st.x, st.y]; G.dieHole = e.type === 'swallow' ? [e.x, e.y] : null;
-    G.log.push(e.type); G.shake = Math.max(G.shake, 6);
-    if (G.dieHole) for (let k = 0; k < 26; k++) { const a = rand(0, 6.28), r = rand(30, 90);
-      part('Spark', e.x + Math.cos(a) * r, e.y + Math.sin(a) * r, { life: 0.6, s0: rand(0.3, 0.6), s1: 0, drag: 2, sink: [e.x, e.y], color: '255;150;120' }); }
-  }
-}
-function showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(color); G.toastT = dur; }
-
-// ------------------------------------------------------------------ state animations
-if (G.state === 'clear') {
-  G.clearT += rdt; const t = G.clearT, P = L.exit;
-  const px = cc(P[0]), py = cc(P[1]);
-  G.vis.x = lerp(G.vis.x, px, 1 - Math.pow(0.0001, rdt)); G.vis.y = lerp(G.vis.y, py, 1 - Math.pow(0.0001, rdt));
-  G.orbScale = Math.max(0, 1 - t / 0.35);
-  if (t - rdt < 0.3 && t >= 0.3) { G.flash = 1; sparks(px, py, 0, 0, 30, '120;255;170', 520); ring(px, py, 1.4, [120, 255, 170]); G.shake = 6; G.clearShown = true; }
-  if (t > 1.6) {
-    if (G.level + 1 < LEVELS.length) { loadLevel(G.level + 1); G.state = 'play'; G.flash = 0.8; }
-    else { G.state = 'end'; G.flash = 0.8; }
-  }
-} else if (G.state === 'dying') {
-  G.dieT += rdt; const t = G.dieT;
-  if (G.dieHole) {   // spiral into the hole
-    const [hx, hy] = G.dieHole, a0 = Math.atan2(G.dieFrom[1] - hy, G.dieFrom[0] - hx), r0 = Math.hypot(G.dieFrom[0] - hx, G.dieFrom[1] - hy);
-    const u = Math.min(1, t / 0.55), r = r0 * (1 - ease(u)), a = a0 + u * 7;
-    G.vis.x = hx + Math.cos(a) * r; G.vis.y = hy + Math.sin(a) * r; G.orbScale = Math.max(0, 1 - u);
-    for (const h of G.holes) if (h.x === hx && h.y === hy) h.pulse = Math.max(h.pulse, u < 1 ? 0.3 : 0);
-    if (t - rdt < 0.55 && t >= 0.55) { G.flash = 0.45; for (const h of G.holes) if (h.x === hx && h.y === hy) h.pulse = 1; ring(hx, hy, 1.2, [255, 110, 150]); G.shake = 7; showToast('SWALLOWED', 1.2, '255;120;160'); }
-  } else { G.orbScale = Math.max(0, 1 - t / 0.3); }
-  if (t > 1.05) {    // respawn at the last spot the orb was stuck to
-    const [i, j] = st.lastStuck; Object.assign(st, { mode: 'stuck', i, j, x: cc(i), y: cc(j), vx: 0, vy: 0, speed: 0, events: [] });
-    G.vis.x = st.x; G.vis.y = st.y; G.orbScale = 0; G.spawnT = 0; G.state = 'play'; ring(st.x, st.y, 0.6, [140, 240, 255]); G.log.push('respawn ' + i + ',' + j);
-  }
-}
-
-// ------------------------------------------------------------------ orb visuals
-if (G.state === 'play' || G.state === 'title' || G.state === 'end') {
-  if (G.orbScale < 1) { G.spawnT += rdt; G.orbScale = Math.min(1, ease(G.spawnT / 0.35) * 1.0); }
-  if (st.mode === 'fly') { G.vis.x = st.x; G.vis.y = st.y; }
-  else {
-    // hug the wall(s) it is stuck to, ease from the impact point to the snapped tile centre
-    let hx = 0, hy = 0; for (const d of SIM.contacts(L, st.i, st.j)) { hx += DIRV[d][0]; hy += DIRV[d][1]; }
-    const hug = 7, tx = st.x + Math.sign(hx) * hug, ty = st.y + Math.sign(hy) * hug, k = 1 - Math.pow(0.000002, rdt);
-    G.vis.x = lerp(G.vis.x, tx, k); G.vis.y = lerp(G.vis.y, ty, k);
-  }
-}
-// squash spring
-G.squashV += (-G.squash * 520 - G.squashV * 22) * rdt; G.squash += G.squashV * rdt;
-let ox = 0, oy = 0;
-if (G.bump) {     // illegal move: little wiggle (toward the swipe for "into", sideways shiver for "away")
-  G.bump.t += rdt; const u = G.bump.t / 0.32, amp = 5 * (1 - u) * Math.sin(u * Math.PI * 5);
-  if (G.bump.d) { const [dx, dy] = DIRV[G.bump.d]; if (G.bump.why === 'into') { ox = dx * Math.abs(amp); oy = dy * Math.abs(amp); } else { ox = dx * amp * 0.8; oy = dy * amp * 0.8; } }
-  else { G.squash = Math.max(G.squash, 0.15 * (1 - u)); }
-  if (u >= 1) G.bump = null;
-}
-const orb = G.orb, halo = G.halo, sp = st.mode === 'fly' ? st.speed / SIM.VMAX : 0;
-const pulse = 1 + 0.06 * Math.sin(G.time * 3.2);
-let sxs = 0.5 * G.orbScale * pulse, sys = sxs, ang = 0;
-if (st.mode === 'fly' && G.state === 'play') { ang = Math.atan2(st.vy, st.vx) * 180 / Math.PI; sxs *= 1 + 0.45 * sp; sys *= 1 - 0.22 * sp; }
-else { const q = G.squash; if (G.squashAxis === 'x') { sxs *= 1 - 0.42 * q; sys *= 1 + 0.3 * q; } else { sxs *= 1 + 0.3 * q; sys *= 1 - 0.42 * q; } }
-orb.setPosition(G.vis.x + ox, G.vis.y + oy); orb.setAngle(ang); orb.setScaleX(Math.max(0.001, sxs)); orb.setScaleY(Math.max(0.001, sys));
-orb.setColor(G.bump ? '255;170;190' : '255;255;255');
-halo.setPosition(G.vis.x + ox, G.vis.y + oy); halo.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.1 * Math.sin(G.time * 2.1) + 0.25 * sp)));
-halo.setOpacity(200 + 55 * sp);
-// light trail
-if (st.mode === 'fly' && G.state === 'play') {
-  const [lx, ly] = G.lastTrail || [st.x, st.y]; const dist = Math.hypot(st.x - lx, st.y - ly), stepD = 3.5;
+M.zoomPull = C.trans ? 1 + 6 * clamp(C.trans.t / C.trans.dur, 0, 1) : 1;
+if (M.prewarm) { M.prewarm = false; for (let k = 0; k < 7; k++) spawnPhoton(true); }
+M.spawnT -= dt; if (M.spawnT <= 0) { spawnPhoton(false); M.spawnT = rand(0.18, 0.42); }
+for (let k = M.photons.length - 1; k >= 0; k--) {
+  const p = M.photons[k];
+  const sub = 4; for (let s = 0; s < sub; s++) stepPhoton(p, dt / sub);
+  const r = Math.hypot(bx - p.x, by - p.y);
+  // trail: dense additive dots along the path
+  const dist = Math.hypot(p.x - p.lx, p.y - p.ly), stepD = 9;
   for (let s = stepD; s <= dist; s += stepD) {
-    const u = s / dist, x = lerp(lx, st.x, u), y = lerp(ly, st.y, u);
-    const tp = part('Trail', x, y, { life: 0.42, s0: 0.62, s1: 0.04, drag: 0, a0: 200, z: 25, color: '150;225;255' }); if (tp) tp.lin = true;
-    G.trailN = (G.trailN || 0) + 1;
-    if (G.trailN % 4 === 0) { const t2 = part('OrbHalo', x, y, { life: 0.5, s0: 0.16, s1: 0.02, drag: 0, a0: 90, z: 24 }); if (t2) t2.lin = true; }
+    const u = s / dist;
+    C.part('TrailW', '', lerp(p.lx, p.x, u), lerp(p.ly, p.y, u), { life: 0.5, s0: 0.42 * p.s, s1: 0.03, drag: 0, a0: 190, z: 25, color: p.color, lin: true });
   }
-  if (dist >= stepD) G.lastTrail = [st.x, st.y];
-} else if (G.state === 'play' && Math.random() < rdt * 3) {
-  part('Spark', G.vis.x + rand(-8, 8), G.vis.y + rand(-8, 8), { vx: rand(-15, 15), vy: rand(-35, -10), life: 0.9, s0: 0.25, s1: 0, drag: 0.5, a0: 160 });
+  if (dist >= stepD) { p.lx = p.x; p.ly = p.y; }
+  p.head.setPosition(p.x, p.y); p.head.setScale(0.9 * p.s * (1 + 0.15 * Math.sin(C.time * 9 + p.ph)));
+  p.halo.setPosition(p.x, p.y); p.halo.setScale(0.32 * p.s); p.halo.setOpacity(150);
+  if (r < SWALLOW) {   // swallowed: tiny implode flash
+    M.swallowed++; M.pulse = Math.min(1.4, M.pulse + 0.7);
+    C.part('RingW', '', bx, by, { life: 0.35, s0: 0.5, s1: 0.02, drag: 0, color: p.color, z: 12, a0: 255 });
+    C.part('Soft', '', bx, by, { life: 0.25, s0: 0.5, s1: 0.1, drag: 0, color: '255;255;255', z: 12, a0: 220 });
+    for (let q = 0; q < 8; q++) { const a = rand(0, 6.28), rr = rand(20, 50); C.part('SparkW', '', bx + Math.cos(a) * rr, by + Math.sin(a) * rr, { life: 0.4, s0: 0.5, s1: 0, drag: 2, sink: [bx, by], color: p.color, z: 12 }); }
+    C.del(p.head); C.del(p.halo); M.photons.splice(k, 1); continue;
+  }
+  if (p.x < -160 || p.x > UW + 160 || p.y < -160 || p.y > UH + 160) {
+    if (p.minR < 150) M.slung++;
+    let da = Math.abs(Math.atan2(p.vy, p.vx) - p.a0); if (da > Math.PI) da = 2 * Math.PI - da; if (da > 0.35) M.bent = (M.bent || 0) + 1;
+    C.del(p.head); C.del(p.halo); M.photons.splice(k, 1);
+  }
 }
-updateParts(rdt);
-
-// ------------------------------------------------------------------ world objects animation
-if (G.portal) {
-  const p = G.portal, s = 0.5 * (1 + 0.08 * Math.sin(G.time * 4)) * (G.state === 'clear' ? 1 + 0.6 * ease(G.clearT / 0.3) : 1);
-  p.core.setScale(s); p.r1.setScale(0.5 * (1 + 0.04 * Math.sin(G.time * 2))); p.r2.setScale(0.5);
-  p.r1.setAngle(G.time * 60); p.r2.setAngle(-G.time * 110);
-}
-for (const s of G.shards) {
-  if (s.got) { if (s.o.getOpacity() > 0) { s.o.setOpacity(Math.max(0, s.o.getOpacity() - rdt * 900)); s.o.setScale(s.o.getScaleX() + rdt * 2); } continue; }
-  s.o.setPosition(cc(s.i), cc(s.j) + Math.sin(G.time * 2.5 + s.k) * 3); s.o.setScale(0.5 * (1 + 0.1 * Math.sin(G.time * 5 + s.k)));
-}
-for (const p of G.pads) {
-  p.boost = Math.max(0, p.boost - rdt * 1.5);
-  const onIt = st.mode === 'stuck' && st.i === p.i + p.dx && st.j === p.j + p.dy;
-  p.g.setOpacity(Math.min(255, 150 + 90 * Math.sin(G.time * 5) + (onIt ? 60 : 0) + 120 * p.boost)); p.g.setScaleX(0.5 * (1 + 0.6 * p.boost));
-  const u = (G.time * 0.9) % 1; p.ch.setPosition(cc(p.i) + p.dx * (T * 0.55 + u * 26), cc(p.j) + p.dy * (T * 0.55 + u * 26));
-  p.ch.setOpacity((onIt ? 255 : 150) * Math.sin(u * Math.PI));
-}
-for (const h of G.holes) {
-  h.pulse = Math.max(0, h.pulse - rdt * 1.6);
-  h.disk.setAngle(G.time * 140); h.swirl.setAngle(G.time * 40); h.range.setAngle(-G.time * 6);
-  h.disk.setScale(0.5 * (1 + 0.05 * Math.sin(G.time * 6) + 0.4 * h.pulse)); h.core.setScale(0.5 * (1 + 0.3 * h.pulse));
-  h.glow.setScale(0.5 * (1 + 0.15 * Math.sin(G.time * 1.7) + 0.6 * h.pulse));
-  h.range.setOpacity(st.mode === 'fly' ? 255 : 130 + 40 * Math.sin(G.time * 2));
-}
-// ambient motes (pulled into black holes)
-for (const m of G.motes) {
-  m.ph += rdt; m.x += m.vx * rdt; m.y += m.vy * rdt;
-  for (const h of G.holes) { const dx = h.x - m.x, dy = h.y - m.y, d = Math.hypot(dx, dy) || 1;
-    if (d < 180) { m.x += (dx / d * 40 - dy / d * 60) * rdt * (1 - d / 180); m.y += (dy / d * 40 + dx / d * 60) * rdt * (1 - d / 180); }
-    if (d < 14) { m.x = rand(-80, G.W + 80); m.y = G.H + 60; } }
-  if (m.y < -100) { m.y = G.H + 80; m.x = rand(-80, G.W + 80); }
-  if (m.x < -120) m.x = G.W + 100; if (m.x > G.W + 120) m.x = -100;
-  m.o.setPosition(m.x, m.y); m.o.setScale(m.s * 0.5); m.o.setOpacity(70 + 70 * Math.sin(m.ph * 1.3));
-}
-
-// ------------------------------------------------------------------ resolution + camera fit (portrait & landscape)
-if (typeof window !== 'undefined') {
-  const cw = window.innerWidth || 800, ch = window.innerHeight || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let h = Math.round(Math.min(ch * dpr, Math.sqrt(2.2e6 * ch / cw))); h = Math.max(480, h);
-  const key = cw + 'x' + ch + ':' + h;
-  if (key !== G.resKey) { G.resKey = key; game.setGameResolutionSize(Math.round(h * cw / ch), h); }
-}
-const rw = game.getGameResolutionWidth(), rh = game.getGameResolutionHeight();
-const uiS = Math.min(rw, rh) / 720;
-const hudTop = 120 * uiS, hudBot = 90 * uiS;          // keep the level clear of the HUD
-const zoom = Math.min((rw - 24 * uiS) / (G.W + 16), (rh - hudTop - hudBot) / (G.H + 16));
-G.shake *= Math.exp(-9 * rdt); if (G.shake < 0.05) G.shake = 0;
-const shx = (Math.random() * 2 - 1) * G.shake, shy = (Math.random() * 2 - 1) * G.shake;
-const camX = G.W / 2 + shx, camY = G.H / 2 - (hudTop - hudBot) / 2 / zoom + shy;
-for (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(zoom); l.setCameraX(camX); l.setCameraY(camY); }
-G.zoom = zoom;
-G.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);
-// black-hole lensing on the background grid (BulgePinch effect on the Bg layer)
+C.updateParts(dt);
+// ---------------------------------------------------------------- black hole
+M.pulse = Math.max(0, M.pulse - dt * 1.8);
+const B = M.bh;
+B.disk.setAngle(C.time * 140); B.swirl.setAngle(C.time * 40); B.range.setAngle(-C.time * 6);
+for (const k of ['range', 'swirl', 'glow', 'disk', 'core']) B[k].setPosition(bx, by);
+B.disk.setScale(bhS * (1 + 0.05 * Math.sin(C.time * 6) + 0.25 * M.pulse)); B.core.setScale(bhS * (1 + 0.25 * M.pulse));
+B.swirl.setScale(bhS * 1.0); B.swirl.setOpacity(190); B.range.setScale(bhS * 1.15); B.range.setOpacity(90);
+B.glow.setScale(bhS * 1.1 * (1 + 0.15 * Math.sin(C.time * 1.7) + 0.5 * M.pulse)); B.glow.setOpacity(200);
+B.halo.setPosition(bx, by); B.halo.setScale(bhS * 2.4); B.halo.setOpacity(35 + 60 * M.pulse);
+C.updateMotes(dt, UW, UH, [[bx, by, 260]]);
+// ---------------------------------------------------------------- cameras (world == UI units), zoom into the hole when leaving
+const [shx, shy] = C.shakeOffset();
+const tz = C.trans ? clamp(C.trans.t / C.trans.dur, 0, 1) : 0;
+const z = 1 + 5 * Math.pow(tz, 2.4);
+const camX = lerp(UW / 2, bx, ease(tz * 1.4)) + shx, camY = lerp(UH / 2, by, ease(tz * 1.4)) + shy;
+for (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(C.uiS * z); l.setCameraX(camX); l.setCameraY(camY); }
+C.bgT.setPosition(-2112, -2112);
+C.neb.setPosition(bx, by); C.neb.setScale(Math.max(UW, UH) / 512 * 1.6); C.neb.setAngle(C.time * 2); C.neb.setOpacity(160);
 const bgL = runtimeScene.getLayer('Bg');
-if (G.holes.length) {
-  const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;
-  bgL.enableEffect('Lens', true);
-  bgL.setEffectDoubleParameter('Lens', 'centerX', sx / rw); bgL.setEffectDoubleParameter('Lens', 'centerY', sy / rh);
-  bgL.setEffectDoubleParameter('Lens', 'radius', 150 * zoom); bgL.setEffectDoubleParameter('Lens', 'strength', -0.55 - 0.3 * h.pulse);
-} else bgL.enableEffect('Lens', false);
-
-// ------------------------------------------------------------------ UI layout
-const ui = runtimeScene.getLayer('UI'); ui.setCameraZoom(uiS); ui.setCameraX(rw / 2 / uiS); ui.setCameraY(rh / 2 / uiS);
-const UW = rw / uiS, UH = rh / uiS;
-G.ui.flash.setPosition(-10, -10); G.ui.flash.setWidth(UW + 20); G.ui.flash.setHeight(UH + 20);
-G.ui.dim.setPosition(-10, -10); G.ui.dim.setWidth(UW + 20); G.ui.dim.setHeight(UH + 20); G.ui.dim.setOpacity(((G.state === 'title' || G.state === 'end') ? 170 : 0) * (1 - (G.state === 'end' ? 0 : G.titleT || 0)));
-G.flash = Math.max(0, G.flash - rdt * 2.2); G.ui.flash.setOpacity(255 * G.flash * G.flash);
-// title: big card at start, then shrinks to a tiny neon logo at the top
-const titleTarget = (G.state === 'title') ? 0 : 1; G.titleT = lerp(G.titleT || 0, titleTarget, 1 - Math.pow(0.002, rdt));
-const tt = G.titleT, bigS = Math.min(0.62, (UW - 40) / 980), smallS = 0.17;
-const tS = lerp(bigS, smallS, tt), tY = lerp(UH * 0.36, 26, tt);
-const tA = G.ui.titleA, tB = G.ui.titleB;
-tA.setScale(tS); tB.setScale(tS);
-const gap = 6 * tS / 0.62;
-tA.setPosition(UW / 2 - tA.getWidth() / 2 - (tt > 0.5 ? tB.getWidth() / 2 * 0 : 0), tY - tA.getHeight() + gap * 8);
-tB.setPosition(UW / 2 - tB.getWidth() / 2, tY + gap * 2);
-if (tt > 0.02) { // side by side when small
-  const w = tA.getWidth() + tB.getWidth() - 40 * tS;
-  const ax = lerp(UW / 2 - tA.getWidth() / 2, UW / 2 - w / 2, tt), bx = lerp(UW / 2 - tB.getWidth() / 2, UW / 2 - w / 2 + tA.getWidth() - 40 * tS, tt);
-  const ay = lerp(tY - tA.getHeight() + gap * 8, tY - tA.getHeight() / 2, tt), by = lerp(tY + gap * 2, tY - tB.getHeight() / 2, tt);
-  tA.setPosition(ax, ay); tB.setPosition(bx, by);
-}
-const flick = 0.9 + 0.1 * Math.sin(G.time * 23) * Math.sin(G.time * 7.3);
-tA.setOpacity(255 * flick); tB.setOpacity(255 * (0.92 + 0.08 * Math.sin(G.time * 17)));
-G.ui.start.setString(G.state === 'end' ? 'ALL LEVELS CLEAR  -  ' + G.stats.shards + ' SHARDS\nTAP / SPACE TO PLAY AGAIN' : 'SWIPE TO PLAY\nARROWS / WASD  -  SPACE TO LAUNCH');
-const showStart = G.state === 'title' || G.state === 'end';
-G.ui.start.setOpacity(showStart ? 160 + 95 * Math.sin(G.time * 4) : 0);
-G.ui.start.setPosition(UW / 2 - G.ui.start.getWidth() / 2, G.state === 'end' ? UH * 0.42 : tB.getY() + tB.getHeight() + 10);
-if (G.state === 'end') { tA.setOpacity(0); tB.setOpacity(0); }
-const hudA = G.state === 'title' ? 0 : 255;
-G.ui.level.setOpacity(hudA); G.ui.level.setPosition(UW / 2 - G.ui.level.getWidth() / 2, 52);
-const got = G.shards.filter((s) => s.got).length;
-G.ui.shards.setString(G.shards.length ? (got + ' / ' + G.shards.length) : ''); G.ui.shards.setOpacity(hudA);
-G.ui.shards.setPosition(UW / 2 - G.ui.shards.getWidth() / 2 + 12, 82);
-G.ui.shardIcon.setScale(0.3); G.ui.shardIcon.setPosition(UW / 2 - G.ui.shards.getWidth() / 2 - 8, 82 + G.ui.shards.getHeight() / 2); G.ui.shardIcon.setOpacity(G.shards.length ? hudA : 0);
-G.ui.restart.setScale(0.34); G.ui.restart.setPosition(UW - 44, 44); G.ui.restart.setOpacity(G.state === 'title' ? 0 : 200);
-G.hintA = (G.firstMove && G.moves >= 2) ? Math.max(0.35, G.hintA - rdt * 0.5) : 1;
-G.ui.hint.setWrapping(true); G.ui.hint.setWrappingWidth(Math.min(UW - 40, 620));
-G.ui.hint.setOpacity((G.state === 'title' ? 0 : 230) * G.hintA); G.ui.hint.setPosition(UW / 2 - G.ui.hint.getWidth() / 2, UH - 30 - G.ui.hint.getHeight());
-const cl = G.ui.clear; const ct = G.state === 'clear' ? G.clearT - 0.3 : -1;
-cl.setScale(0.5 * (ct > 0 ? 1 + 0.25 * (1 - ease(ct / 0.4)) : 1) * Math.min(1, (UW - 40) / 620)); cl.setOpacity(ct > 0 ? 255 * Math.min(1, ct * 5) * (ct > 1.0 ? Math.max(0, 1 - (ct - 1.0) * 4) : 1) : 0);
-cl.setPosition(UW / 2 - cl.getWidth() / 2, UH * 0.42 - cl.getHeight() / 2);
-G.toastT = Math.max(0, (G.toastT || 0) - rdt);
-G.ui.toast.setOpacity(255 * Math.min(1, G.toastT * 3)); G.ui.toast.setPosition(UW / 2 - G.ui.toast.getWidth() / 2, UH - 92 - G.ui.hint.getHeight());
+const sx = (bx - camX) * C.uiS * z + C.rw / 2, sy = (by - camY) * C.uiS * z + C.rh / 2;
+bgL.setEffectDoubleParameter('Lens', 'centerX', sx / C.rw); bgL.setEffectDoubleParameter('Lens', 'centerY', sy / C.rh);
+bgL.setEffectDoubleParameter('Lens', 'radius', 210 * C.uiS * z); bgL.setEffectDoubleParameter('Lens', 'strength', -0.6 - 0.25 * M.pulse - 0.3 * tz);
+// ---------------------------------------------------------------- logo: big, flickering neon with a slow pulse
+M.logoIn = Math.min(1, M.logoIn + dt / 0.8);
+M.nextStutter -= dt; if (M.nextStutter <= 0) { M.stutter = rand(0.18, 0.4); M.nextStutter = rand(2.2, 5); M.stutterWho = Math.random() < 0.5 ? 0 : 1; }
+M.stutter = Math.max(0, M.stutter - dt);
+const flickA = M.stutter > 0 && M.stutterWho === 0 ? (Math.random() < 0.55 ? 0.25 : 1) : 1;
+const flickB = M.stutter > 0 && M.stutterWho === 1 ? (Math.random() < 0.55 ? 0.25 : 1) : 1;
+const pulse = 1 + 0.025 * Math.sin(C.time * 2.2);
+const tS = Math.min(C.portrait ? 0.66 : 0.5, (UW - 50) / 990, UH / 1500) * pulse * (0.7 + 0.3 * LIB.easeBack(M.logoIn));
+const tA = M.tA, tB = M.tB; tA.setScale(tS); tB.setScale(tS);
+const ty = C.portrait ? UH * 0.17 : UH * 0.15;
+tA.setPosition(UW / 2 - tA.getWidth() / 2, ty - tA.getHeight() * 0.80);
+tB.setPosition(UW / 2 - tB.getWidth() / 2, ty - tB.getHeight() * 0.18);
+const base = 0.88 + 0.12 * Math.sin(C.time * 23) * Math.sin(C.time * 7.3);
+tA.setOpacity(255 * M.logoIn * base * flickA); tB.setOpacity(255 * M.logoIn * (0.92 + 0.08 * Math.sin(C.time * 17)) * flickB);
+M.logoGlow.setColor('40;200;255'); M.logoGlow.setPosition(UW / 2, tA.getY() + tA.getHeight() / 2); M.logoGlow.setScaleX(tS * 6); M.logoGlow.setScaleY(tS * 1.8); M.logoGlow.setOpacity(38 * flickA * M.logoIn * (0.8 + 0.2 * Math.sin(C.time * 2.2)));
+M.logoGlow2.setColor('255;50;200'); M.logoGlow2.setPosition(UW / 2, tB.getY() + tB.getHeight() / 2); M.logoGlow2.setScaleX(tS * 6); M.logoGlow2.setScaleY(tS * 1.8); M.logoGlow2.setOpacity(38 * flickB * M.logoIn * (0.8 + 0.2 * Math.sin(C.time * 2.2 + 1)));
+M.tag.setPosition(UW / 2 - M.tag.getWidth() / 2, tB.getY() + tB.getHeight() * 0.86); M.tag.setOpacity(200 * M.logoIn);
+// ---------------------------------------------------------------- PLAY button + footer
+M.play.x = UW / 2; M.play.y = C.portrait ? UH * 0.82 : UH * 0.84; M.play.scale = C.portrait ? 1 : 0.85;
+C.updateButtons(dt);
+M.foot.setPosition(UW / 2 - M.foot.getWidth() / 2, M.play.y + 95 * M.play.scale); M.foot.setOpacity(150 * clamp((C.time - 1) * 2, 0, 1));
+C.updateTrans(dt);
 
 };
-gdjs.GameCode.eventsList0 = function(runtimeScene) {
+gdjs.MenuCode.eventsList0 = function(runtimeScene) {
 
 {
 
 
-gdjs.GameCode.userFunc0x906d00(runtimeScene);
+gdjs.MenuCode.userFunc0x940898(runtimeScene);
 
 }
 
 
-};gdjs.GameCode.eventsList1 = function(runtimeScene) {
+};gdjs.MenuCode.eventsList1 = function(runtimeScene) {
 
 {
 
 
-gdjs.GameCode.eventsList0(runtimeScene);
+gdjs.MenuCode.eventsList0(runtimeScene);
 }
 
 
 };
 
-gdjs.GameCode.func = function(runtimeScene) {
+gdjs.MenuCode.func = function(runtimeScene) {
 runtimeScene.getOnceTriggers().startNewFrame();
 
-gdjs.GameCode.GDBgTileObjects1.length = 0;
-gdjs.GameCode.GDBgTileObjects2.length = 0;
-gdjs.GameCode.GDNebulaObjects1.length = 0;
-gdjs.GameCode.GDNebulaObjects2.length = 0;
-gdjs.GameCode.GDMoteObjects1.length = 0;
-gdjs.GameCode.GDMoteObjects2.length = 0;
-gdjs.GameCode.GDLevelArtObjects1.length = 0;
-gdjs.GameCode.GDLevelArtObjects2.length = 0;
-gdjs.GameCode.GDPadGlowObjects1.length = 0;
-gdjs.GameCode.GDPadGlowObjects2.length = 0;
-gdjs.GameCode.GDPadChevronObjects1.length = 0;
-gdjs.GameCode.GDPadChevronObjects2.length = 0;
-gdjs.GameCode.GDPortalCoreObjects1.length = 0;
-gdjs.GameCode.GDPortalCoreObjects2.length = 0;
-gdjs.GameCode.GDPortalRingObjects1.length = 0;
-gdjs.GameCode.GDPortalRingObjects2.length = 0;
-gdjs.GameCode.GDPortalRing2Objects1.length = 0;
-gdjs.GameCode.GDPortalRing2Objects2.length = 0;
-gdjs.GameCode.GDShardObjects1.length = 0;
-gdjs.GameCode.GDShardObjects2.length = 0;
-gdjs.GameCode.GDShardIconObjects1.length = 0;
-gdjs.GameCode.GDShardIconObjects2.length = 0;
-gdjs.GameCode.GDBhRangeObjects1.length = 0;
-gdjs.GameCode.GDBhRangeObjects2.length = 0;
-gdjs.GameCode.GDBhSwirlObjects1.length = 0;
-gdjs.GameCode.GDBhSwirlObjects2.length = 0;
-gdjs.GameCode.GDBhGlowObjects1.length = 0;
-gdjs.GameCode.GDBhGlowObjects2.length = 0;
-gdjs.GameCode.GDBhDiskObjects1.length = 0;
-gdjs.GameCode.GDBhDiskObjects2.length = 0;
-gdjs.GameCode.GDBhCoreObjects1.length = 0;
-gdjs.GameCode.GDBhCoreObjects2.length = 0;
-gdjs.GameCode.GDTrailObjects1.length = 0;
-gdjs.GameCode.GDTrailObjects2.length = 0;
-gdjs.GameCode.GDSparkObjects1.length = 0;
-gdjs.GameCode.GDSparkObjects2.length = 0;
-gdjs.GameCode.GDRingObjects1.length = 0;
-gdjs.GameCode.GDRingObjects2.length = 0;
-gdjs.GameCode.GDOrbHaloObjects1.length = 0;
-gdjs.GameCode.GDOrbHaloObjects2.length = 0;
-gdjs.GameCode.GDOrbObjects1.length = 0;
-gdjs.GameCode.GDOrbObjects2.length = 0;
-gdjs.GameCode.GDPreviewOrbObjects1.length = 0;
-gdjs.GameCode.GDPreviewOrbObjects2.length = 0;
-gdjs.GameCode.GDTitlePhantomObjects1.length = 0;
-gdjs.GameCode.GDTitlePhantomObjects2.length = 0;
-gdjs.GameCode.GDTitlePhotonObjects1.length = 0;
-gdjs.GameCode.GDTitlePhotonObjects2.length = 0;
-gdjs.GameCode.GDTxtClearObjects1.length = 0;
-gdjs.GameCode.GDTxtClearObjects2.length = 0;
-gdjs.GameCode.GDBtnRestartObjects1.length = 0;
-gdjs.GameCode.GDBtnRestartObjects2.length = 0;
-gdjs.GameCode.GDFlashObjects1.length = 0;
-gdjs.GameCode.GDFlashObjects2.length = 0;
-gdjs.GameCode.GDLevelTextObjects1.length = 0;
-gdjs.GameCode.GDLevelTextObjects2.length = 0;
-gdjs.GameCode.GDShardTextObjects1.length = 0;
-gdjs.GameCode.GDShardTextObjects2.length = 0;
-gdjs.GameCode.GDHintTextObjects1.length = 0;
-gdjs.GameCode.GDHintTextObjects2.length = 0;
-gdjs.GameCode.GDStartTextObjects1.length = 0;
-gdjs.GameCode.GDStartTextObjects2.length = 0;
-gdjs.GameCode.GDToastTextObjects1.length = 0;
-gdjs.GameCode.GDToastTextObjects2.length = 0;
+gdjs.MenuCode.GDBgTileObjects1.length = 0;
+gdjs.MenuCode.GDBgTileObjects2.length = 0;
+gdjs.MenuCode.GDNebulaObjects1.length = 0;
+gdjs.MenuCode.GDNebulaObjects2.length = 0;
+gdjs.MenuCode.GDMoteObjects1.length = 0;
+gdjs.MenuCode.GDMoteObjects2.length = 0;
+gdjs.MenuCode.GDLevelArtObjects1.length = 0;
+gdjs.MenuCode.GDLevelArtObjects2.length = 0;
+gdjs.MenuCode.GDPadGlowObjects1.length = 0;
+gdjs.MenuCode.GDPadGlowObjects2.length = 0;
+gdjs.MenuCode.GDPadChevronObjects1.length = 0;
+gdjs.MenuCode.GDPadChevronObjects2.length = 0;
+gdjs.MenuCode.GDPortalCoreObjects1.length = 0;
+gdjs.MenuCode.GDPortalCoreObjects2.length = 0;
+gdjs.MenuCode.GDPortalRingObjects1.length = 0;
+gdjs.MenuCode.GDPortalRingObjects2.length = 0;
+gdjs.MenuCode.GDPortalRing2Objects1.length = 0;
+gdjs.MenuCode.GDPortalRing2Objects2.length = 0;
+gdjs.MenuCode.GDShardObjects1.length = 0;
+gdjs.MenuCode.GDShardObjects2.length = 0;
+gdjs.MenuCode.GDShardIconObjects1.length = 0;
+gdjs.MenuCode.GDShardIconObjects2.length = 0;
+gdjs.MenuCode.GDBhRangeObjects1.length = 0;
+gdjs.MenuCode.GDBhRangeObjects2.length = 0;
+gdjs.MenuCode.GDBhSwirlObjects1.length = 0;
+gdjs.MenuCode.GDBhSwirlObjects2.length = 0;
+gdjs.MenuCode.GDBhGlowObjects1.length = 0;
+gdjs.MenuCode.GDBhGlowObjects2.length = 0;
+gdjs.MenuCode.GDBhDiskObjects1.length = 0;
+gdjs.MenuCode.GDBhDiskObjects2.length = 0;
+gdjs.MenuCode.GDBhCoreObjects1.length = 0;
+gdjs.MenuCode.GDBhCoreObjects2.length = 0;
+gdjs.MenuCode.GDTrailObjects1.length = 0;
+gdjs.MenuCode.GDTrailObjects2.length = 0;
+gdjs.MenuCode.GDSparkObjects1.length = 0;
+gdjs.MenuCode.GDSparkObjects2.length = 0;
+gdjs.MenuCode.GDRingObjects1.length = 0;
+gdjs.MenuCode.GDRingObjects2.length = 0;
+gdjs.MenuCode.GDOrbHaloObjects1.length = 0;
+gdjs.MenuCode.GDOrbHaloObjects2.length = 0;
+gdjs.MenuCode.GDOrbObjects1.length = 0;
+gdjs.MenuCode.GDOrbObjects2.length = 0;
+gdjs.MenuCode.GDPreviewOrbObjects1.length = 0;
+gdjs.MenuCode.GDPreviewOrbObjects2.length = 0;
+gdjs.MenuCode.GDTitlePhantomObjects1.length = 0;
+gdjs.MenuCode.GDTitlePhantomObjects2.length = 0;
+gdjs.MenuCode.GDTitlePhotonObjects1.length = 0;
+gdjs.MenuCode.GDTitlePhotonObjects2.length = 0;
+gdjs.MenuCode.GDTxtClearObjects1.length = 0;
+gdjs.MenuCode.GDTxtClearObjects2.length = 0;
+gdjs.MenuCode.GDBtnRestartObjects1.length = 0;
+gdjs.MenuCode.GDBtnRestartObjects2.length = 0;
+gdjs.MenuCode.GDFlashObjects1.length = 0;
+gdjs.MenuCode.GDFlashObjects2.length = 0;
+gdjs.MenuCode.GDLevelTextObjects1.length = 0;
+gdjs.MenuCode.GDLevelTextObjects2.length = 0;
+gdjs.MenuCode.GDShardTextObjects1.length = 0;
+gdjs.MenuCode.GDShardTextObjects2.length = 0;
+gdjs.MenuCode.GDHintTextObjects1.length = 0;
+gdjs.MenuCode.GDHintTextObjects2.length = 0;
+gdjs.MenuCode.GDStartTextObjects1.length = 0;
+gdjs.MenuCode.GDStartTextObjects2.length = 0;
+gdjs.MenuCode.GDToastTextObjects1.length = 0;
+gdjs.MenuCode.GDToastTextObjects2.length = 0;
+gdjs.MenuCode.GDBtnPillObjects1.length = 0;
+gdjs.MenuCode.GDBtnPillObjects2.length = 0;
+gdjs.MenuCode.GDBtnPillSObjects1.length = 0;
+gdjs.MenuCode.GDBtnPillSObjects2.length = 0;
+gdjs.MenuCode.GDBtnGlowObjects1.length = 0;
+gdjs.MenuCode.GDBtnGlowObjects2.length = 0;
+gdjs.MenuCode.GDBtnGlowSObjects1.length = 0;
+gdjs.MenuCode.GDBtnGlowSObjects2.length = 0;
+gdjs.MenuCode.GDBtnRoundObjects1.length = 0;
+gdjs.MenuCode.GDBtnRoundObjects2.length = 0;
+gdjs.MenuCode.GDBtnRoundGlowObjects1.length = 0;
+gdjs.MenuCode.GDBtnRoundGlowObjects2.length = 0;
+gdjs.MenuCode.GDIcBackObjects1.length = 0;
+gdjs.MenuCode.GDIcBackObjects2.length = 0;
+gdjs.MenuCode.GDIcLeftObjects1.length = 0;
+gdjs.MenuCode.GDIcLeftObjects2.length = 0;
+gdjs.MenuCode.GDIcRightObjects1.length = 0;
+gdjs.MenuCode.GDIcRightObjects2.length = 0;
+gdjs.MenuCode.GDIcLockObjects1.length = 0;
+gdjs.MenuCode.GDIcLockObjects2.length = 0;
+gdjs.MenuCode.GDIcCheckObjects1.length = 0;
+gdjs.MenuCode.GDIcCheckObjects2.length = 0;
+gdjs.MenuCode.GDIcRestartObjects1.length = 0;
+gdjs.MenuCode.GDIcRestartObjects2.length = 0;
+gdjs.MenuCode.GDIcPlayObjects1.length = 0;
+gdjs.MenuCode.GDIcPlayObjects2.length = 0;
+gdjs.MenuCode.GDNodeFillObjects1.length = 0;
+gdjs.MenuCode.GDNodeFillObjects2.length = 0;
+gdjs.MenuCode.GDSoftObjects1.length = 0;
+gdjs.MenuCode.GDSoftObjects2.length = 0;
+gdjs.MenuCode.GDSparkWObjects1.length = 0;
+gdjs.MenuCode.GDSparkWObjects2.length = 0;
+gdjs.MenuCode.GDRingWObjects1.length = 0;
+gdjs.MenuCode.GDRingWObjects2.length = 0;
+gdjs.MenuCode.GDTrailWObjects1.length = 0;
+gdjs.MenuCode.GDTrailWObjects2.length = 0;
+gdjs.MenuCode.GDCardObjects1.length = 0;
+gdjs.MenuCode.GDCardObjects2.length = 0;
+gdjs.MenuCode.GDBtnTextObjects1.length = 0;
+gdjs.MenuCode.GDBtnTextObjects2.length = 0;
+gdjs.MenuCode.GDBtnTextSObjects1.length = 0;
+gdjs.MenuCode.GDBtnTextSObjects2.length = 0;
+gdjs.MenuCode.GDHeadTextObjects1.length = 0;
+gdjs.MenuCode.GDHeadTextObjects2.length = 0;
+gdjs.MenuCode.GDSubTextObjects1.length = 0;
+gdjs.MenuCode.GDSubTextObjects2.length = 0;
+gdjs.MenuCode.GDChapterTextObjects1.length = 0;
+gdjs.MenuCode.GDChapterTextObjects2.length = 0;
+gdjs.MenuCode.GDNodeTextObjects1.length = 0;
+gdjs.MenuCode.GDNodeTextObjects2.length = 0;
+gdjs.MenuCode.GDStarCoreObjects1.length = 0;
+gdjs.MenuCode.GDStarCoreObjects2.length = 0;
+gdjs.MenuCode.GDStarCoronaObjects1.length = 0;
+gdjs.MenuCode.GDStarCoronaObjects2.length = 0;
+gdjs.MenuCode.GDStarGlowObjects1.length = 0;
+gdjs.MenuCode.GDStarGlowObjects2.length = 0;
+gdjs.MenuCode.GDMoverObjects1.length = 0;
+gdjs.MenuCode.GDMoverObjects2.length = 0;
+gdjs.MenuCode.GDTrackDotObjects1.length = 0;
+gdjs.MenuCode.GDTrackDotObjects2.length = 0;
+gdjs.MenuCode.GDCloudObjects1.length = 0;
+gdjs.MenuCode.GDCloudObjects2.length = 0;
+gdjs.MenuCode.GDCloudPuffObjects1.length = 0;
+gdjs.MenuCode.GDCloudPuffObjects2.length = 0;
+gdjs.MenuCode.GDCloudBlockObjects1.length = 0;
+gdjs.MenuCode.GDCloudBlockObjects2.length = 0;
+gdjs.MenuCode.GDLightObjects1.length = 0;
+gdjs.MenuCode.GDLightObjects2.length = 0;
 
-gdjs.GameCode.eventsList1(runtimeScene);
-gdjs.GameCode.GDBgTileObjects1.length = 0;
-gdjs.GameCode.GDBgTileObjects2.length = 0;
-gdjs.GameCode.GDNebulaObjects1.length = 0;
-gdjs.GameCode.GDNebulaObjects2.length = 0;
-gdjs.GameCode.GDMoteObjects1.length = 0;
-gdjs.GameCode.GDMoteObjects2.length = 0;
-gdjs.GameCode.GDLevelArtObjects1.length = 0;
-gdjs.GameCode.GDLevelArtObjects2.length = 0;
-gdjs.GameCode.GDPadGlowObjects1.length = 0;
-gdjs.GameCode.GDPadGlowObjects2.length = 0;
-gdjs.GameCode.GDPadChevronObjects1.length = 0;
-gdjs.GameCode.GDPadChevronObjects2.length = 0;
-gdjs.GameCode.GDPortalCoreObjects1.length = 0;
-gdjs.GameCode.GDPortalCoreObjects2.length = 0;
-gdjs.GameCode.GDPortalRingObjects1.length = 0;
-gdjs.GameCode.GDPortalRingObjects2.length = 0;
-gdjs.GameCode.GDPortalRing2Objects1.length = 0;
-gdjs.GameCode.GDPortalRing2Objects2.length = 0;
-gdjs.GameCode.GDShardObjects1.length = 0;
-gdjs.GameCode.GDShardObjects2.length = 0;
-gdjs.GameCode.GDShardIconObjects1.length = 0;
-gdjs.GameCode.GDShardIconObjects2.length = 0;
-gdjs.GameCode.GDBhRangeObjects1.length = 0;
-gdjs.GameCode.GDBhRangeObjects2.length = 0;
-gdjs.GameCode.GDBhSwirlObjects1.length = 0;
-gdjs.GameCode.GDBhSwirlObjects2.length = 0;
-gdjs.GameCode.GDBhGlowObjects1.length = 0;
-gdjs.GameCode.GDBhGlowObjects2.length = 0;
-gdjs.GameCode.GDBhDiskObjects1.length = 0;
-gdjs.GameCode.GDBhDiskObjects2.length = 0;
-gdjs.GameCode.GDBhCoreObjects1.length = 0;
-gdjs.GameCode.GDBhCoreObjects2.length = 0;
-gdjs.GameCode.GDTrailObjects1.length = 0;
-gdjs.GameCode.GDTrailObjects2.length = 0;
-gdjs.GameCode.GDSparkObjects1.length = 0;
-gdjs.GameCode.GDSparkObjects2.length = 0;
-gdjs.GameCode.GDRingObjects1.length = 0;
-gdjs.GameCode.GDRingObjects2.length = 0;
-gdjs.GameCode.GDOrbHaloObjects1.length = 0;
-gdjs.GameCode.GDOrbHaloObjects2.length = 0;
-gdjs.GameCode.GDOrbObjects1.length = 0;
-gdjs.GameCode.GDOrbObjects2.length = 0;
-gdjs.GameCode.GDPreviewOrbObjects1.length = 0;
-gdjs.GameCode.GDPreviewOrbObjects2.length = 0;
-gdjs.GameCode.GDTitlePhantomObjects1.length = 0;
-gdjs.GameCode.GDTitlePhantomObjects2.length = 0;
-gdjs.GameCode.GDTitlePhotonObjects1.length = 0;
-gdjs.GameCode.GDTitlePhotonObjects2.length = 0;
-gdjs.GameCode.GDTxtClearObjects1.length = 0;
-gdjs.GameCode.GDTxtClearObjects2.length = 0;
-gdjs.GameCode.GDBtnRestartObjects1.length = 0;
-gdjs.GameCode.GDBtnRestartObjects2.length = 0;
-gdjs.GameCode.GDFlashObjects1.length = 0;
-gdjs.GameCode.GDFlashObjects2.length = 0;
-gdjs.GameCode.GDLevelTextObjects1.length = 0;
-gdjs.GameCode.GDLevelTextObjects2.length = 0;
-gdjs.GameCode.GDShardTextObjects1.length = 0;
-gdjs.GameCode.GDShardTextObjects2.length = 0;
-gdjs.GameCode.GDHintTextObjects1.length = 0;
-gdjs.GameCode.GDHintTextObjects2.length = 0;
-gdjs.GameCode.GDStartTextObjects1.length = 0;
-gdjs.GameCode.GDStartTextObjects2.length = 0;
-gdjs.GameCode.GDToastTextObjects1.length = 0;
-gdjs.GameCode.GDToastTextObjects2.length = 0;
+gdjs.MenuCode.eventsList1(runtimeScene);
+gdjs.MenuCode.GDBgTileObjects1.length = 0;
+gdjs.MenuCode.GDBgTileObjects2.length = 0;
+gdjs.MenuCode.GDNebulaObjects1.length = 0;
+gdjs.MenuCode.GDNebulaObjects2.length = 0;
+gdjs.MenuCode.GDMoteObjects1.length = 0;
+gdjs.MenuCode.GDMoteObjects2.length = 0;
+gdjs.MenuCode.GDLevelArtObjects1.length = 0;
+gdjs.MenuCode.GDLevelArtObjects2.length = 0;
+gdjs.MenuCode.GDPadGlowObjects1.length = 0;
+gdjs.MenuCode.GDPadGlowObjects2.length = 0;
+gdjs.MenuCode.GDPadChevronObjects1.length = 0;
+gdjs.MenuCode.GDPadChevronObjects2.length = 0;
+gdjs.MenuCode.GDPortalCoreObjects1.length = 0;
+gdjs.MenuCode.GDPortalCoreObjects2.length = 0;
+gdjs.MenuCode.GDPortalRingObjects1.length = 0;
+gdjs.MenuCode.GDPortalRingObjects2.length = 0;
+gdjs.MenuCode.GDPortalRing2Objects1.length = 0;
+gdjs.MenuCode.GDPortalRing2Objects2.length = 0;
+gdjs.MenuCode.GDShardObjects1.length = 0;
+gdjs.MenuCode.GDShardObjects2.length = 0;
+gdjs.MenuCode.GDShardIconObjects1.length = 0;
+gdjs.MenuCode.GDShardIconObjects2.length = 0;
+gdjs.MenuCode.GDBhRangeObjects1.length = 0;
+gdjs.MenuCode.GDBhRangeObjects2.length = 0;
+gdjs.MenuCode.GDBhSwirlObjects1.length = 0;
+gdjs.MenuCode.GDBhSwirlObjects2.length = 0;
+gdjs.MenuCode.GDBhGlowObjects1.length = 0;
+gdjs.MenuCode.GDBhGlowObjects2.length = 0;
+gdjs.MenuCode.GDBhDiskObjects1.length = 0;
+gdjs.MenuCode.GDBhDiskObjects2.length = 0;
+gdjs.MenuCode.GDBhCoreObjects1.length = 0;
+gdjs.MenuCode.GDBhCoreObjects2.length = 0;
+gdjs.MenuCode.GDTrailObjects1.length = 0;
+gdjs.MenuCode.GDTrailObjects2.length = 0;
+gdjs.MenuCode.GDSparkObjects1.length = 0;
+gdjs.MenuCode.GDSparkObjects2.length = 0;
+gdjs.MenuCode.GDRingObjects1.length = 0;
+gdjs.MenuCode.GDRingObjects2.length = 0;
+gdjs.MenuCode.GDOrbHaloObjects1.length = 0;
+gdjs.MenuCode.GDOrbHaloObjects2.length = 0;
+gdjs.MenuCode.GDOrbObjects1.length = 0;
+gdjs.MenuCode.GDOrbObjects2.length = 0;
+gdjs.MenuCode.GDPreviewOrbObjects1.length = 0;
+gdjs.MenuCode.GDPreviewOrbObjects2.length = 0;
+gdjs.MenuCode.GDTitlePhantomObjects1.length = 0;
+gdjs.MenuCode.GDTitlePhantomObjects2.length = 0;
+gdjs.MenuCode.GDTitlePhotonObjects1.length = 0;
+gdjs.MenuCode.GDTitlePhotonObjects2.length = 0;
+gdjs.MenuCode.GDTxtClearObjects1.length = 0;
+gdjs.MenuCode.GDTxtClearObjects2.length = 0;
+gdjs.MenuCode.GDBtnRestartObjects1.length = 0;
+gdjs.MenuCode.GDBtnRestartObjects2.length = 0;
+gdjs.MenuCode.GDFlashObjects1.length = 0;
+gdjs.MenuCode.GDFlashObjects2.length = 0;
+gdjs.MenuCode.GDLevelTextObjects1.length = 0;
+gdjs.MenuCode.GDLevelTextObjects2.length = 0;
+gdjs.MenuCode.GDShardTextObjects1.length = 0;
+gdjs.MenuCode.GDShardTextObjects2.length = 0;
+gdjs.MenuCode.GDHintTextObjects1.length = 0;
+gdjs.MenuCode.GDHintTextObjects2.length = 0;
+gdjs.MenuCode.GDStartTextObjects1.length = 0;
+gdjs.MenuCode.GDStartTextObjects2.length = 0;
+gdjs.MenuCode.GDToastTextObjects1.length = 0;
+gdjs.MenuCode.GDToastTextObjects2.length = 0;
+gdjs.MenuCode.GDBtnPillObjects1.length = 0;
+gdjs.MenuCode.GDBtnPillObjects2.length = 0;
+gdjs.MenuCode.GDBtnPillSObjects1.length = 0;
+gdjs.MenuCode.GDBtnPillSObjects2.length = 0;
+gdjs.MenuCode.GDBtnGlowObjects1.length = 0;
+gdjs.MenuCode.GDBtnGlowObjects2.length = 0;
+gdjs.MenuCode.GDBtnGlowSObjects1.length = 0;
+gdjs.MenuCode.GDBtnGlowSObjects2.length = 0;
+gdjs.MenuCode.GDBtnRoundObjects1.length = 0;
+gdjs.MenuCode.GDBtnRoundObjects2.length = 0;
+gdjs.MenuCode.GDBtnRoundGlowObjects1.length = 0;
+gdjs.MenuCode.GDBtnRoundGlowObjects2.length = 0;
+gdjs.MenuCode.GDIcBackObjects1.length = 0;
+gdjs.MenuCode.GDIcBackObjects2.length = 0;
+gdjs.MenuCode.GDIcLeftObjects1.length = 0;
+gdjs.MenuCode.GDIcLeftObjects2.length = 0;
+gdjs.MenuCode.GDIcRightObjects1.length = 0;
+gdjs.MenuCode.GDIcRightObjects2.length = 0;
+gdjs.MenuCode.GDIcLockObjects1.length = 0;
+gdjs.MenuCode.GDIcLockObjects2.length = 0;
+gdjs.MenuCode.GDIcCheckObjects1.length = 0;
+gdjs.MenuCode.GDIcCheckObjects2.length = 0;
+gdjs.MenuCode.GDIcRestartObjects1.length = 0;
+gdjs.MenuCode.GDIcRestartObjects2.length = 0;
+gdjs.MenuCode.GDIcPlayObjects1.length = 0;
+gdjs.MenuCode.GDIcPlayObjects2.length = 0;
+gdjs.MenuCode.GDNodeFillObjects1.length = 0;
+gdjs.MenuCode.GDNodeFillObjects2.length = 0;
+gdjs.MenuCode.GDSoftObjects1.length = 0;
+gdjs.MenuCode.GDSoftObjects2.length = 0;
+gdjs.MenuCode.GDSparkWObjects1.length = 0;
+gdjs.MenuCode.GDSparkWObjects2.length = 0;
+gdjs.MenuCode.GDRingWObjects1.length = 0;
+gdjs.MenuCode.GDRingWObjects2.length = 0;
+gdjs.MenuCode.GDTrailWObjects1.length = 0;
+gdjs.MenuCode.GDTrailWObjects2.length = 0;
+gdjs.MenuCode.GDCardObjects1.length = 0;
+gdjs.MenuCode.GDCardObjects2.length = 0;
+gdjs.MenuCode.GDBtnTextObjects1.length = 0;
+gdjs.MenuCode.GDBtnTextObjects2.length = 0;
+gdjs.MenuCode.GDBtnTextSObjects1.length = 0;
+gdjs.MenuCode.GDBtnTextSObjects2.length = 0;
+gdjs.MenuCode.GDHeadTextObjects1.length = 0;
+gdjs.MenuCode.GDHeadTextObjects2.length = 0;
+gdjs.MenuCode.GDSubTextObjects1.length = 0;
+gdjs.MenuCode.GDSubTextObjects2.length = 0;
+gdjs.MenuCode.GDChapterTextObjects1.length = 0;
+gdjs.MenuCode.GDChapterTextObjects2.length = 0;
+gdjs.MenuCode.GDNodeTextObjects1.length = 0;
+gdjs.MenuCode.GDNodeTextObjects2.length = 0;
+gdjs.MenuCode.GDStarCoreObjects1.length = 0;
+gdjs.MenuCode.GDStarCoreObjects2.length = 0;
+gdjs.MenuCode.GDStarCoronaObjects1.length = 0;
+gdjs.MenuCode.GDStarCoronaObjects2.length = 0;
+gdjs.MenuCode.GDStarGlowObjects1.length = 0;
+gdjs.MenuCode.GDStarGlowObjects2.length = 0;
+gdjs.MenuCode.GDMoverObjects1.length = 0;
+gdjs.MenuCode.GDMoverObjects2.length = 0;
+gdjs.MenuCode.GDTrackDotObjects1.length = 0;
+gdjs.MenuCode.GDTrackDotObjects2.length = 0;
+gdjs.MenuCode.GDCloudObjects1.length = 0;
+gdjs.MenuCode.GDCloudObjects2.length = 0;
+gdjs.MenuCode.GDCloudPuffObjects1.length = 0;
+gdjs.MenuCode.GDCloudPuffObjects2.length = 0;
+gdjs.MenuCode.GDCloudBlockObjects1.length = 0;
+gdjs.MenuCode.GDCloudBlockObjects2.length = 0;
+gdjs.MenuCode.GDLightObjects1.length = 0;
+gdjs.MenuCode.GDLightObjects2.length = 0;
 
 
 return;
 
 }
 
-gdjs['GameCode'] = gdjs.GameCode;
+gdjs['MenuCode'] = gdjs.MenuCode;

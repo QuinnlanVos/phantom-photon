@@ -1,0 +1,88 @@
+[
+ {
+  "name": "First Light",
+  "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.",
+  "map": [
+   "###########",
+   "#.........#",
+   "#....E...*#",
+   "#.........#",
+   "##........#",
+   "#..*..##..#",
+   "#.........#",
+   "#.........#",
+   "#.........#",
+   "#S...*....#",
+   "###########"
+  ]
+ },
+ {
+  "name": "Angles",
+  "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.",
+  "map": [
+   "###########",
+   "#..S.....d#",
+   "#.........#",
+   "#....#....#",
+   "#...#E#...#",
+   "#.........#",
+   "#.........#",
+   "#.........#",
+   "#.........#",
+   "#b.*.a...*#",
+   "###########"
+  ]
+ },
+ {
+  "name": "Kick",
+  "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.",
+  "map": [
+   "###########",
+   "#...*.#...#",
+   "#.........#",
+   "#....E....#",
+   "#.........#",
+   "#.........#",
+   "#.........#",
+   "#.........#",
+   "#....S...*#",
+   "#####P#####",
+   "###########"
+  ]
+ },
+ {
+  "name": "Event Horizon",
+  "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.",
+  "map": [
+   "###########",
+   "#S....#...#",
+   "#.......*.#",
+   "##......E.#",
+   "#....*....#",
+   "#....O....#",
+   "#.........#",
+   "#........##",
+   "#.........#",
+   "#...#.....#",
+   "###########"
+  ]
+ },
+ {
+  "name": "Phantom Run",
+  "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.",
+  "map": [
+   "###########",
+   "##.......##",
+   "#........##",
+   "#.........#",
+   "#.......a.#",
+   "#.O..##...#",
+   "#.........#",
+   "#...*.....#",
+   "#.#...E.*.P",
+   "#.#.......#",
+   "#.S.*.....#",
+   "###########"
+  ]
+ }
+]
