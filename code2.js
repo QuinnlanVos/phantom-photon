@@ -135,7 +135,7 @@ gdjs.GameCode.GDLightObjects1= [];
 gdjs.GameCode.GDLightObjects2= [];
 
 
-gdjs.GameCode.userFunc0x9cdf10 = function GDJSInlineCode(runtimeScene) {
+gdjs.GameCode.userFunc0x940958 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -468,6 +468,8 @@ const KEY = 'phantomPhoton.progress.v1';
 const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : new URLSearchParams('');
 LIB.qs = qs;
 LIB.debugUnlock = qs.has('unlock');
+// Lite mode (?lite, or no WebGL): turn off bloom / lens / lighting so a weak or odd GPU never shows a black screen.
+LIB.lite = qs.has('lite');
 LIB.prog = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || { done: {} }; } catch (e) { return { done: {} }; } })();
 if (!LIB.prog.done) LIB.prog.done = {};
 LIB.save = () => { try { localStorage.setItem(KEY, JSON.stringify(LIB.prog)); } catch (e) {} };
@@ -715,6 +717,16 @@ LIB.ctx = function (scene) {
       m.o.setPosition(m.x, m.y); m.o.setScale(m.s * 0.5); m.o.setOpacity(70 + 70 * Math.sin(m.ph * 1.3));
     }
   };
+  // heavy-effects fallback: disable layer effects + darkness in lite mode or when the renderer isn't WebGL
+  C.safeEffects = () => {
+    try {
+      const pr = game.getRenderer().getPIXIRenderer();
+      if (!pr || pr.type !== 1) LIB.lite = true;
+    } catch (e) { LIB.lite = true; }
+    if (!LIB.lite) return;
+    for (const ln of ['Bg', '', 'UI']) { try { const l = scene.getLayer(ln); for (const ef of ['Lens', 'Bloom', 'UiBloom']) if (l.hasEffect && l.hasEffect(ef)) l.enableEffect(ef, false); } catch (e) {} }
+  };
+  C.safeEffects();
   C.frame = () => {
     C.rdt = Math.min(0.05, scene.getElapsedTime() / 1000); C.time += C.rdt;
     C.fit(); C.input();
@@ -812,8 +824,13 @@ function loadLevel(c, n) {
   const art = add('LevelArt', G.W / 2, G.H / 2, 1); art.setAnimationName('L' + (gi + 1)); art.setScale(0.5);
   // lighting (The Abyss): dark ambient, everything lit by lights on the "Light" layer
   const LL = runtimeScene.getLayer('Light'), HL = runtimeScene.getLayer('Hint');
+  // NOTE: hiding a GDevelop lighting layer does NOT stop it: in the 2D-only renderer its multiply-blended
+  // "lighting sprite" is still drawn over the layers below (that made chapter 1 render black).
+  // So outside the Abyss the ambient is pure white (multiply x1 = no change) AND the sprite is hidden.
   LL.show(G.dark); HL.show(true);
-  if (G.dark) LL.setClearColor(2, 2, 6);
+  if (G.dark && !LIB.lite) LL.setClearColor(2, 2, 6); else LL.setClearColor(255, 255, 255);
+  try { const ls = LL.getRenderer().getLightingSprite && LL.getRenderer().getLightingSprite(); if (ls) ls.visible = G.dark && !LIB.lite; } catch (e) {}
+  if (LIB.lite) G.dark = false;     // lite mode: no darkness at all (Abyss levels are fully lit)
   G.portal = L.exit ? { core: add('PortalCore', cc(L.exit[0]), cc(L.exit[1]), 5, true), r1: add('PortalRing', cc(L.exit[0]), cc(L.exit[1]), 6, true),
                         r2: add('PortalRing2', cc(L.exit[0]), cc(L.exit[1]), 6, true) } : null;
   if (G.portal && G.dark) {
@@ -1223,7 +1240,7 @@ for (const ln of ['', 'Bg', 'Hint']) { const l = runtimeScene.getLayer(ln); l.se
 G.zoom = zoom;
 G.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);
 const bgL = runtimeScene.getLayer('Bg');
-if (G.holes.length) {
+if (G.holes.length && !LIB.lite) {
   const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;
   bgL.enableEffect('Lens', true);
   bgL.setEffectDoubleParameter('Lens', 'centerX', sx / rw); bgL.setEffectDoubleParameter('Lens', 'centerY', sy / rh);
@@ -1271,7 +1288,7 @@ gdjs.GameCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.GameCode.userFunc0x9cdf10(runtimeScene);
+gdjs.GameCode.userFunc0x940958(runtimeScene);
 
 }
 

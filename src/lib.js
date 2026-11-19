@@ -12,6 +12,8 @@ const KEY = 'phantomPhoton.progress.v1';
 const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : new URLSearchParams('');
 LIB.qs = qs;
 LIB.debugUnlock = qs.has('unlock');
+// Lite mode (?lite, or no WebGL): turn off bloom / lens / lighting so a weak or odd GPU never shows a black screen.
+LIB.lite = qs.has('lite');
 LIB.prog = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || { done: {} }; } catch (e) { return { done: {} }; } })();
 if (!LIB.prog.done) LIB.prog.done = {};
 LIB.save = () => { try { localStorage.setItem(KEY, JSON.stringify(LIB.prog)); } catch (e) {} };
@@ -259,6 +261,16 @@ LIB.ctx = function (scene) {
       m.o.setPosition(m.x, m.y); m.o.setScale(m.s * 0.5); m.o.setOpacity(70 + 70 * Math.sin(m.ph * 1.3));
     }
   };
+  // heavy-effects fallback: disable layer effects + darkness in lite mode or when the renderer isn't WebGL
+  C.safeEffects = () => {
+    try {
+      const pr = game.getRenderer().getPIXIRenderer();
+      if (!pr || pr.type !== 1) LIB.lite = true;
+    } catch (e) { LIB.lite = true; }
+    if (!LIB.lite) return;
+    for (const ln of ['Bg', '', 'UI']) { try { const l = scene.getLayer(ln); for (const ef of ['Lens', 'Bloom', 'UiBloom']) if (l.hasEffect && l.hasEffect(ef)) l.enableEffect(ef, false); } catch (e) {} }
+  };
+  C.safeEffects();
   C.frame = () => {
     C.rdt = Math.min(0.05, scene.getElapsedTime() / 1000); C.time += C.rdt;
     C.fit(); C.input();
