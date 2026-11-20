@@ -296,6 +296,11 @@ function setupRocks(CHP, def, gi) {
     return hz;
   });
 }
+// pooled splash droplet for a rain cloud (reuses the oldest when the pool is full)
+function rcSplash(rc, x, y, vx, vy, life, s) {
+  const p = rc.spl[rc.si]; rc.si = (rc.si + 1) % rc.spl.length;
+  Object.assign(p, { on: true, x, y, vx, vy, t: 0, life, s }); p.o.hide(false); p.o.setPosition(x, y); p.o.setScale(s); p.o.setOpacity(255);
+}
 // ------------------------------------------------------------------ Song of Rainbows (chapter 5): pastel sky, rainbows, prisms, gates, rain clouds
 function setupRainbow(CHP, def, gi) {
   const add = (name, x, y, z, blend, layer) => { const o = tag(mk(name, layer || '', x, y, z, blend)); G.dyn.push(o); return o; };
@@ -339,8 +344,12 @@ function setupRainbow(CHP, def, gi) {
   G.rclouds = L.rain.map((c, k) => {
     const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const o = add('RainCloud', cx, cy, 16, false); o.setScaleX(0.5 * (c.x1 - c.x0) * 1.25 / 192); o.setScaleY(0.5 * (c.y1 - c.y0) * 1.35 / 112);
-    const drops = []; for (let q = 0; q < (LIB.lite ? 8 : 18); q++) { const d = add('RainDrop', cx, cy, 15, false); d.setColor('110;160;255'); d.setOpacity(0); drops.push({ o: d, t: -rand(0, 0.6), x: 0, y: 0 }); }
-    return { c, k, o, cx, cy, burst: !!(G.st.rain & (1 << k)), bt: 9, drops, ph: rand(0, 6.28) };
+    // a pooled downpour (thick bright streaks + white glints) and a pool of splash droplets; ?lite uses far fewer
+    const nD = LIB.lite ? 26 : 80, nS = LIB.lite ? 26 : 72, drops = [], spl = [];
+    for (let q = 0; q < nD; q++) { const hl = q % 5 === 0, d = add('RainDrop', cx, cy, 15, false); d.setColor(hl ? '225;240;255' : '80;135;255'); d.setOpacity(0); d.hide(true);
+      drops.push({ o: d, q, hl, t: -rand(0, 0.35), x: 0, y: 0, v: 0, lf: 0, on: false }); }
+    for (let q = 0; q < nS; q++) { const s = add('Spark', cx, cy, 17, false); s.setColor(q % 3 ? '70;140;255' : '190;225;255'); s.setOpacity(0); s.hide(true); spl.push({ o: s, on: false }); }
+    return { c, k, o, cx, cy, bsx: o.getScaleX(), bsy: o.getScaleY(), burst: !!(G.st.rain & (1 << k)), bt: 99, drops, spl, si: 0, ph: rand(0, 6.28), sprayAcc: 0 };
   });
 }
 // ------------------------------------------------------------------ Frozen Light (chapter 6): icy sky, aurora, snow, lanterns, ice, glaciers, cracks, waterfalls, sunlight
@@ -598,10 +607,16 @@ function handleEvent(e) {
     ring(e.x, e.y, 0.8, RBC[e.c].split(';').map(Number)); G.shake = Math.max(G.shake, 2.5); G.flash = Math.max(G.flash, 0.12);
     showToast(RBN[e.c] + ' LIGHT!', 1.0, lightC(RBC[e.c], 0.25)); G.log.push('prism ' + e.k + ' ' + e.c);
   } else if (e.type === 'rain') {      // a rain cloud bursts: puff, rain shower, and any rainbow waiting on it appears
-    const rc = G.rclouds[e.k]; if (rc) { rc.burst = true; rc.bt = 0; }
-    for (let q = 0; q < 14; q++) { const a = rand(0, 6.28), v = rand(60, 200); part('Soft', (rc ? rc.cx : e.x) + rand(-30, 30), (rc ? rc.cy : e.y) + rand(-16, 16), { normal: true, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.5, life: rand(0.5, 0.9), s0: rand(0.25, 0.4), s1: rand(0.45, 0.6), drag: 2.5, color: '255;255;255', a0: 220, z: 17 }); }
+    const rc = G.rclouds[e.k]; if (rc) { rc.burst = true; rc.bt = 0;
+      // water splash: a ring of droplets sprays out all around the cloud, plus ripples and a light flash
+      const c = rc.c, hw = (c.x1 - c.x0) / 2 + 6, hh = (c.y1 - c.y0) / 2 + 4, n = LIB.lite ? 20 : 56;
+      for (let q = 0; q < n; q++) { const a = (q / n) * 6.283 + rand(-0.08, 0.08), v = rand(200, 420);
+        rcSplash(rc, rc.cx + Math.cos(a) * hw, rc.cy + Math.sin(a) * hh, Math.cos(a) * v, Math.sin(a) * v * 0.8 - rand(60, 160), rand(0.55, 0.95), rand(0.55, 0.95)); }
+      for (let q = 0; q < 3; q++) part('Ring', rc.cx, rc.cy, { life: 0.45 + q * 0.15, s0: 0.1, s1: (0.9 + q * 0.5) * Math.max(1, hw / 60), drag: 0, color: q === 1 ? '255;255;255' : '140;200;255', a0: 220 - q * 50, z: 18 });
+      G.flash = Math.max(G.flash, 0.18); }
+    for (let q = 0; q < 18; q++) { const a = rand(0, 6.28), v = rand(60, 200); part('Soft', (rc ? rc.cx : e.x) + rand(-30, 30), (rc ? rc.cy : e.y) + rand(-16, 16), { normal: true, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.5, life: rand(0.5, 0.9), s0: rand(0.25, 0.4), s1: rand(0.45, 0.6), drag: 2.5, color: '255;255;255', a0: 220, z: 17 }); }
     for (let q = 0; q < 4; q++) part('Note', e.x + rand(-30, 30), e.y + rand(-20, 10), { normal: true, vx: rand(-40, 40), vy: rand(-120, -70), life: 1.3, s0: 0.45, s1: 0.32, drag: 0.5, color: RBSEQ[q + 1], a0: 240, spin: rand(-50, 50), z: 26 });
-    G.shake = Math.max(G.shake, 2); G.log.push('rain ' + e.k);
+    G.shake = Math.max(G.shake, 3); G.log.push('rain ' + e.k);
     if (L.bows.some((b) => b.cloud === e.k)) rbToast('rain', 'A RAINBOW APPEARS!', 1.4, '255;170;225'); else rbToast('rain', 'SPLASH!', 0.9, '150;200;255');
   } else if (e.type === 'lantern') {   // lantern lit: warm flare, its linked ice starts melting
     const lv = G.lanV[e.k]; if (lv) { lv.lit = true; lv.flare = 1; lv.o.setAnimationName('On'); }
@@ -1044,18 +1059,49 @@ if (G.rb) {
     const open = st.color === gv.c;
     gv.o.setOpacity(open ? 95 + 35 * Math.sin(G.time * 4 + gv.i + gv.j) : 225);
   }
+  G.ev = handleEvent;     // debug/test hook: fire a game event's visuals (e.g. a rain burst)
   for (const rc of G.rclouds) {
     rc.ph += rdt; rc.bt += rdt;
-    const bob = Math.sin(rc.ph * 0.8) * 3;
+    const bob = Math.sin(rc.ph * 0.8) * 3, c = rc.c, k = rc.bt;
     if (!rc.burst) { rc.o.setPosition(rc.cx + Math.sin(rc.ph * 0.37) * 4, rc.cy + bob); rc.o.setOpacity(240); }
-    else { const u = clamp01(rc.bt / 0.55); rc.o.setOpacity(240 * (1 - u) * (1 - u)); rc.o.setPosition(rc.cx, rc.cy + bob - 10 * u); }
-    const raining = rc.burst && rc.bt < 3.2, c = rc.c;
+    else if (k < 0.7) {     // squash, then pop outward while fading
+      let fx, fy, a; if (k < 0.09) { const s = k / 0.09; fx = 1 + 0.22 * s; fy = 1 - 0.22 * s; a = 240; }
+      else { const s = clamp01((k - 0.09) / 0.5); fx = 1.22 + 0.4 * s; fy = 0.78 + 0.7 * s; a = 240 * (1 - s) * (1 - s); }
+      rc.o.setScaleX(rc.bsx * fx); rc.o.setScaleY(rc.bsy * fy); rc.o.setOpacity(a); rc.o.setPosition(rc.cx, rc.cy + bob);
+    } else rc.o.setOpacity(0);
+    // downpour 0-4.5s, eases into a light drizzle that lingers until ~9s
+    const A = !rc.burst ? 0 : k < 4.5 ? 1 : k < 5.3 ? 1 - 0.65 * (k - 4.5) / 0.8 : k < 9 ? 0.35 * (1 - clamp01((k - 8) / 1)) : 0;
+    const share = A >= 0.99 ? 1 : 0.25, nD = rc.drops.length;
     for (const d of rc.drops) {
-      if (!raining) { d.o.setOpacity(0); continue; }
-      d.t += rdt; if (d.t < 0) continue;
-      if (d.t === rdt || d.y === 0 || d.y > c.y1 + 3.2 * T) { d.x = rand(c.x0 + 6, c.x1 - 6); d.y = (c.y0 + c.y1) / 2 + rand(-6, 8); d.t = 0.0001; }
-      d.y += rdt * 620; d.o.setPosition(d.x, d.y); d.o.setScale(0.5); d.o.setOpacity(Math.min(200, 230 * (1 - (d.y - c.y1) / (3.4 * T))) * (1 - clamp01((rc.bt - 2.6) / 0.6)));
-      if (d.y > c.y1 + 3.1 * T && Math.random() < 0.3) part('Ring', d.x, d.y, { life: 0.3, s0: 0.05, s1: 0.25, drag: 0, color: '150;200;255', a0: 150, z: 14 });
+      const active = A > 0 && d.q < nD * share;
+      if (!active && !d.on) continue;
+      if (d.on) {
+        d.y += rdt * d.v;
+        if (d.y > c.y1 + d.lf) {     // lands: splash droplets hop up, now and then a ripple
+          if (Math.random() < (LIB.lite ? 0.3 : 0.55)) rcSplash(rc, d.x, d.y, rand(-90, 90), -rand(90, 200), rand(0.22, 0.38), rand(0.3, 0.48));
+          if (Math.random() < 0.05) part('Ring', d.x, d.y, { life: 0.3, s0: 0.05, s1: 0.3, drag: 0, color: '150;200;255', a0: 170, z: 14 });
+          d.on = false;
+        }
+      }
+      if (!d.on) {
+        if (!active) { d.o.hide(true); continue; }
+        d.t += rdt; if (d.t < 0) continue;
+        d.on = true; d.x = rand(c.x0 - 6, c.x1 + 6); d.y = rand((c.y0 + c.y1) / 2, c.y1); d.v = rand(700, 920); d.lf = rand(2.0, 3.6) * T; d.t = 0;
+        d.o.hide(false); d.o.setScaleX(d.hl ? 0.55 : 0.8); d.o.setScaleY(0.55 + d.v / 2400);
+      }
+      const fall = (d.y - c.y1) / d.lf;
+      d.o.setPosition(d.x, d.y); d.o.setOpacity(255 * Math.min(1, A * 1.4) * (A < 0.99 ? 0.7 : 1) * (1 - 0.6 * clamp01(fall)));
+    }
+    // during the downpour water keeps splashing off the cloud's rim all around it
+    if (rc.burst && k < 4.5) { rc.sprayAcc += rdt * (LIB.lite ? 10 : 26);
+      while (rc.sprayAcc >= 1) { rc.sprayAcc--; const a = rand(0, 6.283), hw = (c.x1 - c.x0) / 2 + 4, hh = (c.y1 - c.y0) / 2 + 2, v = rand(110, 230);
+        rcSplash(rc, rc.cx + Math.cos(a) * hw, rc.cy + Math.sin(a) * hh, Math.cos(a) * v, Math.sin(a) * v * 0.6 - 90, rand(0.35, 0.6), rand(0.38, 0.6)); } }
+    for (const p of rc.spl) {
+      if (!p.on) continue;
+      p.t += rdt; const u = p.t / p.life;
+      if (u >= 1) { p.on = false; p.o.hide(true); continue; }
+      p.vy += 1100 * rdt; p.x += p.vx * rdt; p.y += p.vy * rdt;
+      p.o.setPosition(p.x, p.y); p.o.setScale(p.s * (1 - 0.5 * u)); p.o.setOpacity(255 * (1 - u * u));
     }
   }
 }
