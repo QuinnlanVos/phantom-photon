@@ -50,12 +50,13 @@ if (!S) {
       const done = LIB.isDone(c, l), open = LIB.levelUnlocked(c, l), rec = LIB.prog.done[LIB.id(c, l)];
       const nShards = lv.map.join('').split('*').length - 1;
       const b = C.button({ kind: 'round', label: open ? String(l + 1) : null, icon: open ? (done ? 'IcCheck' : null) : 'IcLock',
-        color: !open ? '95;105;140' : (done ? th.done : th.node), delay: 0.3 + l * 0.07 + Math.abs(c - S.cur) * 0.0, name: 'node ' + (c + 1) + '-' + (l + 1), pool: false,
+        color: !open ? '95;105;140' : (done ? th.done : (lv.finale ? '255;210;100' : th.node)), delay: 0.3 + l * 0.07 + Math.abs(c - S.cur) * 0.0, name: 'node ' + (c + 1) + '-' + (l + 1), pool: false,
         onPress: (bb) => pick(c, l, bb) });
       b.c = c; b.l = l; b.open = open; b.dim = open ? 1 : 0.45; b.done = done; b.icS = done ? 0.42 : 0.62; b.icDx = 0;
       b.pips = []; for (let k = 0; k < nShards; k++) { const pp = C.mk('ShardIcon', 'UI', 0, 0, 75, true); b.pips.push(pp); }
       b.got = rec ? rec.shards : 0; b.lvName = lv.name;
       b.nameTx = C.mk('NodeText', 'UI', 0, 0, 75); b.nameTx.setString(lv.name.toUpperCase());
+      b.finale = !!lv.finale; if (b.finale) { b.crown = C.mk('Crown', 'UI', 0, 0, 77, false); b.finTx = C.mk('NodeText', 'UI', 0, 0, 75); b.finTx.setString('FINALE'); try { b.finTx.setColor('255;215;110'); } catch (e) {} }
       card.nodes.push(b);
     });
     for (let l = 0; l + 1 < ch.levels.length; l++) { const dots = []; for (let k = 0; k < 6; k++) dots.push(C.mk('SparkW', 'UI', 0, 0, 64, true)); card.links.push(dots); }
@@ -145,8 +146,8 @@ S.cards.forEach((cd, c) => {
   cd.shardTx.setPosition(x - cd.shardTx.getWidth() / 2 + 12, top + cardH * sc - 46 * sc); cd.shardTx.setOpacity(220 * a * (cd.unlocked ? 1 : 0.4));
   cd.shardIc.setScale(0.3); cd.shardIc.setPosition(x - cd.shardTx.getWidth() / 2 - 8, top + cardH * sc - 46 * sc + cd.shardTx.getHeight() / 2); cd.shardIc.setOpacity(255 * a * (cd.unlocked ? 1 : 0.4));
   // nodes along a snake path
-  const n = cd.nodes.length, cols = C.portrait ? 2 : 3, rows = Math.ceil(n / cols);
-  const areaT = top + 150 * sc, areaB = top + cardH * sc - 80 * sc, areaW = cardW * sc * (C.portrait ? 0.62 : 0.72);
+  const n = cd.nodes.length, cols = C.portrait ? (n > 6 ? 3 : 2) : (n > 6 ? Math.ceil(n / 2) : 3), rows = Math.ceil(n / cols);
+  const areaT = top + 150 * sc, areaB = top + cardH * sc - 80 * sc, areaW = cardW * sc * (C.portrait ? (cols > 2 ? 0.66 : 0.62) : (cols > 3 ? 0.8 : 0.72));
   const rowH = (areaB - areaT) / rows;
   const pos = [];
   cd.nodes.forEach((b, l) => {
@@ -155,12 +156,16 @@ S.cards.forEach((cd, c) => {
     const nx = x - areaW / 2 + (cols === 1 ? areaW / 2 : k * areaW / (cols - 1)) + offset, ny = areaT + rowH * (r + 0.42);
     pos.push([nx, ny]);
     b.wobT = Math.max(0, (b.wobT || 0) - dt);
-    b.x = nx + Math.sin(b.wobT * 50) * 9 * (b.wobT / 0.45); b.y = ny; b.scale = sc * Math.min(1, rowH / 190) * (C.portrait ? 1.05 : 0.95);
+    b.x = nx + Math.sin(b.wobT * 50) * 9 * (b.wobT / 0.45); b.y = ny; b.scale = sc * Math.min(1, rowH / 190) * (C.portrait ? (cols > 2 ? 0.92 : 1.05) : 0.95);
     b.visible = vis; b.enabled = vis;
     const pip = 18 * b.scale, nP = b.pips.length;
     b.pips.forEach((pp, k2) => { pp.setScale(0.24 * b.scale); pp.setPosition(nx + (k2 - (nP - 1) / 2) * pip * 1.3, ny + 66 * b.scale);
       pp.setOpacity(a * 255 * (k2 < b.got ? 1 : 0.22)); pp.setColor(k2 < b.got ? '255;255;255' : '120;120;160'); });
-    b.nameTx.setScale(b.scale); b.nameTx.setPosition(nx - b.nameTx.getWidth() / 2, ny + 82 * b.scale); b.nameTx.setOpacity(a * (b.open ? 200 : 90));
+    const colW = areaW / Math.max(1, cols - 1) * 0.98;
+    b.nameTx.setScale(b.scale); if (b.nameTx.getWidth() > colW) b.nameTx.setScale(b.scale * colW / b.nameTx.getWidth());
+    b.nameTx.setPosition(nx - b.nameTx.getWidth() / 2, ny + 82 * b.scale); b.nameTx.setOpacity(a * (b.open ? 200 : 90));
+    if (b.crown) { const bob = Math.sin(C.time * 2.4 + l) * 3 * b.scale; b.crown.setScale(0.62 * b.scale); b.crown.setPosition(nx, ny - 58 * b.scale + bob);
+      b.crown.setOpacity(255 * a * (b.open ? 1 : 0.55)); b.finTx.setScale(b.scale * 0.85); b.finTx.setPosition(nx - b.finTx.getWidth() / 2, ny + 82 * b.scale + b.nameTx.getHeight() + 2); b.finTx.setOpacity(a * (b.open ? 230 : 110)); }
   });
   cd.links.forEach((dots, l) => {
     const [x0, y0] = pos[l], [x1, y1] = pos[l + 1], lit = cd.nodes[l].done, flow = (C.time * 0.6) % 1;

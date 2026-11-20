@@ -83,10 +83,10 @@ function plan(c, n, toks) {
   await pg.goto(url + '?unlock&select&ch=3'); await sleep(5000);
   const sel = await pg.evaluate(() => { const S = window.__ppSel; return S ? { cur: S.cur, n: S.cards.length, name: S.cards[2] && S.cards[2].name.getString(), open: S.cards[2].nodes.filter(b => b.open).length,
     vis: S.cards[2].nodes.filter(b => b.visible).length, fx: S.cards[2].frame.getX(), fw: S.cards[2].frame.getWidth(), UW: window.__ppC.UW } : null; });
-  ok(sel && sel.n === CH.length && sel.cur === 2 && /SOLAR WINDS/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1, `select ?select&ch=3: ${CH.length} chapter cards, ch3 "Solar Winds" centred and on-screen, 5 levels open ${JSON.stringify(sel)}`);
+  ok(sel && sel.n === CH.length && sel.cur === 2 && /SOLAR WINDS/.test(sel.name) && sel.open === CH[2].levels.length && sel.vis === CH[2].levels.length && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1, `select ?select&ch=3: ${CH.length} chapter cards, ch3 "Solar Winds" centred and on-screen, all levels open ${JSON.stringify(sel)}`);
   await pg.screenshot({ path: `${outdir}/${tag}_select.png` });
   // ---------------------------------------------------------------- play every chapter-3 level
-  for (let n = 0; n < CH[2].levels.length; n++) {
+  for (let n = 0; n < Math.min(5, CH[2].levels.length); n++) {   // original levels (longer levels: test_long.js)
     if (process.env.ONLY && !process.env.ONLY.split(",").includes(String(n + 1))) continue;
     await load(`?unlock&ch=3&level=${n + 1}`);
     let s = await S();

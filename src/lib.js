@@ -20,7 +20,8 @@ LIB.save = () => { try { localStorage.setItem(KEY, JSON.stringify(LIB.prog)); } 
 LIB.id = (c, l) => (c + 1) + '-' + (l + 1);
 LIB.isDone = (c, l) => !!LIB.prog.done[LIB.id(c, l)];
 LIB.chapterDone = (c) => LIB.CHAPTERS[c].levels.every((_, l) => LIB.isDone(c, l));
-LIB.chapterUnlocked = (c) => LIB.debugUnlock || c === 0 || LIB.chapterDone(c - 1);
+// a chapter stays open once the player has cleared any level in it (new levels added to an earlier chapter never re-lock it)
+LIB.chapterUnlocked = (c) => LIB.debugUnlock || c === 0 || LIB.chapterDone(c - 1) || LIB.CHAPTERS[c].levels.some((_, l) => LIB.isDone(c, l));
 LIB.levelUnlocked = (c, l) => LIB.chapterUnlocked(c) && (LIB.debugUnlock || l === 0 || LIB.isDone(c, l - 1) || LIB.isDone(c, l));
 LIB.complete = (c, l, shards, of, moves) => {
   const id = LIB.id(c, l), prev = LIB.prog.done[id];

@@ -94,7 +94,7 @@ objects = [
     one("IceSky", "sky_ice.png", False), one("Aurora", "aurora.png"), one("Snowflake", "snowflake.png"),
     sprite("Lantern", [("Off", ["lantern_off.png"], 1), ("On", ["lantern_on.png"], 1)]),
     one("IceBlock", "ice_block.png"), one("Glacier", "glacier.png"), one("Crack", "crack.png"),
-    sprite("Waterfall", [("Flow", [f"waterfall_{k}.png" for k in range(4)], 0.07)]), one("SunShaft", "sun_shaft.png"), one("IceShard", "ice_shard.png"),
+    sprite("Waterfall", [("Flow", [f"waterfall_{k}.png" for k in range(4)], 0.07)]), one("SunShaft", "sun_shaft.png"), one("IceShard", "ice_shard.png"), one("LifeIcon", "life_icon.png"), one("Crown", "crown.png"), one("Bolt", "bolt.png"), one("Icicle", "icicle.png"),
     {"assetStoreId": "", "name": "Light", "type": "Lighting::LightObject", "variables": [], "effects": [], "behaviors": [],
      "content": {"radius": 100, "color": "255;255;255", "debugMode": False, "texture": ""}},
 ]

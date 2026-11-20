@@ -42,6 +42,7 @@ if (!G) {
     level: mk('LevelText', 'UI', 0, 0, 40), shards: mk('ShardText', 'UI', 0, 0, 40), hint: mk('HintText', 'UI', 0, 0, 40),
     clear: mk('TxtClear', 'UI', 0, 0, 160, true), dim: mk('Flash', 'UI', 0, 0, 140), flash: mk('Flash', 'UI', 0, 0, 190),
     toast: mk('ToastText', 'UI', 0, 0, 45), shardIcon: mk('ShardIcon', 'UI', 0, 0, 41, true),
+    lives: [0, 1, 2].map(() => mk('LifeIcon', 'UI', 0, 0, 41, false)), overTitle: mk('ToastText', 'UI', 0, 0, 160),
     panel: mk('Card', 'UI', 0, 0, 150), pShards: mk('ShardText', 'UI', 0, 0, 160), pIcon: mk('ShardIcon', 'UI', 0, 0, 160, true), pSub: mk('SubText', 'UI', 0, 0, 160),
   };
   G.ui.flash.setOpacity(0); G.ui.dim.setColor('2;3;10'); G.ui.dim.setOpacity(0); G.ui.clear.setOpacity(0); G.ui.toast.setOpacity(0);
@@ -167,7 +168,8 @@ function loadLevel(c, n) {
   } else { G.orbLight = null; }
   G.vis.x = G.st.x; G.vis.y = G.st.y; G.orbScale = 0; G.spawnT = 0; G.squash = 0; G.squashV = 0;
   G.buffered = null; G.bump = null; G.clearT = 0; G.dieT = 0; G.moves = 0; G.state = 'play'; G.deaths = 0; G.saved = false;
-  G.ui.level.setString((c + 1) + '-' + (n + 1) + '   ' + def.name.toUpperCase());
+  G.finale = !!def.finale; G.lives = G.finale ? 3 : 0; G.lifeFx = [0, 0, 0]; G.overT = 0;     // grand finale: exactly 3 lives
+  G.ui.level.setString((c + 1) + '-' + (n + 1) + '   ' + (G.finale ? 'FINALE: ' : '') + def.name.toUpperCase());
   G.ui.hint.setString(def.hint || ''); G.hintA = 1;
   G.btnNext.visible = G.btnLevels.visible = false;
   G.log.push('load ' + (c + 1) + '-' + (n + 1));
@@ -178,7 +180,7 @@ function loadLevel(c, n) {
 // ------------------------------------------------------------------ Solar Winds (chapter 3): winds, curves, wells, stardust, sky
 function setupSolar(CHP, def) {
   const add = (name, x, y, z, blend, layer) => { const o = tag(mk(name, layer || '', x, y, z, blend)); G.dyn.push(o); return o; };
-  G.sun = CHP.theme === 'sun'; G.scroll = !!CHP.scroll; G.camSnap = true; G.ts = 1; G.slowT = 0; G.surge = 0;
+  G.sun = CHP.theme === 'sun'; G.scroll = !!(CHP.scroll || def.scroll); G.camSnap = true; G.ts = 1; G.slowT = 0; G.surge = 0;
   G.sky.hide(!G.sun); G.sunGlow.hide(!G.sun);
   G.bg.setOpacity(G.sun ? 0 : 255); G.neb.setColor(G.sun ? '255;175;205' : '255;255;255');
   for (const m of G.motes) m.o.setColor(G.sun ? '255;220;150' : '255;255;255');
@@ -270,8 +272,28 @@ function setupRocks(CHP, def, gi) {
     const nL = Math.max(3, Math.min(9, Math.round((Math.abs(dv[0]) > 0.9 ? zh : zw) / (T * 0.55))));
     const lines = []; for (let q = 0; q < nL; q++) { const o = add('HailTele', cx, cy, 3, true); o.setOpacity(0); lines.push({ o, f: (q + 0.5) / nL }); }
     const nS = LIB.lite ? 6 : Math.min(30, Math.max(10, Math.round(zw * zh / (T * T) * 2.2)));
-    const streaks = []; for (let q = 0; q < nS; q++) { const o = add('HailStreak', cx, cy, 12, true); o.setOpacity(0); streaks.push({ o, t: -rand(0, 0.5), f: Math.random(), len: 1 }); }
-    return { h, k, zw, zh, cx, cy, zone, dv, lines, streaks, ph: 'calm', ang: Math.atan2(dv[1], dv[0]) * 180 / Math.PI };
+    // Song of Rainbows: storm lightning (bolts flicker along the whole lane); Frozen Light: falling icicles; Rocks: cosmic hail
+    const kind = CHP.theme === 'rainbow' ? 'bolt' : CHP.theme === 'ice' ? 'icicle' : 'hail';
+    const nS2 = kind === 'bolt' ? 3 : nS;
+    const streaks = []; for (let q = 0; q < nS2; q++) { const o = add(kind === 'bolt' ? 'Bolt' : kind === 'icicle' ? 'Icicle' : 'HailStreak', cx, cy, 12, kind !== 'icicle'); o.setOpacity(0); streaks.push({ o, t: -rand(0, 0.5), f: Math.random(), len: 1 }); }
+    const hz = { h, k, zw, zh, cx, cy, zone, dv, lines, streaks, ph: 'calm', ang: Math.atan2(dv[1], dv[0]) * 180 / Math.PI, kind, decor: [] };
+    if (kind !== 'hail') {      // the source of the danger, always visible: little storm clouds / a fringe of hanging icicles on the upstream edge
+      const nD = kind === 'bolt' ? Math.max(2, Math.round((Math.abs(dv[0]) > 0.9 ? zh : zw) / (T * 1.3))) : Math.max(3, Math.round((Math.abs(dv[0]) > 0.9 ? zh : zw) / (T * 0.5)));
+      for (let q = 0; q < nD; q++) {
+        const sg = laneSeg(hz, (q + 0.5) / nD); if (!sg) continue;
+        const o = kind === 'bolt' ? add('RainCloud', sg.x0, sg.y0, 15, false) : add('Icicle', sg.x0, sg.y0, 11, false);
+        if (kind === 'bolt') { o.setScaleX(0.5 * T * 1.6 / 192 * 2); o.setScaleY(0.5 * T * 0.9 / 112 * 2); o.setColor('150;140;200'); }
+        else { o.setAngle(hz.ang); o.setScale(0.32 + 0.1 * ((q * 7) % 3) / 2); }
+        let dx0 = sg.x0 - dv[0] * (kind === 'bolt' ? 6 : 14), dy0 = sg.y0 - dv[1] * (kind === 'bolt' ? 6 : 14);
+        if (kind === 'icicle' && h.d === 'D') {     // icicles hang from the ice ceiling above the lane
+          const ci = Math.floor(sg.x0 / T); let cj = Math.floor((sg.y0 - 1) / T);
+          while (cj > 0 && SIM.cell(L, ci, cj) === '.') cj--;
+          dy0 = (cj + 1) * T + 16;
+        }
+        hz.decor.push({ o, x: dx0, y: dy0, ph: rand(0, 6.28) });
+      }
+    }
+    return hz;
   });
 }
 // ------------------------------------------------------------------ Song of Rainbows (chapter 5): pastel sky, rainbows, prisms, gates, rain clouds
@@ -382,6 +404,7 @@ function laneSeg(hz, f) {
   return { x0: ox + dx * t0, y0: oy + dy * t0, x1: ox + dx * t1, y1: oy + dy * t1, len: t1 - t0 };
 }
 function restart() { G.log.push('restart'); loadLevel(G.chapter, G.level); G.flash = 0.25; }
+function retryFinale() { G.log.push('retry'); loadLevel(G.chapter, G.level); G.flash = 0.6; C.shake = 3; }
 function toSelect() { if (C.trans) return; LIB.nav.from = 'game'; G.log.push('to-select'); C.go('LevelSelect', 'fade', { dur: 0.45 }); }
 function nextOf(c, n) {
   const CH = LIB.CHAPTERS;
@@ -491,7 +514,7 @@ st = G.st; L = G.L;
 // ------------------------------------------------------------------ actions
 function tryAction(a, src) {
   if (a === 'BACK') { if (G.state === 'clear') toSelect(); else toSelect(); return; }
-  if (G.state === 'clear') return;    // the clear panel's buttons take over
+  if (G.state === 'clear' || G.state === 'over') return;    // the clear / game-over panel's buttons take over
   if (a === 'RESTART') { restart(); return; }
   if (G.state !== 'play') return;
   if (st.mode === 'fly') { G.buffered = a; G.bufferT = 0.22; return; }
@@ -613,6 +636,7 @@ function handleEvent(e) {
   } else if (e.type === 'swallow' || e.type === 'lost' || e.type === 'burn' || e.type === 'crush' || e.type === 'rock' || e.type === 'dust' || e.type === 'hail') {
     G.state = 'dying'; G.dieT = 0; G.deaths++; G.dieFrom = [st.x, st.y]; G.dieHole = e.type === 'swallow' ? [e.x, e.y] : null; G.dieType = e.type;
     G.log.push(e.type); G.shake = Math.max(G.shake, 6);
+    if (G.finale && G.lives > 0) { G.lives--; G.lifeFx[G.lives] = 1; G.log.push('life-lost ' + G.lives); }
     if (G.dieHole) for (let k = 0; k < 26; k++) { const a = rand(0, 6.28), r = rand(30, 90);
       part('Spark', e.x + Math.cos(a) * r, e.y + Math.sin(a) * r, { life: 0.6, s0: rand(0.3, 0.6), s1: 0, drag: 2, sink: [e.x, e.y], color: '255;150;120' }); }
     if (e.type === 'burn') {
@@ -645,7 +669,10 @@ function handleEvent(e) {
       part('IceBurst', st.x, st.y, { life: 0.4, s0: 0.4, s1: 1.4, drag: 0, lin: true, color: '200;245;255', z: 21 });
       for (let k = 0; k < 30; k++) { const a = rand(0, 6.28), v = rand(100, 480);
         part('Spark', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.25, 0.6), s0: rand(0.3, 0.7), s1: 0, drag: 3.5, color: Math.random() < 0.5 ? '255;255;255' : '120;230;255' }); }
-      ring(st.x, st.y, 0.9, [170, 240, 255]); G.flash = Math.max(G.flash, 0.3); G.shake = Math.max(G.shake, 7); showToast('HAIL STRIKE', 1.2, '170;235;255');
+      ring(st.x, st.y, 0.9, [170, 240, 255]); G.flash = Math.max(G.flash, 0.3); G.shake = Math.max(G.shake, 7);
+      if (G.rb) { for (let k = 0; k < 24; k++) { const a = rand(0, 6.28), v = rand(120, 420); part('Spark', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.3, 0.7), s0: rand(0.4, 0.8), s1: 0, drag: 3, color: Math.random() < 0.5 ? '255;235;90' : '255;170;230' }); }
+        ring(st.x, st.y, 1.1, [255, 230, 90]); showToast('ZAPPED!', 1.2, '255;205;60'); }
+      else showToast(G.ice ? 'ICICLE STRIKE' : 'HAIL STRIKE', 1.2, '170;235;255');
     }
   }
 }
@@ -676,6 +703,14 @@ if (G.state === 'clear') {
       (chDone && G.level === LIB.CHAPTERS[G.chapter].levels.length - 1 ? '\n' + LIB.CHAPTERS[G.chapter].name.toUpperCase() + ' COMPLETE' + (nx ? '  -  ' + LIB.CHAPTERS[nx[0]].name.toUpperCase() + ' UNLOCKED' : '') : ''));
     G.panelT = 0;
   }
+} else if (G.state === 'over') {
+  G.overT += rdt;
+  if (G.overT - rdt < 0.35 && G.overT >= 0.35) {
+    G.btnNext.visible = G.btnLevels.visible = true; G.btnNext.born = G.btnLevels.born = C.time; G.btnNext.delay = 0.12; G.btnLevels.delay = 0.24; G.btnNext.s = G.btnLevels.s = 0;
+    G.btnNext.enabled = true; if (G.btnNext.lbl) G.btnNext.lbl.setString('RETRY'); G.btnNext.onPress = () => retryFinale(); G.btnLevels.onPress = () => toSelect();
+    C.buttonNav = true; C.modalKeys = false; C.defaultFocus = G.btnNext; C.focus = G.btnNext.id; C.keyNav = true;
+    G.ui.pShards.setString(''); G.ui.pSub.setString('ALL 3 LIVES LOST\nTRY AGAIN FROM THE START'); G.log.push('over-panel');
+  }
 } else if (G.state === 'dying') {
   G.dieT += rdt; const t = G.dieT;
   if (G.dieHole) {
@@ -686,8 +721,11 @@ if (G.state === 'clear') {
     if (t - rdt < 0.55 && t >= 0.55) { G.flash = 0.45; for (const h of G.holes) if (h.x === hx && h.y === hy) h.pulse = 1; ring(hx, hy, 1.2, [255, 110, 150]); G.shake = 7; showToast('SWALLOWED', 1.2, '255;120;160'); }
   } else if (G.dieType === 'burn') { G.orbScale = Math.max(0, 1 - t / 0.18); }
   else { G.orbScale = Math.max(0, 1 - t / 0.3); }
-  if (t > 1.05) {
+  if (t > 1.05 && G.finale && G.lives <= 0) {     // out of lives: game-over panel (RETRY = fresh run with 3 lives, LEVELS)
+    G.state = 'over'; G.overT = 0; G.log.push('game-over'); G.orbScale = 0; G.flash = Math.max(G.flash, 0.3);
+  } else if (t > 1.05) {
     SIM.respawn(L, st);
+    if (G.finale) showToast(G.lives === 1 ? 'LAST LIFE!' : G.lives + ' LIVES LEFT', 1.3, '255;215;120');
     G.vis.x = st.x; G.vis.y = st.y; G.orbScale = 0; G.spawnT = 0; G.state = 'play'; ring(st.x, st.y, 0.6, [140, 240, 255]); G.log.push('respawn ' + st.i + ',' + st.j);
   }
 }
@@ -925,7 +963,18 @@ for (const cv of G.curves || []) {
     if (P.ph === 'hail' && was !== 'hail') { G.log.push('hail-on ' + hz.k); if (onScreen && G.state === 'play') G.shake = Math.max(G.shake, 1.5); }
     if (P.ph === 'tele' && was !== 'tele') G.log.push('hail-warn ' + hz.k);
     const fl = 0.5 + 0.5 * Math.sin(G.time * 38);
-    if (P.ph === 'calm') { hz.zone.setColor('120;165;235'); hz.zone.setOpacity(16 + 6 * Math.sin(G.time * 1.5 + hz.k)); }
+    for (const dc of hz.decor) {      // rumble / shiver while the lane telegraphs, flash on the strike
+      const jit = P.ph === 'tele' ? (2 + 4 * P.u) * Math.sin(G.time * 45 + dc.ph) : 0;
+      dc.o.setPosition(dc.x + jit, dc.y + (hz.kind === 'bolt' ? 2 * Math.sin(G.time * 1.3 + dc.ph) : 0));
+      if (hz.kind === 'bolt') dc.o.setColor(P.ph === 'hail' ? (fl > 0.5 ? '255;250;200' : '200;190;240') : P.ph === 'tele' ? '120;105;175' : '175;165;220');
+      else dc.o.setColor(P.ph === 'tele' ? '255;255;255' : '200;230;255');
+    }
+    if (hz.kind === 'bolt' || hz.kind === 'icicle') {
+      const cz = hz.kind === 'bolt' ? ['205;180;255', '120;90;200', '255;240;150'] : ['170;220;255', '235;248;255', '200;235;255'];
+      if (P.ph === 'calm') { hz.zone.setColor(cz[0]); hz.zone.setOpacity(14 + 6 * Math.sin(G.time * 1.5 + hz.k)); }
+      else if (P.ph === 'tele') { hz.zone.setColor(cz[1]); hz.zone.setOpacity(40 + 60 * P.u + 20 * fl); }
+      else { hz.zone.setColor(cz[2]); hz.zone.setOpacity(50 + 30 * fl); }
+    } else if (P.ph === 'calm') { hz.zone.setColor('120;165;235'); hz.zone.setOpacity(16 + 6 * Math.sin(G.time * 1.5 + hz.k)); }
     else if (P.ph === 'tele') { hz.zone.setColor(fl > 0.5 ? '255;80;70' : '255;180;90'); hz.zone.setOpacity(40 + 50 * P.u + 25 * fl); }
     else { hz.zone.setColor('150;225;255'); hz.zone.setOpacity(38 + 18 * fl); }
     // telegraph: crisp shimmering lines showing the exact incoming corridor
@@ -933,11 +982,23 @@ for (const cv of G.curves || []) {
       const sg = (P.ph === 'tele') ? laneSeg(hz, ln.f) : null;
       if (!sg) { ln.o.setOpacity(0); continue; }
       ln.o.setPosition((sg.x0 + sg.x1) / 2, (sg.y0 + sg.y1) / 2); ln.o.setAngle(hz.ang); ln.o.setScaleX(sg.len / 256); ln.o.setScaleY(0.5);
-      ln.o.setColor((Math.floor(G.time * 12) + Math.round(ln.f * 7)) % 2 ? '255;90;80' : '255;200;110');
+      const tc = hz.kind === 'bolt' ? ['255;225;60', '190;140;255'] : hz.kind === 'icicle' ? ['255;255;255', '130;200;255'] : ['255;90;80', '255;200;110'];
+      ln.o.setColor((Math.floor(G.time * 12) + Math.round(ln.f * 7)) % 2 ? tc[0] : tc[1]);
       ln.o.setOpacity(Math.min(255, (110 + 145 * P.u) * (0.55 + 0.45 * Math.sin(G.time * 30 + ln.f * 9))));
     }
     // barrage: fast blazing streaks tearing along the lane, with an icy flare where each one leaves it
-    const vS = 1500;
+    const vS = hz.kind === 'icicle' ? 1100 : 1500;
+    if (hz.kind === 'bolt') {      // storm lightning: jagged bolts flicker along the whole lane (re-picked every few frames)
+      for (const sk of hz.streaks) {
+        if (P.ph !== 'hail') { sk.o.setOpacity(0); sk.sg = null; continue; }
+        sk.t -= rdt;
+        if (!sk.sg || sk.t <= 0) { sk.sg = laneSeg(hz, rand(0.1, 0.9)); sk.t = rand(0.05, 0.12); if (sk.sg) { sk.o.flipY(Math.random() < 0.5); if (onScreen && Math.random() < 0.4) part('IceBurst', sk.sg.x1, sk.sg.y1, { life: 0.2, s0: 0.15, s1: 0.5, drag: 0, lin: true, color: '255;235;140', z: 13 }); } }
+        if (!sk.sg) { sk.o.setOpacity(0); continue; }
+        const sg = sk.sg; sk.o.setPosition((sg.x0 + sg.x1) / 2, (sg.y0 + sg.y1) / 2); sk.o.setAngle(hz.ang); sk.o.setScaleX(sg.len / 512 * 1.02); sk.o.setScaleY(0.5 * (0.8 + 0.4 * Math.random()));
+        sk.o.setOpacity(150 + 105 * Math.random());
+      }
+      continue;
+    }
     for (const sk of hz.streaks) {
       if (P.ph !== 'hail') { sk.o.setOpacity(0); sk.t = -rand(0, 0.25); continue; }
       sk.t += rdt;
@@ -949,7 +1010,8 @@ for (const cv of G.curves || []) {
         sk.sg = null; sk.t = -rand(0, 0.12); sk.o.setOpacity(0); continue;
       }
       const u = Math.max(0, d) / sg.len, x = sg.x0 + (sg.x1 - sg.x0) * u, y = sg.y0 + (sg.y1 - sg.y0) * u;
-      sk.o.setPosition(x - hz.dv[0] * 24, y - hz.dv[1] * 24); sk.o.setAngle(hz.ang); sk.o.setScaleX(0.62 * Math.min(1, (d + 60) / 60)); sk.o.setScaleY(0.62);
+      sk.o.setPosition(x - hz.dv[0] * 24, y - hz.dv[1] * 24); sk.o.setAngle(hz.ang);
+      if (hz.kind === 'icicle') sk.o.setScale(0.42); else { sk.o.setScaleX(0.62 * Math.min(1, (d + 60) / 60)); sk.o.setScaleY(0.62); }
       sk.o.setOpacity(255 * Math.min(1, (1 - u) * 6));
     }
   }
@@ -1100,7 +1162,7 @@ if (G.holes.length && !LIB.lite) {
 const UW = C.UW, UH = C.UH;
 G.flash = Math.max(0, G.flash - rdt * 2.2); G.ui.flash.setPosition(-10, -10); G.ui.flash.setWidth(UW + 20); G.ui.flash.setHeight(UH + 20); G.ui.flash.setOpacity(255 * G.flash * G.flash);
 G.btnBack.x = 48; G.btnBack.y = 48; G.btnRestart.x = UW - 48; G.btnRestart.y = 48;
-G.btnRestart.enabled = G.state !== 'clear';
+G.btnRestart.enabled = G.state !== 'clear' && G.state !== 'over';
 G.ui.level.setPosition(UW / 2 - G.ui.level.getWidth() / 2, 30);
 const got = G.shards.filter((s) => s.got).length;
 G.ui.shards.setString(G.shards.length ? (got + ' / ' + G.shards.length) : '');
@@ -1137,20 +1199,33 @@ G.wmLift = wmWant > (G.wmLift || 0) ? wmWant : lerp(G.wmLift || 0, wmWant, 1 - M
 G.ui.hint.setOpacity((G.state === 'clear' ? 0 : 230) * G.hintA); G.ui.hint.setPosition(UW / 2 - G.ui.hint.getWidth() / 2, UH - 30 - G.ui.hint.getHeight() - G.wmLift);
 // level-clear: big text, then a panel with NEXT / LEVELS
 const cl = G.ui.clear; const ct = G.state === 'clear' ? G.clearT - 0.3 : -1;
-const pOn = G.state === 'clear' && G.clearT > 0.85; G.panelT = pOn ? (G.panelT || 0) + rdt : 0;
+const overOn = G.state === 'over' && G.overT >= 0.35;
+const pOn = (G.state === 'clear' && G.clearT > 0.85) || overOn; G.panelT = pOn ? (G.panelT || 0) + rdt : 0;
 const pu = LIB.easeBack(clamp(G.panelT / 0.45, 0, 1));
 const pw = Math.min(UW - 60, 560), ph = 400, px = UW / 2 - pw / 2, py = UH * 0.5 - ph / 2 + (1 - pu) * 40;
 G.ui.dim.setPosition(-10, -10); G.ui.dim.setWidth(UW + 20); G.ui.dim.setHeight(UH + 20); G.ui.dim.setOpacity(pOn ? 150 * clamp(G.panelT * 3, 0, 1) : 0);
+G.ui.panel.setColor(overOn ? '255;120;170' : '120;255;170');
 G.ui.panel.setPosition(px, py); G.ui.panel.setWidth(pw); G.ui.panel.setHeight(ph); G.ui.panel.setOpacity(pOn ? 240 * clamp(G.panelT * 4, 0, 1) : 0);
 cl.setScale(0.5 * (ct > 0 ? 1 + 0.25 * (1 - ease(ct / 0.4)) : 1) * Math.min(1, (pw - 40) / 620));
 cl.setOpacity(ct > 0 ? 255 * Math.min(1, ct * 5) : 0);
+const ot = G.ui.overTitle; ot.setString('OUT OF LIGHT'); try { ot.setColor('255;200;220'); } catch (e) {}
+ot.setScale(1); ot.setScale(Math.min(1.5, (pw - 60) / Math.max(1, ot.getWidth()))); ot.setOpacity(overOn ? 255 * clamp(G.panelT * 3, 0, 1) : 0);
+ot.setPosition(UW / 2 - ot.getWidth() / 2, py + 40);
 cl.setPosition(UW / 2 - cl.getWidth() / 2, pOn ? py + 20 : UH * 0.42 - cl.getHeight() / 2);
 G.ui.pShards.setPosition(UW / 2 - G.ui.pShards.getWidth() / 2 + 14, py + 128); G.ui.pShards.setOpacity(pOn ? 255 * clamp(G.panelT * 3 - 0.5, 0, 1) : 0);
 G.ui.pIcon.setScale(0.36); G.ui.pIcon.setPosition(UW / 2 - G.ui.pShards.getWidth() / 2 - 10, py + 128 + G.ui.pShards.getHeight() / 2); G.ui.pIcon.setOpacity(G.ui.pShards.getOpacity());
 G.ui.pSub.setPosition(UW / 2 - G.ui.pSub.getWidth() / 2, py + 170); G.ui.pSub.setOpacity(pOn ? 210 * clamp(G.panelT * 3 - 0.7, 0, 1) : 0);
 G.btnNext.x = UW / 2; G.btnNext.y = py + ph - 140; G.btnNext.scale = Math.min(0.8, (pw - 40) / 560);
 G.btnLevels.x = UW / 2; G.btnLevels.y = py + ph - 48; G.btnLevels.scale = 0.75;
-if (G.state !== 'clear') { G.btnNext.visible = G.btnLevels.visible = false; C.buttonNav = false; C.modalKeys = true; }
+if (overOn) G.ui.pSub.setPosition(UW / 2 - G.ui.pSub.getWidth() / 2, py + 130);
+// finale lives: three photons pinned under the level name; a lost one pops, then stays as a dim husk
+{ const ly = G.shards.length ? 106 : 74, gap = 46;
+  G.ui.lives.forEach((o, k) => { const fx = G.lifeFx[k] || 0; G.lifeFx[k] = Math.max(0, fx - rdt * 1.6);
+    if (!G.finale) { o.setOpacity(0); return; }
+    const alive = k < G.lives, pulse = alive ? 1 + 0.06 * Math.sin(G.time * 4 + k) : 1;
+    o.setScale(0.6 * pulse * (1 + 0.9 * fx)); o.setPosition(UW / 2 + (k - 1) * gap, ly);
+    o.setColor(alive ? (G.lives === 1 ? '255;200;120' : '255;255;255') : (fx > 0 ? '255;120;140' : '80;90;120')); o.setOpacity(alive ? 255 : 90 + 165 * fx); }); }
+if (G.state !== 'clear' && !(G.state === 'over' && G.overT >= 0.35)) { G.btnNext.visible = G.btnLevels.visible = false; C.buttonNav = false; C.modalKeys = true; }
 C.updateButtons(rdt);
 G.toastT = Math.max(0, (G.toastT || 0) - rdt);
 G.ui.toast.setOpacity(255 * Math.min(1, G.toastT * 3)); G.ui.toast.setPosition(UW / 2 - G.ui.toast.getWidth() / 2, UH - 92 - G.ui.hint.getHeight() - (G.wmLift || 0));

@@ -55,6 +55,8 @@ const BOW_MINV = 0.15;           // ...and it is moving along the arc at least t
 const PRISM_R = 0.45 * T;        // passing this close to a prism's centre takes its colour
 const LANTERN_R = 0.55 * T;      // Frozen Light: passing this close to a lantern lights it (melting its linked ice)
 let MELT = 0, BROKE = 0, SIZE = 1;  // Frozen Light: lit lanterns (bits), smashed glaciers (bits), photon size 0 small / 1 normal / 2 big
+let TRACE = null;                // optional per-frame callback while simulate() flies (level generator / tools)
+function setTrace(f) { TRACE = f; }
 let COLOR = '';                  // colour of the photon being simulated (colour gates are walls for every other colour)
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
@@ -545,14 +547,15 @@ function stick(L, st, side, hit) {
   }
   cand.sort((a, b) => a[0] - b[0]);
   if (cand.length) { i = cand[0][1]; j = cand[0][2]; }
-  st.rail = null; st.boost = 0; st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j]; st.lastColor = st.color || ''; st.bow = null;
+  st.rail = null; st.boost = 0; st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j]; st.bow = null;
   st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX, fromY, impact: impactSpeed });
   st.x = center(i); st.y = center(j);
   pickups(L, st);
+  st.lastColor = st.color || ''; st.lastSize = st.size;     // checkpoint = the state at this resting spot (respawn restores it)
 }
 function respawn(L, st) {
   const [i, j] = st.lastStuck;
-  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, rail: null, boost: 0, events: [], bow: null, bowSkip: -1, color: st.lastColor || '' });
+  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, rail: null, boost: 0, events: [], bow: null, bowSkip: -1, color: st.lastColor || '', size: st.lastSize === undefined ? st.size : st.lastSize });
 }
 function clone(st) { const s = JSON.parse(JSON.stringify(st)); s.events = []; return s; }
 // Run a whole move instantly (used by the solver/tests). `wait` seconds pass first (moving platforms keep moving).
@@ -573,9 +576,9 @@ function simulate(L, st0, action, wait) {
     startFlight(st, action, false, L);
   }
   const evs = pre;
-  while (st.mode === 'fly') { step(L, st, 1 / 60); evs.push(...st.events); st.events = []; }
+  while (st.mode === 'fly') { step(L, st, 1 / 60); evs.push(...st.events); st.events = []; if (TRACE) TRACE(st); }
   evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { iceSolid, LANTERN_R, bowNear, bowOn, BOW_SNAP, isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+return { setTrace, iceSolid, LANTERN_R, bowNear, bowOn, BOW_SNAP, isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
          padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };

@@ -17,6 +17,12 @@ You play a photon of light that can only move along walls. Swipe along a wall to
 - **5 · Song of Rainbows:** a cheerful pastel sky. Touch a rainbow while moving along it and you snap on, ride it to the end and launch off tangentially. Prisms tint your light, and coloured glass gates only let the matching colour through. Rain clouds burst when you fly through them, and the rain reveals hidden rainbows. Use `?unlock&select&ch=5` to jump to it, or `?ch=5&level=N` for a level.
 - **6 · Frozen Light:** an ice world under an aurora. Fly past a lantern to light it and melt its matching ice. Sunlight shining through the ice makes the photon big, and big light smashes glaciers; waterfalls make it small, and only small light slips through cracks. Use `?unlock&select&ch=6` to jump to it, or `?ch=6&level=N` for a level.
 
+- **Longer levels and grand finales:** chapters 2-6 each end with three new long, multi-section levels that scroll with a follow camera. The last level of each chapter is a **grand finale**, marked with a crown and a FINALE badge on level select.
+  - In a finale you get exactly 3 lives, shown as photons under the level name. A death costs one life and you respawn where you last rested.
+  - Lose all three and the OUT OF LIGHT panel offers RETRY (a fresh run with 3 lives) or LEVELS. Normal levels keep unlimited retries.
+  - Song of Rainbows adds friendly storm lightning: a lane darkens and sparkles, then bolts strike it. Cross while the sky is calm.
+  - Frozen Light adds falling icicles: they shiver on the ceiling, then drop down their lane.
+
 Progress is saved in your browser (localStorage).
 
 ## Controls

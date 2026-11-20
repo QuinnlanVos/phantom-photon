@@ -117,8 +117,8 @@ function plan(c, n, toks) {
   await pg.goto(url + '?unlock&select&ch=6'); await sleep(5000);
   const sel = await pg.evaluate((C6) => { const S = window.__ppSel; const cd = S && S.cards[C6]; return S ? { cur: S.cur, n: S.cards.length, dots: S.dots.length, name: cd.name.getString(), open: cd.nodes.filter(b => b.open).length,
     vis: cd.nodes.filter(b => b.visible).length, fx: cd.frame.getX(), fw: cd.frame.getWidth(), UW: window.__ppC.UW, skyA: S.iceSky.getOpacity(), rbA: S.rbSky.getOpacity() } : null; }, C6);
-  ok(sel && sel.n === CH.length && CH.length === 6 && sel.dots === 6 && sel.cur === C6 && /FROZEN LIGHT/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.skyA > 200 && sel.rbA < 10,
-    `select ?unlock&select&ch=6: 6 cards + 6 dots, "Frozen Light" centred on-screen, 5 levels open, icy backdrop ${JSON.stringify(sel)}`);
+  ok(sel && sel.n === CH.length && CH.length >= 6 && sel.dots === CH.length && sel.cur === C6 && /FROZEN LIGHT/.test(sel.name) && sel.open === CH[C6].levels.length && sel.vis === CH[C6].levels.length && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.skyA > 200 && sel.rbA < 10,
+    `select ?unlock&select&ch=6: 6 cards + 6 dots, "Frozen Light" centred on-screen, all levels open, icy backdrop ${JSON.stringify(sel)}`);
   await pg.screenshot({ path: `${outdir}/${tag}_select.png` });
   if (VIEW[3]) { const id = 99; await touch('touchstart', id, W * 0.3, H * 0.5); for (let k = 1; k <= 5; k++) { await touch('touchmove', id, W * 0.3 + k * 30, H * 0.5); await sleep(16); } await touch('touchend', id, W * 0.3 + 150, H * 0.5); }
   else await pg.keyboard.press('PageUp');
@@ -130,7 +130,7 @@ function plan(c, n, toks) {
   ok(cur === C6, `select: ${VIEW[3] ? 'swipe left' : 'PageDown'} returns to chapter 6 (cur=${cur})`);
 
   // ---------------------------------------------------------------- play every chapter-6 level
-  for (let n = 0; n < CH[C6].levels.length; n++) {
+  for (let n = 0; n < Math.min(5, CH[C6].levels.length); n++) {   // original levels (longer levels: test_long.js)
     if (process.env.ONLY && !process.env.ONLY.split(',').includes(String(n + 1))) continue;
     await load(`?unlock&ch=6&level=${n + 1}`);
     let s = await S();
