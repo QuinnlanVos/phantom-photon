@@ -152,6 +152,11 @@ def level_art(n, lv, dark=False, theme=''):
         base = np.array(Image.fromarray((hsv * 255).astype(np.uint8), 'HSV').convert('RGB')).astype(np.float32)
         nz = (1 - padz - rampz).clip(0, 1)[..., None]
         col = col * (1 - nz) + base * nz
+    if theme == 'ice':      # Frozen Light: frost-white rims up top shading to glacier cyan lower down
+        yy_, xx_ = np.mgrid[0:H, 0:W]; t = np.clip(yy_ / H * 0.8 + 0.2 * np.sin(xx_ / W * 5.0) * 0.5 + 0.1, 0, 1)[..., None]
+        base = np.array([225, 248, 255])[None, None, :] * (1 - t) + np.array([110, 205, 255])[None, None, :] * t
+        nz = (1 - padz - rampz).clip(0, 1)[..., None]
+        col = col * (1 - nz) + base * nz
     col = col * (1 - mirz[..., None]) + SILVER[None, None, :] * mirz[..., None]
     col = col / 255.0
     g1 = blur(line, 8); g2 = blur(line, 22); g3 = blur(line, 52)
@@ -166,6 +171,12 @@ def level_art(n, lv, dark=False, theme=''):
         interior_rgb = past * (1 - stripe[..., None]) + np.array([1.0, 1.0, 1.0])[None, None, :] * stripe[..., None]
         ig = blur(line, 9)[..., None] * 0.6
         interior_rgb = interior_rgb * (1 - ig) + (col * 0.55 + 0.45) * ig
+    if theme == 'ice':      # deep blue ice with frost crystals and faint facet streaks
+        rs_ = np.random.RandomState(700 + n)
+        frost = blur((rs_.rand(H, W) < 0.012).astype(np.float32), 1.2 * SS) * 3.0 + blur(rs_.rand(H, W).astype(np.float32), 6 * SS) * 0.6
+        facet = ((((xx * 2 + yy) % (58 * SS)) < 3 * SS)).astype(np.float32) * 0.10
+        interior_rgb = np.array([0.035, 0.085, 0.19])[None, None, :] + np.array([0.55, 0.8, 1.0])[None, None, :] * np.clip(frost * 0.16 + facet, 0, 0.5)[..., None]
+        interior_rgb = interior_rgb + col * 0.5 * blur(line, 10)[..., None]
     padin = arr(pad) * ((((xx // 2) + (yy // 2)) % 16) < 7)        # energised stripes inside pad tiles
     interior_rgb = interior_rgb + (MAGENTA / 255.0)[None, None, :] * (padin * 0.28 + arr(pad) * 0.10)[..., None]
     sheen = arr(mir) * ((((xx - yy) % 40) < 9).astype(np.float32) * 0.35 + 0.18)        # mirror blocks: polished diagonal sheen
@@ -177,6 +188,7 @@ def level_art(n, lv, dark=False, theme=''):
     if theme == 'sun': gl = np.clip(0.75 * g1 + 0.25 * g2, 0, 1) * outside * 0.8     # bright sky behind: keep the spill tight (no flat panels)
     if theme == 'void': gl = np.clip(0.8 * g1 + 0.06 * g2, 0, 1) * outside * 0.7   # deep space: crisp tube, short halo, the void stays black
     if theme == 'rainbow': gl = np.clip(0.9 * g1 + 0.25 * g2, 0, 1) * outside * 0.6   # bright sky: soft candy halo
+    if theme == 'ice': gl = np.clip(0.85 * g1 + 0.3 * g2 + 0.12 * g3, 0, 1) * outside * 0.7   # cold frosty halo
     rgb = rgb + col * gl[..., None]
     alpha = alpha + gl
     # bright tube with white-hot core
@@ -214,6 +226,10 @@ def level_art(n, lv, dark=False, theme=''):
     if theme == 'rainbow':   # hidden rainbows: dotted white ghost of the arc (it appears for real after the rain)
         hd = np.clip(blur(arr(hid), 0.8) * 0.85 + blur(arr(hid), 4) * 0.35, 0, 1) * (1 - sm)
         rgb = rgb * (1 - hd[..., None]) + np.array([1.0, 1.0, 1.0])[None, None, :] * hd[..., None]; alpha = np.maximum(alpha, hd * 0.8)
+    if theme == 'ice':       # snow caps on every upward-facing wall top (lumpy, bright white)
+        k_ = 11 * SS; up = np.zeros_like(sm); up[k_:] = sm[:-k_]
+        cap = blur(np.clip(sm - up, 0, 1), 1.6 * SS); cap = np.clip(cap * 1.5, 0, 1) * fade * sm
+        rgb = rgb * (1 - cap[..., None]) + np.array([0.97, 0.99, 1.0])[None, None, :] * cap[..., None]; alpha = np.maximum(alpha, cap)
     a = np.clip(alpha, 1e-4, 1)
     save_rgba(rgb / a[..., None] * np.minimum(alpha, 1)[..., None] / a[..., None] if False else np.clip(rgb / a[..., None], 0, 1), alpha, f'level_{n + 1}.png')
     return (W // SS, H // SS)
@@ -345,5 +361,6 @@ glow_sprite(np.clip(ic + blur(ic, 6) * 0.7 + ringb + blur(ringb, 5) * 0.5, 0, 1)
 exec(open(os.path.join(HERE, 'gen_art2.py')).read())
 exec(open(os.path.join(HERE, 'gen_art3.py')).read())
 exec(open(os.path.join(HERE, 'gen_art4.py')).read())
+exec(open(os.path.join(HERE, 'gen_art5.py')).read())
 json.dump({'levelArtSize': sizes, 'movers': mover_sizes, 'clouds': cloud_sizes, 'cloudIndex': cloud_index, 'rings': ring_sizes, 'ringIndex': ring_index, 'rockVariants': ROCK_VARIANTS, 'bows': bow_sizes, 'bowIndex': bow_index, 'margin': M, 'tile': T, 'ss': SS}, open(os.path.join(HERE, 'art_meta.json'), 'w'))
 print('art ok', sizes)

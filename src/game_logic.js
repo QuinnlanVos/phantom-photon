@@ -61,7 +61,8 @@ if (!G) {
   // Solar Winds: sunrise sky + sun bloom (Bg layer), slow-motion vignette and off-screen exit pointer (UI layer)
   G.sky = mk('Sky', 'Bg', 0, 0, -6); G.sunGlow = mk('SunGlow', 'Bg', 0, 0, -5, true);
   G.voidSky = mk('VoidSky', 'Bg', 0, 0, -7); G.voidSky.hide(true);     // Rocks from Space: pitch-dark deep-space backdrop
-  G.rbSky = mk('RainbowSky', 'Bg', 0, 0, -8); G.rbSky.hide(true);       // Song of Rainbows: bright pastel sky
+  G.rbSky = mk('RainbowSky', 'Bg', 0, 0, -8); G.rbSky.hide(true);
+  G.iceSky = mk('IceSky', 'Bg', 0, 0, -8); G.iceSky.hide(true);       // Frozen Light: night-blue icy sky       // Song of Rainbows: bright pastel sky
   G.orbShade = mk('Soft', '', 0, 0, 29, false); G.orbShade.setColor('70;36;130'); G.orbShade.setOpacity(0);   // contrast for the photon on bright skies
   G.vig = mk('Vignette', 'UI', 0, 0, 30); G.vig.setOpacity(0);
   G.hudTopF = mk('HudFade', 'UI', 0, 0, 29); G.hudBotF = mk('HudFade', 'UI', 0, 0, 29); G.hudTopF.setOpacity(0); G.hudBotF.setOpacity(0);   // readable HUD over scrolling worlds
@@ -159,6 +160,7 @@ function loadLevel(c, n) {
   setupSolar(CHP, def);
   setupRocks(CHP, def, gi);
   setupRainbow(CHP, def, gi);
+  setupIce(CHP, def, gi);
   if (G.dark) {
     G.orbLight = light(st.x, st.y, 170, '210;235;255', 5);
     G.memory = [];
@@ -319,6 +321,52 @@ function setupRainbow(CHP, def, gi) {
     return { c, k, o, cx, cy, burst: !!(G.st.rain & (1 << k)), bt: 9, drops, ph: rand(0, 6.28) };
   });
 }
+// ------------------------------------------------------------------ Frozen Light (chapter 6): icy sky, aurora, snow, lanterns, ice, glaciers, cracks, waterfalls, sunlight
+function setupIce(CHP, def, gi) {
+  G.LANC = ['255;190;90', '255;120;175', '140;255;170'];       // lantern colours (their ice is tinted to match)
+  const add = (name, x, y, z, blend, layer) => { const o = tag(mk(name, layer || '', x, y, z, blend)); G.dyn.push(o); return o; };
+  G.ice = CHP.theme === 'ice'; G.iceSky.hide(!G.ice);
+  if (G.ice) try { const bl = runtimeScene.getLayer(''); bl.setEffectDoubleParameter('Bloom', 'threshold', 0.55); bl.setEffectDoubleParameter('Bloom', 'bloomScale', 0.9); } catch (e) {}   // keep the ice colours crisp G.sizeV = [0.55, 1, 1.45][G.st.size === undefined ? 1 : G.st.size];
+  G.lanV = []; G.iceV = []; G.glacV = []; G.fallV = []; G.sunV = []; G.iceFirst = G.iceFirst || {};
+  if (!G.ice) return;
+  if (!G.rbDecor) G.rbDecor = [];
+  const padX = 3000, padY = 900;
+  G.iceSky.setPosition(-padX, -padY); G.iceSky.setWidth(G.W + 2 * padX); G.iceSky.setHeight(G.H + 2 * padY);
+  G.bg.setOpacity(0); G.neb.setOpacity(0);
+  // aurora curtains (far, slow parallax) + falling snow at three depths
+  for (let q = 0; q < 2; q++) { const o = add('Aurora', 0, 0, -7, true, 'Bg'); o.setOpacity(q ? 150 : 200); if (q) o.setColor('170;150;255');
+    G.rbDecor.push({ o, p: q ? 0.04 : 0.08, u: q ? 0.7 : 0.3, v: q ? 0.3 : 0.38, s: q ? 2.2 : 2.8, bow: true, vx: 0, aur: q }); }
+  const nS = LIB.lite ? 14 : (C.isTouch ? 34 : 48);
+  for (let q = 0; q < nS; q++) { const depth = q % 3, o = add('Snowflake', 0, 0, -5 + depth, true, 'Bg');
+    o.setOpacity(depth === 0 ? 110 : depth === 1 ? 170 : 230);
+    G.rbDecor.push({ o, p: [0.15, 0.3, 0.5][depth], u: Math.random(), v: Math.random(), s: [0.22, 0.32, 0.45][depth] * rand(0.8, 1.2), vx: rand(-10, 10), vy: [18, 30, 46][depth] * rand(0.8, 1.2), ph: rand(0, 6.28) }); }
+  // lanterns: frame + glass (off / lit) over a soft glow in the lantern's colour
+  G.lanV = L.lanterns.map((q, k) => {
+    const aura = add('Soft', q.x, q.y, 5, true); aura.setColor(G.LANC[k % 3]); aura.setScale(0.7); aura.setOpacity(60);
+    const o = add('Lantern', q.x, q.y + 2, 8, false); o.setScale(0.5); const lit = !!(G.st.lit & (1 << k)); o.setAnimationName(lit ? 'On' : 'Off');
+    return { q, k, o, aura, lit, flare: 0 };
+  });
+  // lantern ice: one block per tile, tinted to its lantern; glaciers: deep blue faceted blocks; cracks: thin fractured panes
+  for (const z of (def.ice || [])) for (let j = z.j; j < z.j + (z.h || 1); j++) for (let i = z.i; i < z.i + (z.w || 1); i++) {
+    const o = add('IceBlock', cc(i), cc(j), 4, false); o.setScale(0.5); o.setColor(lightC(G.LANC[z.l % 3], 0.6));
+    const glow = add('Soft', cc(i), cc(j), 3, true); glow.setColor(G.LANC[z.l % 3]); glow.setScale(0.32); glow.setOpacity(70);
+    G.iceV.push({ o, glow, l: z.l, i, j, mt: (G.st.lit & (1 << z.l)) ? 9 : -1 }); }
+  L.glaciers.forEach((g, k) => { for (let j = g.j; j < g.j + g.h; j++) for (let i = g.i; i < g.i + g.w; i++) {
+    const o = add('Glacier', cc(i), cc(j), 4, false); o.setScale(0.5); if (G.st.ice & (1 << k)) o.setOpacity(0); G.glacV.push({ o, k, i, j }); } });
+  for (const c of (def.cracks || [])) for (let j = c.j; j < c.j + (c.h || 1); j++) for (let i = c.i; i < c.i + (c.w || 1); i++) { const o = add('Crack', cc(i), cc(j), 4, false); o.setScale(0.5); o.setOpacity(235); }
+  // waterfalls: animated falling water (one sprite per 2 tiles) + spray particles at the bottom
+  G.fallV = L.falls.map((f, k) => { const parts = [];
+    for (let i = f.i; i < f.i + f.w; i++) for (let j = f.j; j < f.j + f.h; j += 2) { const two = j + 1 < f.j + f.h;
+      const o = add('Waterfall', cc(i), two ? (j + 1) * T : cc(j), 3, false); o.setScaleX(0.5); o.setScaleY(two ? 0.5 : 0.25); o.setOpacity(215); parts.push(o); }
+    return { f, k, parts, t: 0 }; });
+  // sunlight shafts: warm beam through the ice + soft glow
+  G.sunV = L.suns.map((u, k) => { const cx = (u.x0 + u.x1) / 2, cy = (u.y0 + u.y1) / 2;
+    const hgt = u.y1 - u.y0 + 7 * T;      // the beam pours down from above and ends just below the sunlit ice
+    const o = add('SunShaft', cx, u.y1 + T - hgt / 2, 3, true); o.setScaleX((u.x1 - u.x0) * 1.15 / 128); o.setScaleY(hgt / 512);
+    const glow = add('Soft', cx, cy, 2, true); glow.setColor('255;220;140'); glow.setScale(Math.max(u.x1 - u.x0, u.y1 - u.y0) / 260); glow.setOpacity(45);
+    return { u, k, o, glow, cx, cy }; });
+}
+function iceToast(key, text, dur, color) { if (G.iceFirst[key + G.chapter + ':' + G.level]) return; G.iceFirst[key + G.chapter + ':' + G.level] = 1; showToast(text, dur, color); }
 function rbToast(key, text, dur, color) { if (G.rbFirst[key + G.level] && key !== 'prism') return; G.rbFirst[key + G.level] = 1; showToast(text, dur, color); }
 // segment of the line through the hail lane (perpendicular offset f in 0..1 across the lane, direction dv) clipped to the lane rect
 function laneSeg(hz, f) {
@@ -531,6 +579,26 @@ function handleEvent(e) {
     for (let q = 0; q < 4; q++) part('Note', e.x + rand(-30, 30), e.y + rand(-20, 10), { normal: true, vx: rand(-40, 40), vy: rand(-120, -70), life: 1.3, s0: 0.45, s1: 0.32, drag: 0.5, color: RBSEQ[q + 1], a0: 240, spin: rand(-50, 50), z: 26 });
     G.shake = Math.max(G.shake, 2); G.log.push('rain ' + e.k);
     if (L.bows.some((b) => b.cloud === e.k)) rbToast('rain', 'A RAINBOW APPEARS!', 1.4, '255;170;225'); else rbToast('rain', 'SPLASH!', 0.9, '150;200;255');
+  } else if (e.type === 'lantern') {   // lantern lit: warm flare, its linked ice starts melting
+    const lv = G.lanV[e.k]; if (lv) { lv.lit = true; lv.flare = 1; lv.o.setAnimationName('On'); }
+    const c = G.LANC[e.k % 3];
+    for (let q = 0; q < 18; q++) { const a = rand(0, 6.28), v = rand(80, 280); part('Spark', e.x, e.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.35, 0.7), s0: rand(0.35, 0.6), s1: 0, drag: 3, color: c }); }
+    ring(e.x, e.y, 0.9, c.split(';').map(Number)); flashLight(e.x, e.y, 160, c, 0.7);
+    for (const iv of G.iceV) if (iv.l === e.k && iv.mt < 0) iv.mt = -0.15 - 0.04 * (Math.abs(iv.i - L.lanterns[e.k].i) + Math.abs(iv.j - L.lanterns[e.k].j)) * 0;
+    G.shake = Math.max(G.shake, 2); G.flash = Math.max(G.flash, 0.1); G.log.push('lantern ' + e.k); showToast('LANTERN LIT!', 1.1, c);
+  } else if (e.type === 'smash') {     // big light smashes a glacier: the whole glacier shatters
+    for (const gv of G.glacV) if (gv.k === e.k && gv.o.getOpacity() > 0) { gv.o.setOpacity(0);
+      for (let q = 0; q < 7; q++) { const a = rand(0, 6.28), v = rand(120, 420); part('IceShard', cc(gv.i) + rand(-14, 14), cc(gv.j) + rand(-14, 14), { normal: true, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, grav: 900, life: rand(0.6, 1.1), s0: rand(0.4, 0.7), s1: 0.2, drag: 0.6, a0: 255, spin: rand(-400, 400), z: 22 }); } }
+    ring(e.x, e.y, 1.1, [180, 235, 255]); G.shake = Math.max(G.shake, 7); G.flash = Math.max(G.flash, 0.18); G.log.push('smash ' + e.k);
+    iceToast('smash', 'SMASH!', 0.9, '170;230;255');
+  } else if (e.type === 'shrink') {    // waterfall: splash, the photon shrinks
+    for (let q = 0; q < 16; q++) { const a = rand(0, 6.28), v = rand(60, 220); part('Spark', e.x, e.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v + 80, life: rand(0.3, 0.6), s0: rand(0.3, 0.5), s1: 0, drag: 2.5, color: '150;210;255' }); }
+    part('RingW', e.x, e.y, { life: 0.45, s0: 0.7, s1: 0.1, drag: 0, lin: true, color: '150;220;255', a0: 220, z: 19 });
+    G.squash = 0.5; G.log.push('shrink'); showToast('TINY LIGHT!', 1.0, '150;220;255');
+  } else if (e.type === 'grow') {      // sunlight: warm burst, the photon grows big
+    part('RingW', e.x, e.y, { life: 0.5, s0: 0.2, s1: 1.4, drag: 0, lin: true, color: '255;225;150', a0: 230, z: 19 });
+    for (let q = 0; q < 14; q++) { const a = rand(0, 6.28), v = rand(80, 260); part('Spark', e.x, e.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.3, 0.6), s0: rand(0.35, 0.6), s1: 0, drag: 3, color: '255;220;140' }); }
+    G.surge = 1; G.shake = Math.max(G.shake, 2.5); G.log.push('grow'); showToast('BIG LIGHT!', 1.0, '255;215;130');
   } else if (e.type === 'graze') {
     if (!G.lastGraze || G.time - G.lastGraze > 0.15) { sparks(st.x, st.y, 0, 0, 4, null, 120); G.lastGraze = G.time; }
   } else if (e.type === 'shard') {
@@ -583,7 +651,7 @@ function handleEvent(e) {
 }
 function showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(G.rb ? '255;255;255' : color); G.toastT = dur;
   // pastel sky: white letters with a coloured outline stay readable over the bright clouds and rainbows
-  try { G.ui.toast.setOutlineEnabled(!!G.rb); if (G.rb) { G.ui.toast.setOutlineColor(color ? color.split(';').map((v) => Math.round(v * 0.55)).join(';') : '120;40;170'); G.ui.toast.setOutlineThickness(5); } } catch (e) {} }
+  try { G.ui.toast.setShadowColor(G.rb ? '70;20;110' : '255;60;200'); G.ui.toast.setOutlineEnabled(!!G.rb); if (G.rb) { G.ui.toast.setOutlineColor(color ? color.split(';').map((v) => Math.round(v * 0.55)).join(';') : '120;40;170'); G.ui.toast.setOutlineThickness(5); } } catch (e) {} }
 
 // ------------------------------------------------------------------ state animations
 if (G.state === 'clear') {
@@ -653,16 +721,17 @@ if (G.bump) {
 }
 const orb = G.orb, halo = G.halo, sp = st.mode === 'fly' ? st.speed / SIM.VMAX : 0;
 const pulse = 1 + 0.06 * Math.sin(G.time * 3.2);
-let sxs = 0.5 * G.orbScale * pulse, sys = sxs, ang = 0;
+G.sizeV = lerp(G.sizeV || 1, [0.55, 1, 1.45][st.size === undefined ? 1 : st.size], 1 - Math.pow(0.0005, rdt));   // Frozen Light: small / normal / big photon
+let sxs = 0.5 * G.orbScale * pulse * G.sizeV, sys = sxs, ang = 0;
 if (st.mode === 'fly' && G.state === 'play') { ang = Math.atan2(st.vy, st.vx) * 180 / Math.PI; sxs *= 1 + 0.45 * sp; sys *= 1 - 0.22 * sp; }
 else { const q = G.squash; if (G.squashAxis === 'x') { sxs *= 1 - 0.42 * q; sys *= 1 + 0.3 * q; } else { sxs *= 1 + 0.3 * q; sys *= 1 - 0.42 * q; } }
 orb.setPosition(G.vis.x + ox, G.vis.y + oy); orb.setAngle(ang); orb.setScaleX(Math.max(0.001, sxs)); orb.setScaleY(Math.max(0.001, sys));
 const pcol = st.color ? RBC[st.color] : null;
-orb.setColor(G.bump ? '255;170;190' : (G.state === 'dying' && G.dieType === 'burn' ? '255;160;80' : (pcol ? lightC(pcol, 0.35) : '255;255;255')));
+orb.setColor(G.bump ? '255;170;190' : (G.state === 'dying' && G.dieType === 'burn' ? '255;160;80' : (pcol ? lightC(pcol, 0.35) : st.size === 2 ? '255;238;190' : st.size === 0 ? '190;235;255' : '255;255;255')));
 if (G.rb) { G.orbShade.setPosition(G.vis.x + ox, G.vis.y + oy); G.orbShade.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.15 * sp))); G.orbShade.setOpacity(205 * G.orbScale);
   G.orbShade.setColor(pcol ? pcol.split(';').map((v) => Math.round(v * 0.45)).join(';') : '70;36;130'); }
 G.surge = Math.max(0, (G.surge || 0) - rdt * 1.4);
-halo.setPosition(G.vis.x + ox, G.vis.y + oy); halo.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.1 * Math.sin(G.time * 2.1) + 0.25 * sp + 0.9 * G.surge)));
+halo.setPosition(G.vis.x + ox, G.vis.y + oy); halo.setScale(Math.max(0.001, 0.5 * G.sizeV * G.orbScale * (1 + 0.1 * Math.sin(G.time * 2.1) + 0.25 * sp + 0.9 * G.surge)));
 if (pcol && G.surge <= 0.02) halo.setColor(pcol); else halo.setColor(G.surge > 0.02 ? '255;' + Math.round(255 - 70 * G.surge) + ';' + Math.round(255 - 90 * G.surge) : (G.ts < 0.95 ? Math.round(255 - 100 * (1 - G.ts)) + ';255;255' : '255;255;255'));
 const orbCloud = inCloud(G.vis.x, G.vis.y);
 G.cloudK = lerp(G.cloudK || 0, orbCloud ? 1 : 0, 1 - Math.pow(0.001, rdt));
@@ -927,6 +996,27 @@ if (G.rb) {
     }
   }
 }
+if (G.ice) {
+  for (const lv of G.lanV) {
+    lv.flare = Math.max(0, lv.flare - rdt * 1.3);
+    lv.o.setPosition(lv.q.x, lv.q.y + 2 + Math.sin(G.time * 1.6 + lv.k) * 1.5);
+    lv.aura.setScale((lv.lit ? 1.0 : 0.7) * (1 + 0.08 * Math.sin(G.time * (lv.lit ? 7 : 2) + lv.k) + 0.7 * lv.flare));
+    lv.aura.setOpacity(lv.lit ? Math.min(255, 190 + 50 * Math.sin(G.time * 9 + lv.k * 3) * 0.3 + 60 * lv.flare) : 55 + 25 * Math.sin(G.time * 2 + lv.k));
+  }
+  for (const iv of G.iceV) {
+    if (iv.mt < 0 && iv.mt > -1) { iv.mt += rdt; if (iv.mt >= 0) iv.mt = 0.0001; }
+    if (iv.mt > 0 && iv.mt < 9) { iv.mt += rdt; const u = clamp01(iv.mt / 0.7);
+      iv.o.setOpacity(235 * (1 - u)); iv.o.setScaleY(0.5 * (1 - 0.35 * u)); iv.o.setY(cc(iv.j) + 0.35 * 0.5 * T * u); iv.glow.setOpacity(160 * (1 - u)); iv.glow.setScale(0.32 + 0.3 * u);
+      if (Math.random() < rdt * 14 && u < 0.9) part('Spark', cc(iv.i) + rand(-18, 18), cc(iv.j) + rand(0, 18), { vx: 0, vy: rand(60, 140), life: 0.5, s0: 0.3, s1: 0.1, drag: 0, color: '170;225;255' });
+      if (u >= 1) iv.mt = 9; }
+    else if (iv.mt >= 9) { iv.o.setOpacity(0); iv.glow.setOpacity(0); }
+    else { iv.o.setOpacity(235); iv.glow.setOpacity(55 + 30 * Math.sin(G.time * 2 + iv.i * 0.7 + iv.j)); }
+  }
+  for (const fv of G.fallV) { fv.t -= rdt; const f = fv.f;
+    if (fv.t <= 0 && !LIB.lite) { fv.t = 0.09; part('Soft', rand(f.x0 + 4, f.x1 - 4), f.y1 - 4, { normal: true, vx: rand(-40, 40), vy: rand(-60, -20), life: 0.5, s0: 0.05, s1: 0.14, drag: 1.5, color: '210;235;255', a0: 70, z: 13 }); } }
+  for (const sv of G.sunV) { sv.o.setOpacity(120 + 35 * Math.sin(G.time * 1.4 + sv.k)); sv.glow.setOpacity(40 + 15 * Math.sin(G.time * 1.1 + sv.k)); }
+  if (st.size === 2 && st.mode === 'fly' && Math.random() < rdt * 20) part('Spark', G.vis.x + rand(-12, 12), G.vis.y + rand(-12, 12), { vx: rand(-30, 30), vy: rand(-30, 30), life: 0.4, s0: 0.35, s1: 0, drag: 2, color: '255;220;140' });
+}
 if (G.slowT !== undefined && G.ts < 0.8 && G.state === 'play' && !LIB.lite) {    // bullet-time ripples around the orb
   G.slowT -= rdt; if (G.slowT <= 0) { G.slowT = 0.45; part('RingW', G.vis.x, G.vis.y, { life: 0.9, s0: 0.75, s1: 0.1, drag: 0, lin: true, a0: 110, color: '150;230;255', z: 24 }); }
 }
@@ -985,17 +1075,19 @@ if (G.pins && G.pins.length) {
     d.o.setPosition(x, y); d.o.setScale(d.s / czoom * 0.9); d.o.setOpacity(d.a * tw);
   }
 }
-if (G.rb && G.rbDecor) {
+if ((G.rb || G.ice) && G.rbDecor) {
   const vw = rw / czoom * 1.3 + 600, vh = rh / czoom * 1.2 + 300, md = (a, b) => ((a % b) + b) % b;
   for (const d of G.rbDecor) {
-    if (!d.bow) d.u += d.vx * rdt / vw;
+    if (!d.bow) d.u += (d.vx + (d.vy ? 8 * Math.sin(G.time * 0.9 + d.ph) : 0)) * rdt / vw;
+    if (d.vy) d.v += d.vy * rdt / vh;
+    if (d.aur !== undefined) d.o.setOpacity((d.aur ? 90 : 130) * (0.75 + 0.25 * Math.sin(G.time * 0.35 + d.aur * 2)));
     const x = camX + md(d.u * vw - camX * d.p, vw) - vw / 2, y = camY + md(d.v * vh - camY * d.p, vh) - vh / 2;
     d.o.setPosition(x, y); d.o.setScale(d.s / czoom);
   }
 }
-if (G.void || G.rb) for (const m of G.motes) m.o.setOpacity(0);
+if (G.void || G.rb || G.ice) for (const m of G.motes) m.o.setOpacity(0);
 G.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);
-if (G.void || G.rb) G.neb.setOpacity(0);      // deep space stays black: no nebula haze (the rainbow sky stays clean too)
+if (G.void || G.rb || G.ice) G.neb.setOpacity(0);      // deep space stays black: no nebula haze (the rainbow sky stays clean too)
 const bgL = runtimeScene.getLayer('Bg');
 if (G.holes.length && !LIB.lite) {
   const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;
@@ -1034,8 +1126,8 @@ G.ui.shardIcon.setScale(0.3); G.ui.shardIcon.setPosition(UW / 2 - G.ui.shards.ge
   G.vig.setPosition(-10, -10); G.vig.setWidth(UW + 20); G.vig.setHeight(UH + 20); G.vig.setColor(Math.round(70 + 40 * Math.sin(G.time * 2)) + ';150;220');
   G.vig.setOpacity(LIB.lite ? 0 : 120 * Math.sqrt(sl));
   const fadeOn = G.scroll ? 1 : 0, tb = hudTop / uiS * 1.05, bb = (hudBot / uiS + (G.wmLift || 0)) * 1.25;
-  G.hudTopF.setColor(G.void ? '3;4;9' : G.rb ? '74;40;128' : '36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
-  G.hudBotF.setColor(G.void ? '3;4;9' : G.rb ? '74;40;128' : '46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
+  G.hudTopF.setColor(G.void ? '3;4;9' : G.ice ? '4;12;34' : G.rb ? '74;40;128' : '36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
+  G.hudBotF.setColor(G.void ? '3;4;9' : G.ice ? '4;12;34' : G.rb ? '74;40;128' : '46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
 }
 G.hintA = (G.firstMove && G.moves >= 2) ? Math.max(0.35, G.hintA - rdt * 0.5) : 1;
 G.ui.hint.setWrapping(true); G.ui.hint.setWrappingWidth(Math.min(UW - 40, 620));

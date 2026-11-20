@@ -117,8 +117,8 @@ function plan(c, n, toks) {
   await pg.goto(url + '?unlock&select&ch=5'); await sleep(5000);
   const sel = await pg.evaluate((C5) => { const S = window.__ppSel; const cd = S && S.cards[C5]; return S ? { cur: S.cur, n: S.cards.length, dots: S.dots.length, name: cd.name.getString(), open: cd.nodes.filter(b => b.open).length,
     vis: cd.nodes.filter(b => b.visible).length, fx: cd.frame.getX(), fw: cd.frame.getWidth(), UW: window.__ppC.UW, skyA: S.rbSky.getOpacity(), voidA: S.voidSky.getOpacity() } : null; }, C5);
-  ok(sel && sel.n === CH.length && CH.length === 5 && sel.dots === 5 && sel.cur === C5 && /SONG OF RAINBOWS/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.skyA > 200,
-    `select ?unlock&select&ch=5: 5 cards + 5 dots, "Song of Rainbows" centred on-screen, 5 levels open, pastel rainbow backdrop ${JSON.stringify(sel)}`);
+  ok(sel && sel.n === CH.length && CH.length >= 5 && sel.dots === CH.length && sel.cur === C5 && /SONG OF RAINBOWS/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.skyA > 200,
+    `select ?unlock&select&ch=5: ${CH.length} cards + dots, "Song of Rainbows" centred on-screen, 5 levels open, pastel rainbow backdrop ${JSON.stringify(sel)}`);
   await pg.screenshot({ path: `${outdir}/${tag}_select.png` });
   if (VIEW[3]) { const id = 99; await touch('touchstart', id, W * 0.3, H * 0.5); for (let k = 1; k <= 5; k++) { await touch('touchmove', id, W * 0.3 + k * 30, H * 0.5); await sleep(16); } await touch('touchend', id, W * 0.3 + 150, H * 0.5); }
   else await pg.keyboard.press('PageUp');

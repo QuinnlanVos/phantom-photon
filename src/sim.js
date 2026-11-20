@@ -53,6 +53,8 @@ const HAIL_PAD = 0.18 * T;       // the orb counts as in a hail lane once its ce
 const BOW_SNAP = 0.3 * T;        // a rainbow catches the orb when its centre passes this close to the arc
 const BOW_MINV = 0.15;           // ...and it is moving along the arc at least this much (|v . tangent| / speed)
 const PRISM_R = 0.45 * T;        // passing this close to a prism's centre takes its colour
+const LANTERN_R = 0.55 * T;      // Frozen Light: passing this close to a lantern lights it (melting its linked ice)
+let MELT = 0, BROKE = 0, SIZE = 1;  // Frozen Light: lit lanterns (bits), smashed glaciers (bits), photon size 0 small / 1 normal / 2 big
 let COLOR = '';                  // colour of the photon being simulated (colour gates are walls for every other colour)
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
@@ -103,10 +105,28 @@ function parseLevel(def) {
   L.gateC = {};
   for (const g of (def.gates || [])) for (let j = g.j; j < g.j + (g.h || 1); j++) for (let i = g.i; i < g.i + (g.w || 1); i++) { L.cells[j * L.w + i] = 'G'; L.gateC[j * L.w + i] = g.c; }
   L.rain = (def.rain || []).map((c) => Object.assign({}, c, { x0: c.i * T, y0: c.j * T, x1: (c.i + c.w) * T, y1: (c.j + c.h) * T }));
+  // Frozen Light: lanterns melt their linked ice ('Z'), big photons smash glaciers ('Y'), only small ones fit through cracks ('K');
+  // waterfalls shrink the photon, sunlight shafts through the ice make it big
+  L.lanterns = (def.lanterns || []).map((q) => Object.assign({}, q, { x: center(q.i), y: center(q.j) }));
+  L.iceL = {}; L.glacK = {};
+  for (const z of (def.ice || [])) for (let j = z.j; j < z.j + (z.h || 1); j++) for (let i = z.i; i < z.i + (z.w || 1); i++) { L.cells[j * L.w + i] = 'Z'; L.iceL[j * L.w + i] = z.l; }
+  L.glaciers = (def.glaciers || []).map((g, k) => { for (let j = g.j; j < g.j + (g.h || 1); j++) for (let i = g.i; i < g.i + (g.w || 1); i++) { L.cells[j * L.w + i] = 'Y'; L.glacK[j * L.w + i] = k; }
+    return Object.assign({ w: 1, h: 1 }, g); });
+  for (const c of (def.cracks || [])) for (let j = c.j; j < c.j + (c.h || 1); j++) for (let i = c.i; i < c.i + (c.w || 1); i++) L.cells[j * L.w + i] = 'K';
+  const rect = (c) => Object.assign({}, c, { x0: c.i * T, y0: c.j * T, x1: (c.i + c.w) * T, y1: (c.j + c.h) * T });
+  L.falls = (def.falls || []).map(rect); L.suns = (def.suns || []).map(rect);
   return L;
 }
 function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
 const isFlat = (t) => t === '#' || t === 'P';
+// Frozen Light: is this ice tile solid right now? (unlit ice, unbroken glacier, a crack for anything but a small photon)
+function iceSolid(L, i, j) { const t = cell(L, i, j), k = j * L.w + i;
+  if (t === 'Z') return !(MELT & (1 << L.iceL[k]));
+  if (t === 'Y') return !(BROKE & (1 << L.glacK[k]));
+  if (t === 'K') return SIZE !== 0;
+  return false; }
+const isIce = (t) => t === 'Z' || t === 'Y' || t === 'K';
+function ctx(st) { COLOR = st.color || ''; MELT = st.lit || 0; BROKE = st.ice || 0; SIZE = st.size === undefined ? 1 : st.size; }
 const gateShut = (L, i, j) => cell(L, i, j) === 'G' && L.gateC[j * L.w + i] !== COLOR;
 const center = (i) => i * T + T / 2;
 const toCell = (x) => Math.floor(x / T);
@@ -185,6 +205,7 @@ function faceFrom(L, i, j, side) {
   const t = cell(L, i, j);
   if (isFlat(t)) return true;
   if (t === 'G') return gateShut(L, i, j);
+  if (isIce(t)) return iceSolid(L, i, j);
   if (RAMPS[t]) return RAMPS[t].back.includes(side);
   return false;                           // empty tiles and mirrors: nothing to stick to
 }
@@ -194,7 +215,7 @@ function contacts(L, i, j) {
   for (const d in DIRS) { const [dx, dy] = DIRS[d]; if (faceFrom(L, i + dx, j + dy, OPP[d])) out.push(d); }
   return out;
 }
-function stuckContacts(L, st) { COLOR = st.color || ''; return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
+function stuckContacts(L, st) { ctx(st); return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
 // Movement rule: a swipe in `d` is legal only if it is parallel to a wall the orb touches
 // and it is not straight into a wall face.
 function checkMove(L, st, d) {
@@ -220,6 +241,7 @@ function tileBlocks(L, i, j, x, y) {
   const t = cell(L, i, j);
   if (isFlat(t) || t === 'M') return true;
   if (t === 'G') return gateShut(L, i, j);
+  if (isIce(t)) return iceSolid(L, i, j);
   if (!RAMPS[t]) return false;
   const x0 = i * T, y0 = j * T, x1 = x0 + T, y1 = y0 + T, back = RAMPS[t].back;
   if (x >= x1 && back.includes('R')) return true;
@@ -259,13 +281,13 @@ function startFlight(st, d, kick, L) {
 function newState(L) {
   const [i, j] = L.start;
   return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j], ride: null,
-           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0, color: '', lastColor: '', rain: 0, bow: null, bowSkip: -1 };
+           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0, color: '', lastColor: '', rain: 0, bow: null, bowSkip: -1, size: 1, lit: 0, ice: 0 };
 }
 
 // Advance the world by dt seconds in fixed sub-steps: moving platforms (carrying a riding orb) and the orb's flight.
 // Pushes events: shard, deflect, mirror, graze, stick, exit, swallow, burn, crush, lost.
 function step(L, st, dt) {
-  st.acc = (st.acc || 0) + dt; COLOR = st.color || '';
+  st.acc = (st.acc || 0) + dt; ctx(st);
   while (st.acc >= SUB - 1e-9 && (st.mode === 'fly' || st.mode === 'stuck')) {
     st.acc -= SUB;
     const ts = L.wells.length ? timeScale(L, st.x, st.y) : 1; st.ts = ts;
@@ -298,6 +320,10 @@ function pickups(L, st) {
     if (q.c !== st.color && Math.hypot(q.x - st.x, q.y - st.y) < PRISM_R) { st.color = q.c; COLOR = q.c; st.events.push({ type: 'prism', k, c: q.c, x: q.x, y: q.y, dir: st.dir }); } }
   for (let k = 0; k < L.rain.length; k++) { const c = L.rain[k];
     if (!(st.rain & (1 << k)) && st.x > c.x0 && st.x < c.x1 && st.y > c.y0 && st.y < c.y1) { st.rain |= 1 << k; st.events.push({ type: 'rain', k, x: st.x, y: st.y }); } }
+  for (let k = 0; k < L.lanterns.length; k++) { const q = L.lanterns[k];
+    if (!(st.lit & (1 << k)) && Math.hypot(q.x - st.x, q.y - st.y) < LANTERN_R) { st.lit = (st.lit || 0) | (1 << k); MELT = st.lit; st.events.push({ type: 'lantern', k, x: q.x, y: q.y }); } }
+  for (let k = 0; k < L.falls.length; k++) if (st.size !== 0 && inBox(st.x, st.y, L.falls[k])) { st.size = 0; SIZE = 0; st.events.push({ type: 'shrink', k, x: st.x, y: st.y }); }
+  for (let k = 0; k < L.suns.length; k++) if (st.size !== 2 && inBox(st.x, st.y, L.suns[k])) { st.size = 2; SIZE = 2; st.events.push({ type: 'grow', k, x: st.x, y: st.y }); }
 }
 function flySub(L, st, h) {
   st.t += h;
@@ -367,6 +393,12 @@ function flySub2(L, st, h) {
   if (L.curves.length) for (const c of L.curves) if (curveEnter(L, st, c, nx, ny)) return;
   // rainbows: touching one while moving along it snaps the orb onto the curve
   if (L.bows.length && bowEnter(L, st, nx, ny)) return;
+  // Frozen Light: a big photon smashes straight through any glacier it runs into (the whole glacier shatters, flight goes on)
+  if (SIZE === 2 && L.glaciers.length) {
+    const i0 = toCell(nx - H), i1 = toCell(nx + H), j0 = toCell(ny - H), j1 = toCell(ny + H);
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (cell(L, i, j) === 'Y' && iceSolid(L, i, j)) {
+      const k = L.glacK[j * L.w + i]; st.ice = (st.ice || 0) | (1 << k); BROKE = st.ice; st.events.push({ type: 'smash', k, x: center(i), y: center(j), dir: st.dir }); }
+  }
   // move X, then Y (axis-separated box collision). Head-on hit = stick (or bounce off a mirror); grazing hit = slide.
   let hit = boxHit(L, nx, st.y, st.x, st.y, st.time);
   if (hit) {
@@ -505,7 +537,7 @@ function stick(L, st, side, hit) {
   let i = toCell(st.x), j = toCell(st.y);
   const cand = [];
   for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
-    const ci = i + di, cj = j + dj; if (cell(L, ci, cj) !== '.') continue;
+    const ci = i + di, cj = j + dj, ct = cell(L, ci, cj); if (ct !== '.' && !(isIce(ct) && !iceSolid(L, ci, cj))) continue;
     let ok = true;
     if (side) { const [dx, dy] = DIRS[side]; ok = faceFrom(L, ci + dx, cj + dy, OPP[side]); }
     else ok = contacts(L, ci, cj).length > 0;
@@ -530,7 +562,7 @@ function simulate(L, st0, action, wait) {
   const pre = st.events.splice(0);
   if (st.mode !== 'stuck') return { ok: false, why: 'busy', st };
   if (action === 'WAIT') return { ok: true, st, events: pre };
-  COLOR = st.color || '';
+  ctx(st);
   if (action === 'TAP') {
     const d = padLaunchDir(L, st);
     if (!d) return { ok: false, why: 'nopad', st };
@@ -545,5 +577,5 @@ function simulate(L, st0, action, wait) {
   evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { bowNear, bowOn, BOW_SNAP, isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+return { iceSolid, LANTERN_R, bowNear, bowOn, BOW_SNAP, isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
          padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };

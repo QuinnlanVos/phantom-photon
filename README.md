@@ -15,6 +15,7 @@ You play a photon of light that can only move along walls. Swipe along a wall to
 - **3 · Solar Winds:** solar winds, curved boost walls, gravity wells and stardust, with a follow camera on big levels.
 - **4 · Rocks from Space:** a pitch-dark starfield with drifting asteroids, spinning rings of space dust and timed cosmic hail. Use `?unlock&select&ch=4` to jump to it, or `?ch=4&level=N` for a level.
 - **5 · Song of Rainbows:** a cheerful pastel sky. Touch a rainbow while moving along it and you snap on, ride it to the end and launch off tangentially. Prisms tint your light, and coloured glass gates only let the matching colour through. Rain clouds burst when you fly through them, and the rain reveals hidden rainbows. Use `?unlock&select&ch=5` to jump to it, or `?ch=5&level=N` for a level.
+- **6 · Frozen Light:** an ice world under an aurora. Fly past a lantern to light it and melt its matching ice. Sunlight shining through the ice makes the photon big, and big light smashes glaciers; waterfalls make it small, and only small light slips through cracks. Use `?unlock&select&ch=6` to jump to it, or `?ch=6&level=N` for a level.
 
 Progress is saved in your browser (localStorage).
 

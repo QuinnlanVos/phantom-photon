@@ -12,6 +12,7 @@ const THEME = [
   { color: '255;200;110', node: '255;196;120', done: '120;255;210', frame: '255;150;110' },     // Solar Winds: golden sunrise
   { color: '235;242;255', node: '225;238;255', done: '255;190;100', frame: '215;228;248' },     // Rocks from Space: stark silver on black
   { color: '255;170;230', node: '255;190;235', done: '140;235;255', frame: '255;196;150' },     // Song of Rainbows: candy pink + peach
+  { color: '170;235;255', node: '200;245;255', done: '255;205;120', frame: '150;215;255' },     // Frozen Light: frost cyan + lantern gold
 ];
 if (!S) {
   S = runtimeScene.__sel = { cur: clamp(LIB.nav.chapter || 0, 0, CH.length - 1), pos: 0, drag: 0, dragging: false, cards: [], toastT: 0, wig: 0 };
@@ -24,6 +25,8 @@ if (!S) {
     S.pins.push({ o, u: Math.random(), v: Math.random(), p: rand(0.2, 1), ph: rand(0, 6.28), tw: rand(0.6, 2), a: rand(60, 160), s: o.getName && o.getName() === 'DustStar' ? rand(0.16, 0.22) : rand(0.28, 0.5) }); }
   // chapter 5 backdrop: bright pastel sky, a big soft rainbow and drifting clouds (fades in for the Song of Rainbows card)
   S.rbSky = C.mk('RainbowSky', 'Bg', 0, 0, -2); S.rbSky.setOpacity(0);
+  S.iceSky = C.mk('IceSky', 'Bg', 0, 0, 1); S.iceSky.setOpacity(0); S.aurora = C.mk('Aurora', 'Bg', 0, 0, 2, true); S.aurora.setOpacity(0); S.snow = [];
+  for (let k = 0; k < 30; k++) { const o = C.mk('Snowflake', 'Bg', 0, 0, 3, true); o.setOpacity(0); S.snow.push({ o, u: Math.random(), v: Math.random(), s: rand(0.2, 0.45), sp: rand(20, 50), ph: rand(0, 6.28) }); }
   S.rbBow = C.mk('BgBow', 'Bg', 0, 0, -1, false); S.rbBow.setOpacity(0); S.rbClouds = [];
   for (let k = 0; k < 5; k++) { const o = C.mk('BgCloud', 'Bg', 0, 0, 0, false); o.setOpacity(0); S.rbClouds.push({ o, u: Math.random(), v: rand(0.08, 0.92), s: rand(0.45, 0.8), sp: rand(8, 20) }); }
   C.buttonNav = false; C.modalKeys = true;      // this scene drives keyboard focus itself
@@ -134,7 +137,7 @@ S.cards.forEach((cd, c) => {
   cd.frame.setWidth(cardW * sc); cd.frame.setHeight(cardH * sc); cd.frame.setPosition(x - cardW * sc / 2, cy - cardH * sc / 2);
   cd.frame.setOpacity(255 * a * (cd.unlocked ? 1 : 0.75));
   cd.glow.setPosition(x, cy); cd.glow.setScaleX(cardW / 256 * 1.3 * sc); cd.glow.setScaleY(cardH / 256 * 1.2 * sc);
-  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : cd.c === 4 ? 40 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
+  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : cd.c === 4 ? 40 : cd.c === 5 ? 30 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
   const top = cy - cardH * sc / 2;
   cd.small.setPosition(x - cd.small.getWidth() / 2, top + 26 * sc); cd.small.setOpacity(200 * a);
   cd.name.setScale(sc); cd.name.setPosition(x - cd.name.getWidth() / 2, top + 50 * sc); cd.name.setOpacity(255 * a);
@@ -191,11 +194,16 @@ if (vd > 0) for (const m of C.motes) m.o.setOpacity(m.o.getOpacity() * (1 - vd))
 S.voidSky.setPosition(-300, -300); S.voidSky.setWidth(UW + 800 + S.pos * 40); S.voidSky.setHeight(UH + 600); S.voidSky.setOpacity(255 * vd);
 for (const p of S.pins) { p.ph += dt; const x = ((p.u * (UW + 200) - S.pos * 40 * p.p) % (UW + 200) + UW + 200) % (UW + 200) - 100 + S.pos * 40, y = p.v * UH;
   p.o.setPosition(x, y); p.o.setScale(p.s); p.o.setOpacity(vd * p.a * (0.75 + 0.25 * Math.sin(p.ph * p.tw))); }
-const rd = clamp(S.pos - 3, 0, 1);      // chapter 5: pastel rainbow sky
+const id_ = clamp(S.pos - 4, 0, 1);    // chapter 6: night-blue icy sky with an aurora and snow
+const rd = clamp(S.pos - 3, 0, 1) * (1 - id_);      // chapter 5: pastel rainbow sky
 S.rbSky.setPosition(-300, -300); S.rbSky.setWidth(UW + 800 + S.pos * 40); S.rbSky.setHeight(UH + 600); S.rbSky.setOpacity(255 * rd);
 S.rbBow.setPosition(UW / 2 + S.pos * 40, UH * 0.5); S.rbBow.setScale(Math.max(UW, UH) / 512 * 1.1); S.rbBow.setOpacity(120 * rd);
 for (const c of S.rbClouds) { c.u += dt * c.sp / (UW + 400); const x = ((c.u * (UW + 400)) % (UW + 400)) - 200 + S.pos * 40;
   c.o.setPosition(x, c.v * UH); c.o.setScale(c.s); c.o.setOpacity(200 * rd); }
+S.iceSky.setPosition(-300, -300); S.iceSky.setWidth(UW + 800 + S.pos * 40); S.iceSky.setHeight(UH + 600); S.iceSky.setOpacity(255 * id_);
+S.aurora.setPosition(UW / 2 + S.pos * 40, UH * 0.22); S.aurora.setScale(Math.max(UW, UH) / 768 * 1.5); S.aurora.setOpacity(200 * id_ * (0.8 + 0.2 * Math.sin(C.time * 0.4)));
+for (const f of S.snow) { f.v += dt * f.sp / UH; f.ph += dt; const x = ((f.u * (UW + 100)) % (UW + 100)) - 50 + S.pos * 40 + 10 * Math.sin(f.ph), y = ((f.v % 1.05) - 0.025) * UH;
+  f.o.setPosition(x, y); f.o.setScale(f.s); f.o.setOpacity(200 * id_); }
 runtimeScene.getLayer('Bg').enableEffect('Lens', false);
 S.toastT = Math.max(0, S.toastT - dt); S.toast.setOpacity(255 * Math.min(1, S.toastT * 3)); S.toast.setPosition(UW / 2 - S.toast.getWidth() / 2, C.portrait ? 140 : UH - 70);
 C.updateTrans(dt);

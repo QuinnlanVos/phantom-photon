@@ -10,7 +10,7 @@ function analyze(def) {
   const L = SIM.parseLevel(def), timed = SIM.isTimed(L);
   const WAIT = def.solveWait || (L.wells.length ? 0.1 : 0.25);    // finer timing sampling for slow-motion levels
   const nb = timed ? Math.round(L.period / WAIT) : 1;
-  const key = (s) => (s.ride ? `r${s.ride.m}:${s.ride.rx},${s.ride.ry}` : `${s.i},${s.j}`) + (timed ? '@' + (Math.round((s.time % L.period) / WAIT) % nb) : '') + (s.color ? ':' + s.color : '') + (s.rain ? '~' + s.rain : '');
+  const key = (s) => (s.ride ? `r${s.ride.m}:${s.ride.rx},${s.ride.ry}` : `${s.i},${s.j}`) + (timed ? '@' + (Math.round((s.time % L.period) / WAIT) % nb) : '') + (s.color ? ':' + s.color : '') + (s.rain ? '~' + s.rain : '') + (s.size !== undefined && s.size !== 1 ? 's' + s.size : '') + (s.lit ? '^' + s.lit : '') + (s.ice ? '%' + s.ice : '');
   const st0 = SIM.newState(L);
   const seen = new Map([[key(st0), { st: st0, path: [] }]]); const q = [st0];
   const edges = new Map(); let win = null; const deaths = [], shardsSeen = new Set(), mech = new Set();
@@ -20,7 +20,7 @@ function analyze(def) {
       const r = a === 'WAIT' ? SIM.simulate(L, s, 'WAIT', WAIT / SIM.timeScale(L, s.x, s.y)) : SIM.simulate(L, s, a);   // inside a gravity well a real-time wait advances the world less
       if (!r.ok) continue;
       r.events.forEach((e) => { if (e.type === 'shard') shardsSeen.add(e.k); mech.add(e.type); });
-      const p = node.path.concat(a === 'WAIT' ? 'w' : a + (r.st.mode === 'stuck' ? '>' + (r.st.ride ? 'ride' + r.st.ride.m : r.st.i + ',' + r.st.j) + (r.st.color !== s.color && r.st.color ? '(' + r.st.color + ')' : '') : '>' + r.st.mode));
+      const p = node.path.concat(a === 'WAIT' ? 'w' : a + (r.st.mode === 'stuck' ? '>' + (r.st.ride ? 'ride' + r.st.ride.m : r.st.i + ',' + r.st.j) + (r.st.color !== s.color && r.st.color ? '(' + r.st.color + ')' : '') + (r.st.size !== s.size ? ['(small)', '(normal)', '(big)'][r.st.size] : '') : '>' + r.st.mode));
       if (r.st.mode === 'exit') { if (!win || p.length < win.length) win = p; edges.get(key(s)).push('EXIT'); continue; }
       if (r.st.mode === 'dead') {
         if (a !== 'WAIT' || deaths.length < 50) deaths.push(p.join(' ') + ' (' + r.st.deathType + ')');
