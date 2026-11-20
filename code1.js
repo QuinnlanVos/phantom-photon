@@ -227,7 +227,7 @@ gdjs.LevelSelectCode.GDLightObjects1= [];
 gdjs.LevelSelectCode.GDLightObjects2= [];
 
 
-gdjs.LevelSelectCode.userFunc0xbf9348 = function GDJSInlineCode(runtimeScene) {
+gdjs.LevelSelectCode.userFunc0xbcfea8 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -895,10 +895,17 @@ LIB.ctx = function (scene) {
     const q = ui.convertCoords(cx, cy, 0);
     const moved = Math.hypot(q[0] - p.x, q[1] - p.y) > 0.5;
     if (moved && !down) C.keyNav = false;
-    p.x = q[0]; p.y = q[1]; p.pressed = down && !p.down; p.released = !down && p.down; p.down = down;
+    // a touch that starts this frame is always a fresh press, even if a previous touch was never seen to end
+    // (WebKit can leave the old one 'down', which swallowed the first tap on RETRY after a swipe)
+    const sids = im.getStartedTouchIdentifiers(), sid = sids.length ? sids[sids.length - 1] : null;
+    const fresh = down && p.down && sid !== null && sid !== p.sid;
+    if (sid !== null) p.sid = sid;
+    p.x = q[0]; p.y = q[1]; p.pressed = (down && !p.down) || fresh; p.released = !down && p.down; p.down = down;
     if (p.pressed) { p.x0 = p.x; p.y0 = p.y; p.t0 = C.time; p.moved = 0; C.keyNav = false; }
     if (down) p.moved = Math.max(p.moved, Math.hypot(p.x - p.x0, p.y - p.y0));
-    if (!down && !p.released && !tids.length && im.isMouseButtonReleased && false) p.released = true;
+    // quick tap that began and ended between two frames (slow WebKit frames on iPhone): GDevelop still flags the
+    // touchend/mouseup as a release for this frame, so treat it as a full press + release at the tap point
+    if (!down && !p.released && !p.pressed && im.isMouseButtonReleased(0)) { p.pressed = p.released = true; p.x0 = p.x; p.y0 = p.y; p.t0 = C.time; p.moved = 0; C.keyNav = false; }
   };
   C.key = (codes) => codes.some((c) => im.wasKeyJustPressed(c));
   C.K = { L: [37, 65], R: [39, 68], U: [38, 87], D: [40, 83], OK: [13, 32], BACK: [27, 8] };
@@ -1328,7 +1335,7 @@ gdjs.LevelSelectCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.LevelSelectCode.userFunc0xbf9348(runtimeScene);
+gdjs.LevelSelectCode.userFunc0xbcfea8(runtimeScene);
 
 }
 

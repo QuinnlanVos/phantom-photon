@@ -227,7 +227,7 @@ gdjs.GameCode.GDLightObjects1= [];
 gdjs.GameCode.GDLightObjects2= [];
 
 
-gdjs.GameCode.userFunc0xba7080 = function GDJSInlineCode(runtimeScene) {
+gdjs.GameCode.userFunc0xba0990 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -895,10 +895,17 @@ LIB.ctx = function (scene) {
     const q = ui.convertCoords(cx, cy, 0);
     const moved = Math.hypot(q[0] - p.x, q[1] - p.y) > 0.5;
     if (moved && !down) C.keyNav = false;
-    p.x = q[0]; p.y = q[1]; p.pressed = down && !p.down; p.released = !down && p.down; p.down = down;
+    // a touch that starts this frame is always a fresh press, even if a previous touch was never seen to end
+    // (WebKit can leave the old one 'down', which swallowed the first tap on RETRY after a swipe)
+    const sids = im.getStartedTouchIdentifiers(), sid = sids.length ? sids[sids.length - 1] : null;
+    const fresh = down && p.down && sid !== null && sid !== p.sid;
+    if (sid !== null) p.sid = sid;
+    p.x = q[0]; p.y = q[1]; p.pressed = (down && !p.down) || fresh; p.released = !down && p.down; p.down = down;
     if (p.pressed) { p.x0 = p.x; p.y0 = p.y; p.t0 = C.time; p.moved = 0; C.keyNav = false; }
     if (down) p.moved = Math.max(p.moved, Math.hypot(p.x - p.x0, p.y - p.y0));
-    if (!down && !p.released && !tids.length && im.isMouseButtonReleased && false) p.released = true;
+    // quick tap that began and ended between two frames (slow WebKit frames on iPhone): GDevelop still flags the
+    // touchend/mouseup as a release for this frame, so treat it as a full press + release at the tap point
+    if (!down && !p.released && !p.pressed && im.isMouseButtonReleased(0)) { p.pressed = p.released = true; p.x0 = p.x; p.y0 = p.y; p.t0 = C.time; p.moved = 0; C.keyNav = false; }
   };
   C.key = (codes) => codes.some((c) => im.wasKeyJustPressed(c));
   C.K = { L: [37, 65], R: [39, 68], U: [38, 87], D: [40, 83], OK: [13, 32], BACK: [27, 8] };
@@ -1513,7 +1520,8 @@ function laneSeg(hz, f) {
   return { x0: ox + dx * t0, y0: oy + dy * t0, x1: ox + dx * t1, y1: oy + dy * t1, len: t1 - t0 };
 }
 function restart() { G.log.push('restart'); loadLevel(G.chapter, G.level); G.flash = 0.25; }
-function retryFinale() { G.log.push('retry'); loadLevel(G.chapter, G.level); G.flash = 0.6; C.shake = 3; }
+function retryFinale() { G.log.push('retry'); loadLevel(G.chapter, G.level); G.flash = 0.6; C.shake = 3;
+  G.lives = 3; G.lifeFx = [0, 0, 0]; G.ui.lives.forEach((o) => { o.setOpacity(255); o.setColor('255;255;255'); }); }   // refill icons this frame
 function toSelect() { if (C.trans) return; LIB.nav.from = 'game'; G.log.push('to-select'); C.go('LevelSelect', 'fade', { dur: 0.45 }); }
 function nextOf(c, n) {
   const CH = LIB.CHAPTERS;
@@ -2347,7 +2355,7 @@ gdjs.GameCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.GameCode.userFunc0xba7080(runtimeScene);
+gdjs.GameCode.userFunc0xba0990(runtimeScene);
 
 }
 

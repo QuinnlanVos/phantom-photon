@@ -404,7 +404,8 @@ function laneSeg(hz, f) {
   return { x0: ox + dx * t0, y0: oy + dy * t0, x1: ox + dx * t1, y1: oy + dy * t1, len: t1 - t0 };
 }
 function restart() { G.log.push('restart'); loadLevel(G.chapter, G.level); G.flash = 0.25; }
-function retryFinale() { G.log.push('retry'); loadLevel(G.chapter, G.level); G.flash = 0.6; C.shake = 3; }
+function retryFinale() { G.log.push('retry'); loadLevel(G.chapter, G.level); G.flash = 0.6; C.shake = 3;
+  G.lives = 3; G.lifeFx = [0, 0, 0]; G.ui.lives.forEach((o) => { o.setOpacity(255); o.setColor('255;255;255'); }); }   // refill icons this frame
 function toSelect() { if (C.trans) return; LIB.nav.from = 'game'; G.log.push('to-select'); C.go('LevelSelect', 'fade', { dur: 0.45 }); }
 function nextOf(c, n) {
   const CH = LIB.CHAPTERS;
