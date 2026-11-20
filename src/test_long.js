@@ -190,6 +190,7 @@ function plan(c, n, toks) {
       }
     }
     await tapBtn('window.__pp.btnNext'); await sleep(1200); let s = await S();
+    for (let k = 0; k < 20 && !s.lifeA.every(a => a === 255); k++) { await sleep(200); s = await S(); }
     ok(s.state === 'play' && s.lives === 3 && s.level === n && s.chapter === c && s.log.includes('retry') && s.lifeA.every(a => a === 255) && `${s.i},${s.j}` === r.L.start.join(','),
       `${id}: RETRY restarts the finale at the start with 3 lives ${JSON.stringify([s.state, s.lives, s.i, s.j, s.lifeA, s.chapter, s.level, s.log.slice(-3)])}`);
     if (c === chapters[chapters.length - 1]) {    // LEVELS from the game-over panel goes to level select
