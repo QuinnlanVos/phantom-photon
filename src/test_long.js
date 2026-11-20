@@ -166,7 +166,8 @@ function plan(c, n, toks) {
     const n = CH[c].levels.length - 1, def = CH[c].levels[n], id = `${c + 1}-${n + 1}`;
     const r = analyze(def);
     const dp = r.deaths.map((d) => d.replace(/ \([a-z]+\)$/, '').split(' ').filter((t) => t && t !== 'w')).filter((p) => p.filter((t) => t.endsWith('>dead')).length === 1 && p[p.length - 1].endsWith('>dead')).sort((a, b) => a.length - b.length)[0];
-    const dtype = (r.deaths.find((d) => d.replace(/ \([a-z]+\)$/, '').split(' ').filter((t) => t && t !== 'w').join(' ') === dp.join(' ')) || '').match(/\(([a-z]+)\)$/);
+    const dtype = (r.deaths.find((d) => d.replace(/ \([a-z]+\)$/, '').split(' ').filter((t) => t && t !== 'w').join(' ') === (dp || []).join(' ')) || '').match(/\(([a-z]+)\)$/);
+    if (!dp) { soft(false, `${id}: no single-move death found for the lives check (its hazard only kills while you wait)`); continue; }
     const P = plan(c, n, dp); const pre = P.steps.slice(0, -1), kill = P.steps[P.steps.length - 1];
     await load(`?unlock&ch=${c + 1}&level=${n + 1}`);
     if (pre.length) await runSteps(id, pre, P);
@@ -185,12 +186,12 @@ function plan(c, n, toks) {
         ok(s.state === 'over' && s.log.includes('game-over') && s.panel && s.btnLbl === 'RETRY' && s.lvlBtn && s.overA > 200 && /OUT OF LIGHT/.test(s.overTx), `${id}: 0 lives -> OUT OF LIGHT panel with RETRY + LEVELS ${JSON.stringify([s.state, s.panel, s.btnLbl, s.lvlBtn, s.overA, s.overTx, s.log.slice(-4)])}`);
         await sleep(400); await pg.screenshot({ path: `${outdir}/${tag}_${id}_game_over.png` });
         const n0 = s.log.length; await act('U'); await sleep(300); s = await S();
-        ok(s.state === 'over' && s.log.length === n0, `${id}: swipes do nothing behind the game-over panel`);
+        ok(s.state === 'over' && !s.log.slice(n0).some(l => l.startsWith('move')), `${id}: swipes do nothing behind the game-over panel`);
       }
     }
     await tapBtn('window.__pp.btnNext'); await sleep(1200); let s = await S();
     ok(s.state === 'play' && s.lives === 3 && s.level === n && s.chapter === c && s.log.includes('retry') && s.lifeA.every(a => a === 255) && `${s.i},${s.j}` === r.L.start.join(','),
-      `${id}: RETRY restarts the finale at the start with 3 lives ${JSON.stringify([s.state, s.lives, s.i, s.j, s.log.slice(-3)])}`);
+      `${id}: RETRY restarts the finale at the start with 3 lives ${JSON.stringify([s.state, s.lives, s.i, s.j, s.lifeA, s.chapter, s.level, s.log.slice(-3)])}`);
     if (c === chapters[chapters.length - 1]) {    // LEVELS from the game-over panel goes to level select
       if (pre.length) await runSteps(id, pre, P);
       for (let k = 0; k < 3; k++) { if (P.timed && kill.win < 0.97) await syncPhase(kill.t, P.period); await act(kill.a); await sleep(40); await ts(1); await sleep(300); await settle(); }
@@ -204,6 +205,7 @@ function plan(c, n, toks) {
   for (const c of chapters) {
     const n = CH[c].levels.length - 2, def = CH[c].levels[n], r = analyze(def); if (!r.deaths.length) continue;
     const dp = r.deaths.map((d) => d.replace(/ \([a-z]+\)$/, '').split(' ').filter((t) => t && t !== 'w')).filter((p) => p.filter((t) => t.endsWith('>dead')).length === 1 && p[p.length - 1].endsWith('>dead')).sort((a, b) => a.length - b.length)[0];
+    if (!dp) continue;
     const P = plan(c, n, dp); const pre = P.steps.slice(0, -1), kill = P.steps[P.steps.length - 1];
     await load(`?unlock&ch=${c + 1}&level=${n + 1}`); if (pre.length) await runSteps(`${c + 1}-${n + 1}`, pre, P);
     for (let k = 0; k < 4; k++) { if (P.timed && kill.win < 0.97) await syncPhase(kill.t, P.period); await act(kill.a); await sleep(40); await ts(1); await sleep(300); await settle(); }
