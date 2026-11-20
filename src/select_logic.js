@@ -9,11 +9,13 @@ let S = runtimeScene.__sel;
 const THEME = [
   { color: '120;240;255', node: '120;240;255', done: '120;255;170', frame: '90;220;255' },
   { color: '160;130;255', node: '170;140;255', done: '120;255;200', frame: '130;100;255' },
+  { color: '255;200;110', node: '255;196;120', done: '120;255;210', frame: '255;150;110' },     // Solar Winds: golden sunrise
 ];
 if (!S) {
   S = runtimeScene.__sel = { cur: clamp(LIB.nav.chapter || 0, 0, CH.length - 1), pos: 0, drag: 0, dragging: false, cards: [], toastT: 0, wig: 0 };
   S.pos = S.cur;
   C.bg(36);
+  S.sky = C.mk('Sky', 'Bg', 0, 0, -6); S.sky.setOpacity(0); S.sun = C.mk('SunGlow', 'Bg', 0, 0, -5, true); S.sun.setOpacity(0);
   C.buttonNav = false; C.modalKeys = true;      // this scene drives keyboard focus itself
   S.head = C.mk('HeadText', 'UI', 0, 0, 80); S.head.setString('SELECT LEVEL');
   S.back = C.button({ kind: 'round', icon: 'IcBack', color: '120;240;255', delay: 0.1, name: 'back', pool: false, onPress: () => C.go('Menu', 'fade', { dur: 0.45 }) });
@@ -122,7 +124,7 @@ S.cards.forEach((cd, c) => {
   cd.frame.setWidth(cardW * sc); cd.frame.setHeight(cardH * sc); cd.frame.setPosition(x - cardW * sc / 2, cy - cardH * sc / 2);
   cd.frame.setOpacity(255 * a * (cd.unlocked ? 1 : 0.75));
   cd.glow.setPosition(x, cy); cd.glow.setScaleX(cardW / 256 * 1.3 * sc); cd.glow.setScaleY(cardH / 256 * 1.2 * sc);
-  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
+  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
   const top = cy - cardH * sc / 2;
   cd.small.setPosition(x - cd.small.getWidth() / 2, top + 26 * sc); cd.small.setOpacity(200 * a);
   cd.name.setScale(sc); cd.name.setPosition(x - cd.name.getWidth() / 2, top + 50 * sc); cd.name.setOpacity(255 * a);
@@ -166,8 +168,13 @@ C.updateParts(dt);
 const [shx, shy] = C.shakeOffset();
 for (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(C.uiS); l.setCameraX(UW / 2 + shx + S.pos * 40); l.setCameraY(UH / 2 + shy); }
 C.neb.setPosition(UW / 2 + S.pos * 40, UH / 2); C.neb.setScale(Math.max(UW, UH) / 512 * 1.6);
-const dark = lerp(0, 1, clamp(S.pos, 0, 1));
-C.neb.setOpacity(150 * (1 - 0.6 * dark)); C.bgT.setOpacity(255 * (1 - 0.55 * dark));
+// chapter 2 darkens the background; chapter 3 fades in a warm sunrise sky
+const dark = clamp(S.pos, 0, 1) - clamp(S.pos - 1, 0, 1), warm = clamp(S.pos - 1, 0, 1);
+C.neb.setOpacity(150 * (1 - 0.6 * dark) + 40 * warm); C.neb.setColor(warm > 0.01 ? '255;' + Math.round(255 - 80 * warm) + ';' + Math.round(255 - 50 * warm) : '255;255;255');
+C.bgT.setOpacity(255 * (1 - 0.55 * dark) * (1 - warm));
+S.sky.setPosition(-200, -200); S.sky.setWidth(UW + 400 + S.pos * 40 + 200); S.sky.setHeight(UH + 400); S.sky.setOpacity(255 * warm);
+S.sun.setPosition(UW * 0.7 + S.pos * 40, UH * 0.08); S.sun.setScale(Math.max(UW, UH) / 256 * 0.9); S.sun.setOpacity(170 * warm);
+for (const m of C.motes) m.o.setColor(warm > 0.5 ? '255;220;150' : '255;255;255');
 C.updateMotes(dt, UW + 100, UH, []);
 runtimeScene.getLayer('Bg').enableEffect('Lens', false);
 S.toastT = Math.max(0, S.toastT - dt); S.toast.setOpacity(255 * Math.min(1, S.toastT * 3)); S.toast.setPosition(UW / 2 - S.toast.getWidth() / 2, C.portrait ? 140 : UH - 70);

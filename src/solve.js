@@ -4,10 +4,11 @@
 // Usage: node solve.js [chapters.json] [chapterIndex]
 const fs = require('fs'), path = require('path');
 const SIM = new Function(fs.readFileSync(path.join(__dirname, 'sim.js'), 'utf8'))();
-const CH = JSON.parse(fs.readFileSync(process.argv[2] || path.join(__dirname, 'chapters.json'), 'utf8'));
+const CH = JSON.parse(fs.readFileSync((require.main === module && process.argv[2]) || path.join(__dirname, 'chapters.json'), 'utf8'));
 const WAIT = 0.25;
 function analyze(def) {
   const L = SIM.parseLevel(def), timed = L.movers.length > 0;
+  const WAIT = def.solveWait || (L.wells.length ? 0.1 : 0.25);    // finer timing sampling for slow-motion levels
   const nb = timed ? Math.round(L.period / WAIT) : 1;
   const key = (s) => (s.ride ? `r${s.ride.m}:${s.ride.rx},${s.ride.ry}` : `${s.i},${s.j}`) + (timed ? '@' + (Math.round((s.time % L.period) / WAIT) % nb) : '');
   const st0 = SIM.newState(L);
@@ -16,7 +17,7 @@ function analyze(def) {
   while (q.length) {
     const s = q.shift(), node = seen.get(key(s)); edges.set(key(s), []);
     for (const a of ['L', 'R', 'U', 'D', 'TAP'].concat(timed ? ['WAIT'] : [])) {
-      const r = a === 'WAIT' ? SIM.simulate(L, s, 'WAIT', WAIT) : SIM.simulate(L, s, a);
+      const r = a === 'WAIT' ? SIM.simulate(L, s, 'WAIT', WAIT / SIM.timeScale(L, s.x, s.y)) : SIM.simulate(L, s, a);   // inside a gravity well a real-time wait advances the world less
       if (!r.ok) continue;
       r.events.forEach((e) => { if (e.type === 'shard') shardsSeen.add(e.k); mech.add(e.type); });
       const p = node.path.concat(a === 'WAIT' ? 'w' : a + (r.st.mode === 'stuck' ? '>' + (r.st.ride ? 'ride' + r.st.ride.m : r.st.i + ',' + r.st.j) : '>' + r.st.mode));
@@ -35,7 +36,7 @@ function analyze(def) {
   while (changed) { changed = false; for (const [k, es] of edges) if (!canWin.has(k) && es.some((e) => e === 'EXIT' || canWin.has(e))) { canWin.add(k); changed = true; } }
   const dead = [...edges.keys()].filter((k) => !canWin.has(k));
   const pretty = win ? win.join(' ').replace(/(?:w ?)+/g, (m) => 'wait' + (m.trim().split(' ').length * WAIT).toFixed(2) + 's ') : 'NONE';
-  return { L, win, pretty, states: seen.size, dead, deaths, shards: shardsSeen.size, mech };
+  return { WAIT, L, win, pretty, states: seen.size, dead, deaths, shards: shardsSeen.size, shardSet: shardsSeen, mech };
 }
 module.exports = { analyze };
 if (require.main === module) {

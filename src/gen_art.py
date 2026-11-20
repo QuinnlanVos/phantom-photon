@@ -38,9 +38,11 @@ def radial(size, c=None):
 CHAPTERS = json.load(open(os.path.join(HERE, 'chapters.json')))
 LEVELS = [lv for ch in CHAPTERS for lv in ch['levels']]
 DARK = [ch.get('dark', False) for ch in CHAPTERS for lv in ch['levels']]
+THEME = [ch.get('theme', '') for ch in CHAPTERS for lv in ch['levels']]
+SKYC = np.array([90, 200, 255]); TURQ = np.array([50, 245, 215]); CORAL = np.array([255, 120, 160]); AMBER = np.array([255, 196, 80]); ROSEM = np.array([255, 70, 190])
 SILVER = np.array([205, 235, 255]); MINT = np.array([70, 255, 200]); AZURE = np.array([50, 150, 255])
 RAMP_TRI = {'a': ((1, 0), (1, 1), (0, 1)), 'b': ((0, 0), (1, 1), (0, 1)), 'c': ((0, 0), (1, 0), (0, 1)), 'd': ((0, 0), (1, 0), (1, 1))}
-def level_art(n, lv, dark=False):
+def level_art(n, lv, dark=False, theme=''):
     rows = lv['map']; w, h = len(rows[0]), len(rows)
     S = T * SS; m = M * SS; W, H = w * S + 2 * m, h * S + 2 * m
     solid = Image.new('L', (W, H), 255); d = ImageDraw.Draw(solid)
@@ -61,6 +63,23 @@ def level_art(n, lv, dark=False):
             if ch in RAMP_TRI:
                 pts = [(x0 + u * S, y0 + v * S) for u, v in RAMP_TRI[ch]]
                 d.polygon(pts, fill=255); dr.polygon(pts, fill=255)
+    crv = Image.new('L', (W, H), 0); dcv = ImageDraw.Draw(crv)        # curved boost-wall rims
+    lanes = Image.new('L', (W, H), 0); dln = ImageDraw.Draw(lanes)    # faint dashed riding lanes
+    crv_t = np.zeros((H, W), np.float32); crv_w = np.zeros((H, W), np.float32)
+    for cv in lv.get('curves', []):
+        r = cv['r']; sx = 1 if 'E' in cv['c'] else -1; sy = 1 if 'S' in cv['c'] else -1
+        bx0, by0 = m + cv['i'] * S, m + cv['j'] * S; bx1, by1 = bx0 + r * S, by0 + r * S
+        cx, cy = (bx0 if sx > 0 else bx1), (by0 if sy > 0 else by1); R = r * S
+        d.rectangle([bx0, by0, bx1 - 1, by1 - 1], fill=255)
+        a0 = {(1, 1): 0, (-1, 1): 90, (-1, -1): 180, (1, -1): 270}[(sx, sy)]
+        d.pieslice([cx - R, cy - R, cx + R, cy + R], a0, a0 + 90, fill=0)     # the open quarter disc (the wedge is exactly inside the block)
+        dcv.arc([cx - R - 2 * SS, cy - R - 2 * SS, cx + R + 2 * SS, cy + R + 2 * SS], a0, a0 + 90, fill=255, width=5 * SS)
+        for k in range(r):
+            rr = S / 2 + k * S
+            for q in range(0, 90, 6): dln.arc([cx - rr, cy - rr, cx + rr, cy + rr], a0 + q, a0 + q + 3, fill=255, width=SS)
+        yy0, xx0 = np.mgrid[by0:by1, bx0:bx1]
+        ang = np.arctan2((yy0 - cy) * sy, (xx0 - cx) * sx) / (np.pi / 2)
+        crv_t[by0:by1, bx0:bx1] = np.clip(ang, 0, 1); crv_w[by0:by1, bx0:bx1] = 1
     for mv in lv.get('movers', []):    # faint dashed track: the whole area the platform sweeps
         x0, y0 = m + mv['i'] * S, m + mv['j'] * S
         x1 = x0 + mv['w'] * S + (mv['range'] * S if mv['axis'] == 'x' else 0); y1 = y0 + mv['h'] * S + (mv['range'] * S if mv['axis'] == 'y' else 0)
@@ -81,6 +100,16 @@ def level_art(n, lv, dark=False):
     col = col * (1 - rampz[..., None]) + VIOLET[None, None, :] * rampz[..., None]
     mirz = blur(maxf(arr(mir), 9), 3)
     if dark: col = col * (1 - (1 - padz - rampz).clip(0, 1)[..., None]) + AZURE[None, None, :] * (1 - padz - rampz).clip(0, 1)[..., None]
+    if theme == 'sun':      # Solar Winds: sunrise neon - sky-cyan / turquoise up top, coral and amber lower down
+        yy_, xx_ = np.mgrid[0:H, 0:W]; t = np.clip(0.75 * yy_ / H + 0.25 * xx_ / W, 0, 1)[..., None]
+        stops = [SKYC, TURQ, CORAL, AMBER]; seg = np.clip(t * 3, 0, 2.999); k0 = np.floor(seg).astype(int); fr = seg - k0
+        base = np.zeros((H, W, 3)); st_ = np.array(stops, dtype=np.float32)
+        base = st_[k0[..., 0]] * (1 - fr) + st_[np.minimum(k0[..., 0] + 1, 3)] * fr
+        nz = (1 - padz - rampz).clip(0, 1)[..., None]
+        col = col * (1 - nz) + base * nz
+        cz = blur(maxf(arr(crv), 9), 3) * blur(crv_w, 2)
+        ccol = GOLD[None, None, :] * (1 - crv_t[..., None]) + ROSEM[None, None, :] * crv_t[..., None]
+        col = col * (1 - cz[..., None]) + ccol * cz[..., None]
     col = col * (1 - mirz[..., None]) + SILVER[None, None, :] * mirz[..., None]
     col = col / 255.0
     g1 = blur(line, 8); g2 = blur(line, 22); g3 = blur(line, 52)
@@ -88,15 +117,16 @@ def level_art(n, lv, dark=False):
     # wall interior: deep dark with faint diagonal hatching + inner glow from its edges
     yy, xx = np.mgrid[0:H, 0:W]
     hatch = ((xx + yy) % 22 < 2).astype(np.float32) * 0.05
-    interior_rgb = np.array([0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
+    interior_rgb = np.array([0.19, 0.08, 0.23] if theme == 'sun' else [0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
     padin = arr(pad) * ((((xx // 2) + (yy // 2)) % 16) < 7)        # energised stripes inside pad tiles
     interior_rgb = interior_rgb + (MAGENTA / 255.0)[None, None, :] * (padin * 0.28 + arr(pad) * 0.10)[..., None]
     sheen = arr(mir) * ((((xx - yy) % 40) < 9).astype(np.float32) * 0.35 + 0.18)        # mirror blocks: polished diagonal sheen
     interior_rgb = interior_rgb + (SILVER / 255.0)[None, None, :] * sheen[..., None]
     rgb = interior_rgb * sm[..., None]
-    alpha = sm.copy()
+    alpha = sm.copy() * (0.9 if theme == 'sun' else 1.0)
     # glow spilling into the open area (straight alpha)
     gl = np.clip(0.85 * g1 + 0.55 * g2 + 0.4 * g3, 0, 1) * outside
+    if theme == 'sun': gl = np.clip(0.75 * g1 + 0.25 * g2, 0, 1) * outside * 0.8     # bright sky behind: keep the spill tight (no flat panels)
     rgb = rgb + col * gl[..., None]
     alpha = alpha + gl
     # bright tube with white-hot core
@@ -116,11 +146,23 @@ def level_art(n, lv, dark=False):
     # moving-platform tracks (faint mint dashes)
     tk = blur(arr(trk), 1.0) * 0.45; tkg = blur(arr(trk), 8) * 0.25; tt = np.clip(tk + tkg, 0, 1) * (1 - sm)
     rgb = rgb * (1 - tt[..., None]) + (MINT / 255.0)[None, None, :] * tt[..., None]; alpha = np.maximum(alpha, tt)
+    if theme == 'sun':   # curve rims: extra-bright gold->magenta tube, plus faint golden riding lanes
+        cl_ = blur(arr(crv), 1.0); clg = np.clip(blur(arr(crv), 6) * 0.9 + blur(arr(crv), 16) * 0.5, 0, 1) * (1 - sm * 0.5)
+        ccol = (GOLD[None, None, :] * (1 - crv_t[..., None]) + ROSEM[None, None, :] * crv_t[..., None]) / 255.0
+        rgb = rgb * (1 - clg[..., None]) + ccol * clg[..., None]; alpha = np.maximum(alpha, clg)
+        rgb = rgb * (1 - cl_[..., None]) + (ccol * 0.4 + 0.6) * cl_[..., None]; alpha = np.maximum(alpha, cl_)
+        ln_ = np.clip(blur(arr(lanes), 0.8) * 0.7 + blur(arr(lanes), 5) * 0.4, 0, 1) * (1 - sm)
+        rgb = rgb * (1 - ln_[..., None]) + (GOLD / 255.0)[None, None, :] * ln_[..., None]; alpha = np.maximum(alpha, ln_)
     a = np.clip(alpha, 1e-4, 1)
     save_rgba(rgb / a[..., None] * np.minimum(alpha, 1)[..., None] / a[..., None] if False else np.clip(rgb / a[..., None], 0, 1), alpha, f'level_{n + 1}.png')
     return (W // SS, H // SS)
 
-sizes = [level_art(n, lv, DARK[n]) for n, lv in enumerate(LEVELS)]
+ONLY = os.environ.get('PP_ONLY')      # PP_ONLY=17,18 regenerates just those level images (fast iteration)
+sizes = []
+for n, lv in enumerate(LEVELS):
+    if ONLY and str(n + 1) not in ONLY.split(','):
+        im = Image.open(os.path.join(OUT, f'level_{n + 1}.png')); sizes.append((im.width // SS, im.height // SS)); continue
+    sizes.append(level_art(n, lv, DARK[n], THEME[n]))
 
 # ------------------------------------------------------------------ background
 def bg_tile():

@@ -132,3 +132,50 @@ icon(restart, 'ic_restart.png')
 # gas-cloud darkness mask (drawn black on the lighting layer: removes the ambient light inside clouds)
 s = 96 * SS; im = Image.new('L', (s, s), 0); d = ImageDraw.Draw(im); d.rounded_rectangle([14 * SS, 14 * SS, s - 14 * SS, s - 14 * SS], radius=14 * SS, fill=255)
 save_rgba(np.zeros((s, s, 3)), blur(arr(im), 7 * SS), 'cloud_mask.png')
+
+# ---- Solar Winds (chapter 3): sunrise sky, stardust, wind streaks/chevrons, gravity wells, exit arrow, slow-mo vignette
+# sunrise sky: vertical gradient (stretched over the level in-game), deep violet -> rose -> coral -> amber
+hh = 512; tt = np.linspace(0, 1, hh)[:, None]
+stops = [(0.0, (34, 20, 92)), (0.35, (96, 36, 132)), (0.62, (176, 62, 118)), (0.82, (226, 108, 92)), (1.0, (246, 160, 86))]
+skyc = np.zeros((hh, 3))
+for (t0, c0), (t1, c1) in zip(stops[:-1], stops[1:]):
+    msk = (tt[:, 0] >= t0) & (tt[:, 0] <= t1); u = ((tt[:, 0] - t0) / (t1 - t0))[msk][:, None]
+    skyc[msk] = np.array(c0) * (1 - u) + np.array(c1) * u
+skyim = np.repeat(skyc[:, None, :], 16, axis=1) / 255.0
+save_rgba(skyim, np.ones((hh, 16)), 'sky_sun.png')
+# soft sun bloom (warm), sparkly 4-point star (stardust), soft round dust
+s = 256; r = radial(s); glow_sprite((np.exp(-(r / 46) ** 2) * 0.9 + np.exp(-(r / 110) ** 2) * 0.35) * np.clip(1 - r / 127, 0, 1) ** 1.5, np.array([255, 214, 150]), 'sun_glow.png', white_core=np.exp(-(r / 18) ** 2) * 0.8)
+s = 48 * SS; y, x = np.mgrid[0:s, 0:s]; c = (s - 1) / 2; dx, dy = np.abs(x - c), np.abs(y - c)
+starx = np.exp(-(dy / (1.1 * SS)) ** 2) * np.exp(-(dx / (13 * SS)) ** 2) + np.exp(-(dx / (1.1 * SS)) ** 2) * np.exp(-(dy / (13 * SS)) ** 2)
+rr = np.hypot(dx, dy); glow_sprite(np.clip(starx + np.exp(-(rr / (3.2 * SS)) ** 2), 0, 1), WHITE, 'dust_star.png', white_core=np.exp(-(rr / (1.6 * SS)) ** 2))
+s = 32 * SS; r = radial(s); glow_sprite(np.exp(-(r / (4.5 * SS)) ** 2) * 0.9 + np.exp(-(r / (10 * SS)) ** 2) * 0.3, WHITE, 'dust_soft.png', white_core=np.exp(-(r / (1.6 * SS)) ** 2) * 0.7)
+# wind: long soft streak (points right), chevron (points right), soft zone panel
+w, h = 160 * SS, 16 * SS; y, x = np.mgrid[0:h, 0:w]; u = x / w
+streak = np.exp(-((y - h / 2) / (2.2 * SS)) ** 2) * np.clip(u * 1.6, 0, 1) ** 1.5 * np.clip((1 - u) * 6, 0, 1)
+glow_sprite(np.clip(streak, 0, 1), WHITE, 'wind_streak.png', white_core=streak * np.clip((u - 0.6) * 2.5, 0, 1) * 0.7)
+s = 64 * SS; im = Image.new('L', (s, s), 0); d = ImageDraw.Draw(im)
+d.line([(22 * SS, 14 * SS), (40 * SS, 32 * SS), (22 * SS, 50 * SS)], fill=255, width=6 * SS, joint='curve')
+chev = arr(im); glow_sprite(np.clip(chev * 0.9 + blur(chev, 4 * SS) * 0.7, 0, 1), WHITE, 'wind_chev.png', white_core=chev * 0.5)
+s = 128; im = Image.new('L', (s, s), 0); ImageDraw.Draw(im).rounded_rectangle([10, 10, s - 11, s - 11], radius=26, fill=255)
+zb = blur(arr(im), 8); save_rgba(np.ones((s, s, 3)), zb, 'wind_zone.png')
+# gravity well: luminous aqua core with violet swirl (no dark void - clearly not a black hole), dashed temporal range ring
+s = 160 * SS; r = radial(s); y, x = np.mgrid[0:s, 0:s]; ang = np.arctan2(y - s / 2, x - s / 2)
+sw = 0.5 + 0.5 * np.sin(ang * 4 - r / (6 * SS))
+core = np.exp(-(r / (10 * SS)) ** 2); body = np.exp(-(r / (28 * SS)) ** 2) * (0.45 + 0.55 * sw)
+t_ = np.clip(r / (40 * SS), 0, 1)[..., None]
+colw = (np.array([120, 255, 240]) * (1 - t_) + np.array([170, 110, 255]) * t_) / 255.0
+wc = np.clip(core, 0, 1)[..., None]; save_rgba(colw * (1 - wc) + wc, np.clip(core + body, 0, 1), 'well_core.png')
+s2 = 384 * SS; r2 = radial(s2); y2, x2 = np.mgrid[0:s2, 0:s2]; a2 = np.arctan2(y2 - s2 / 2, x2 - s2 / 2)
+rngw = 180 * SS; dashw = blur((np.sin(a2 * 36) > 0.2).astype(np.float32), 1.5)
+inten = np.exp(-((r2 - rngw) / (1.8 * SS)) ** 2) * dashw * 0.6 + np.exp(-((r2 - rngw) / (14 * SS)) ** 2) * 0.12 + np.clip(1 - r2 / rngw, 0, 1) ** 2 * 0.10
+glow_sprite(np.clip(inten, 0, 1), np.array([110, 235, 255]), 'well_range.png')
+# off-screen exit pointer (points right) and the slow-motion vignette (white, tinted in-game)
+s = 96 * SS; im = Image.new('L', (s, s), 0); d = ImageDraw.Draw(im)
+d.polygon([(70 * SS, 48 * SS), (32 * SS, 26 * SS), (40 * SS, 48 * SS), (32 * SS, 70 * SS)], fill=255)
+ea = arr(im); glow_sprite(np.clip(ea + blur(ea, 4 * SS) * 0.8, 0, 1), WHITE, 'exit_arrow.png', white_core=ea * 0.6)
+s = 256; y, x = np.mgrid[0:s, 0:s]; ex = np.maximum(np.abs(x - s / 2) / (s / 2), np.abs(y - s / 2) / (s / 2)); er = np.hypot(x - s / 2, y - s / 2) / (s / 2)
+vg = np.clip((np.maximum(ex, er * 0.85) - 0.55) / 0.45, 0, 1) ** 1.6
+save_rgba(np.ones((s, s, 3)), vg, 'vignette.png')
+# HUD fade band for scrolling levels (top edge opaque -> transparent), tinted in-game
+hh = 128; a_ = (1 - np.linspace(0, 1, hh)) ** 0.9
+save_rgba(np.ones((hh, 16, 3)), np.repeat(a_[:, None], 16, axis=1), 'hud_fade.png')

@@ -73,6 +73,9 @@ objects = [
     text("HeadText", 34, "210;245;255", "40;200;255"), text("SubText", 22, "175;205;240", "40;120;255"),
     text("ChapterText", 56, "235;250;255", "60;190;255"), text("NodeText", 15, "190;215;245", "40;120;255"),
     # --- the Abyss
+    one("Sky", "sky_sun.png", False), one("SunGlow", "sun_glow.png"), one("DustStar", "dust_star.png"), one("DustSoft", "dust_soft.png"),
+    one("WindStreak", "wind_streak.png"), one("WindChev", "wind_chev.png"), one("WindZone", "wind_zone.png"),
+    one("WellCore", "well_core.png"), one("WellRange", "well_range.png"), one("ExitArrow", "exit_arrow.png"), one("Vignette", "vignette.png", False), one("HudFade", "hud_fade.png", False),
     one("StarCore", "star_core.png"), one("StarCorona", "star_corona.png"), one("StarGlow", "star_glow.png"),
     sprite("Mover", [(f"M{k}", [f"mover_{k}.png"], 1) for k in sorted(META['movers'])]), one("TrackDot", "track_dot.png"),
     sprite("Cloud", [(f"C{k}", [f"cloud_{k}.png"], 1) for k in sorted(META['clouds'], key=int)]), one("CloudPuff", "cloud_puff.png"), one("CloudMask", "cloud_mask.png"),
