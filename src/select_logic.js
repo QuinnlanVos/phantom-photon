@@ -11,6 +11,7 @@ const THEME = [
   { color: '160;130;255', node: '170;140;255', done: '120;255;200', frame: '130;100;255' },
   { color: '255;200;110', node: '255;196;120', done: '120;255;210', frame: '255;150;110' },     // Solar Winds: golden sunrise
   { color: '235;242;255', node: '225;238;255', done: '255;190;100', frame: '215;228;248' },     // Rocks from Space: stark silver on black
+  { color: '255;170;230', node: '255;190;235', done: '140;235;255', frame: '255;196;150' },     // Song of Rainbows: candy pink + peach
 ];
 if (!S) {
   S = runtimeScene.__sel = { cur: clamp(LIB.nav.chapter || 0, 0, CH.length - 1), pos: 0, drag: 0, dragging: false, cards: [], toastT: 0, wig: 0 };
@@ -21,6 +22,10 @@ if (!S) {
   S.voidSky = C.mk('VoidSky', 'Bg', 0, 0, -4); S.voidSky.setOpacity(0); S.pins = [];
   for (let k = 0; k < 90; k++) { const o = C.mk(Math.random() < 0.06 ? 'DustStar' : 'PinStar', 'Bg', 0, 0, -3, true); o.setColor(['235;242;255', '205;225;255', '170;210;255', '255;228;180'][k % 4]);
     S.pins.push({ o, u: Math.random(), v: Math.random(), p: rand(0.2, 1), ph: rand(0, 6.28), tw: rand(0.6, 2), a: rand(60, 160), s: o.getName && o.getName() === 'DustStar' ? rand(0.16, 0.22) : rand(0.28, 0.5) }); }
+  // chapter 5 backdrop: bright pastel sky, a big soft rainbow and drifting clouds (fades in for the Song of Rainbows card)
+  S.rbSky = C.mk('RainbowSky', 'Bg', 0, 0, -2); S.rbSky.setOpacity(0);
+  S.rbBow = C.mk('BgBow', 'Bg', 0, 0, -1, false); S.rbBow.setOpacity(0); S.rbClouds = [];
+  for (let k = 0; k < 5; k++) { const o = C.mk('BgCloud', 'Bg', 0, 0, 0, false); o.setOpacity(0); S.rbClouds.push({ o, u: Math.random(), v: rand(0.08, 0.92), s: rand(0.45, 0.8), sp: rand(8, 20) }); }
   C.buttonNav = false; C.modalKeys = true;      // this scene drives keyboard focus itself
   S.head = C.mk('HeadText', 'UI', 0, 0, 80); S.head.setString('SELECT LEVEL');
   S.back = C.button({ kind: 'round', icon: 'IcBack', color: '120;240;255', delay: 0.1, name: 'back', pool: false, onPress: () => C.go('Menu', 'fade', { dur: 0.45 }) });
@@ -129,7 +134,7 @@ S.cards.forEach((cd, c) => {
   cd.frame.setWidth(cardW * sc); cd.frame.setHeight(cardH * sc); cd.frame.setPosition(x - cardW * sc / 2, cy - cardH * sc / 2);
   cd.frame.setOpacity(255 * a * (cd.unlocked ? 1 : 0.75));
   cd.glow.setPosition(x, cy); cd.glow.setScaleX(cardW / 256 * 1.3 * sc); cd.glow.setScaleY(cardH / 256 * 1.2 * sc);
-  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
+  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : cd.c === 4 ? 40 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
   const top = cy - cardH * sc / 2;
   cd.small.setPosition(x - cd.small.getWidth() / 2, top + 26 * sc); cd.small.setOpacity(200 * a);
   cd.name.setScale(sc); cd.name.setPosition(x - cd.name.getWidth() / 2, top + 50 * sc); cd.name.setOpacity(255 * a);
@@ -186,6 +191,11 @@ if (vd > 0) for (const m of C.motes) m.o.setOpacity(m.o.getOpacity() * (1 - vd))
 S.voidSky.setPosition(-300, -300); S.voidSky.setWidth(UW + 800 + S.pos * 40); S.voidSky.setHeight(UH + 600); S.voidSky.setOpacity(255 * vd);
 for (const p of S.pins) { p.ph += dt; const x = ((p.u * (UW + 200) - S.pos * 40 * p.p) % (UW + 200) + UW + 200) % (UW + 200) - 100 + S.pos * 40, y = p.v * UH;
   p.o.setPosition(x, y); p.o.setScale(p.s); p.o.setOpacity(vd * p.a * (0.75 + 0.25 * Math.sin(p.ph * p.tw))); }
+const rd = clamp(S.pos - 3, 0, 1);      // chapter 5: pastel rainbow sky
+S.rbSky.setPosition(-300, -300); S.rbSky.setWidth(UW + 800 + S.pos * 40); S.rbSky.setHeight(UH + 600); S.rbSky.setOpacity(255 * rd);
+S.rbBow.setPosition(UW / 2 + S.pos * 40, UH * 0.5); S.rbBow.setScale(Math.max(UW, UH) / 512 * 1.1); S.rbBow.setOpacity(120 * rd);
+for (const c of S.rbClouds) { c.u += dt * c.sp / (UW + 400); const x = ((c.u * (UW + 400)) % (UW + 400)) - 200 + S.pos * 40;
+  c.o.setPosition(x, c.v * UH); c.o.setScale(c.s); c.o.setOpacity(200 * rd); }
 runtimeScene.getLayer('Bg').enableEffect('Lens', false);
 S.toastT = Math.max(0, S.toastT - dt); S.toast.setOpacity(255 * Math.min(1, S.toastT * 3)); S.toast.setPosition(UW / 2 - S.toast.getWidth() / 2, C.portrait ? 140 : UH - 70);
 C.updateTrans(dt);

@@ -85,6 +85,11 @@ objects = [
     sprite("Asteroid", [(f"A{k + 1}", [f"asteroid_{k + 1}.png"], 1) for k in range(META['rockVariants'])]), one("RockGlow", "rock_glow.png"), one("RockBit", "rock_bit.png"),
     sprite("DustRing", [(f"R{k}", [f"dustring_{k}.png"], 1) for k in sorted(META['rings'], key=int)]),
     one("HailStreak", "hail_streak.png"), one("HailTele", "hail_tele.png"), one("IceBurst", "ice_burst.png"),
+    # --- Song of Rainbows (chapter 5)
+    one("RainbowSky", "sky_rainbow.png", False), one("BgCloud", "bg_cloud.png"), one("BgBow", "bg_bow.png"),
+    sprite("Bow", [(f"B{k}", [f"bow_{k}.png"], 1) for k in sorted(META['bows'], key=int)]),
+    one("Prism", "prism.png"), one("Beam", "beam.png"), one("GatePane", "gate.png"), one("RainCloud", "rain_cloud.png"),
+    one("RainDrop", "raindrop.png"), one("Note", "note.png"),
     {"assetStoreId": "", "name": "Light", "type": "Lighting::LightObject", "variables": [], "effects": [], "behaviors": [],
      "content": {"radius": 100, "color": "255;255;255", "debugMode": False, "texture": ""}},
 ]

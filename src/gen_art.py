@@ -109,6 +109,14 @@ def level_art(n, lv, dark=False, theme=''):
         L_ = 12 * SS
         for (cx_, cy_, sx_, sy_) in ((x0, y0, 1, 1), (x1, y0, -1, 1), (x0, y1, 1, -1), (x1, y1, -1, -1)):
             dhb.line([(cx_, cy_), (cx_ + sx_ * L_, cy_)], fill=255, width=2 * SS); dhb.line([(cx_, cy_), (cx_, cy_ + sy_ * L_)], fill=255, width=2 * SS)
+    hid = Image.new('L', (W, H), 0); dhd = ImageDraw.Draw(hid)        # Song of Rainbows: dotted outline of rainbows hidden until rain
+    for b in lv.get('bows', []):
+        if b.get('cloud', -1) < 0: continue
+        cx_, cy_ = m + b['i'] * S + S / 2, m + b['j'] * S + S / 2; R_ = b['r'] * S
+        t0_, t1_ = math.radians(b['a0']), math.radians(b['a1']); n_ = max(4, int(abs(t1_ - t0_) * R_ / (11 * SS)))
+        for q in range(n_ + 1):
+            t_ = t0_ + (t1_ - t0_) * q / n_; px, py = cx_ + R_ * math.cos(t_), cy_ + R_ * math.sin(t_)
+            dhd.ellipse([px - 2.4 * SS, py - 2.4 * SS, px + 2.4 * SS, py + 2.4 * SS], fill=255)
     sm = arr(solid.filter(ImageFilter.GaussianBlur(5)))      # rounded corners
     sm = (sm > 0.5).astype(np.float32)
     inner = minf(sm, 13)
@@ -138,6 +146,12 @@ def level_art(n, lv, dark=False, theme=''):
         cz = blur(maxf(arr(crv), 9), 3) * blur(crv_w, 2)
         ccol = np.array([255, 190, 70])[None, None, :] * (1 - crv_t[..., None]) + np.array([255, 60, 70])[None, None, :] * crv_t[..., None]
         col = col * (1 - cz[..., None]) + ccol * cz[..., None]
+    if theme == 'rainbow':  # Song of Rainbows: candy rainbow tubes - the hue drifts across the level
+        yy_, xx_ = np.mgrid[0:H, 0:W]; hue = (0.62 * xx_ / W + 0.38 * yy_ / H) * 1.6 % 1.0
+        hsv = np.dstack([hue, np.full_like(hue, 0.88), np.full_like(hue, 0.95)])
+        base = np.array(Image.fromarray((hsv * 255).astype(np.uint8), 'HSV').convert('RGB')).astype(np.float32)
+        nz = (1 - padz - rampz).clip(0, 1)[..., None]
+        col = col * (1 - nz) + base * nz
     col = col * (1 - mirz[..., None]) + SILVER[None, None, :] * mirz[..., None]
     col = col / 255.0
     g1 = blur(line, 8); g2 = blur(line, 22); g3 = blur(line, 52)
@@ -145,7 +159,13 @@ def level_art(n, lv, dark=False, theme=''):
     # wall interior: deep dark with faint diagonal hatching + inner glow from its edges
     yy, xx = np.mgrid[0:H, 0:W]
     hatch = ((xx + yy) % 22 < 2).astype(np.float32) * 0.05
-    interior_rgb = np.array([0.19, 0.08, 0.23] if theme == 'sun' else [0.012, 0.016, 0.03] if theme == 'void' else [0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
+    interior_rgb = np.array([0.19, 0.08, 0.23] if theme == 'sun' else [0.012, 0.016, 0.03] if theme == 'void' else [0.98, 0.95, 1.0] if theme == 'rainbow' else [0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
+    if theme == 'rainbow':  # soft cloud-white walls with faint candy stripes and a pastel inner glow from the rim
+        stripe = (((xx + yy) % (34 * SS)) < 11 * SS).astype(np.float32) * 0.22
+        past = col * 0.42 + 0.58      # pastel candy body in the local rainbow hue
+        interior_rgb = past * (1 - stripe[..., None]) + np.array([1.0, 1.0, 1.0])[None, None, :] * stripe[..., None]
+        ig = blur(line, 9)[..., None] * 0.6
+        interior_rgb = interior_rgb * (1 - ig) + (col * 0.55 + 0.45) * ig
     padin = arr(pad) * ((((xx // 2) + (yy // 2)) % 16) < 7)        # energised stripes inside pad tiles
     interior_rgb = interior_rgb + (MAGENTA / 255.0)[None, None, :] * (padin * 0.28 + arr(pad) * 0.10)[..., None]
     sheen = arr(mir) * ((((xx - yy) % 40) < 9).astype(np.float32) * 0.35 + 0.18)        # mirror blocks: polished diagonal sheen
@@ -156,11 +176,12 @@ def level_art(n, lv, dark=False, theme=''):
     gl = np.clip(0.85 * g1 + 0.55 * g2 + 0.4 * g3, 0, 1) * outside
     if theme == 'sun': gl = np.clip(0.75 * g1 + 0.25 * g2, 0, 1) * outside * 0.8     # bright sky behind: keep the spill tight (no flat panels)
     if theme == 'void': gl = np.clip(0.8 * g1 + 0.06 * g2, 0, 1) * outside * 0.7   # deep space: crisp tube, short halo, the void stays black
+    if theme == 'rainbow': gl = np.clip(0.9 * g1 + 0.25 * g2, 0, 1) * outside * 0.6   # bright sky: soft candy halo
     rgb = rgb + col * gl[..., None]
     alpha = alpha + gl
     # bright tube with white-hot core
     core = np.clip(minf(line, 5) * 1.2, 0, 1)        # thin white-hot centre of the tube
-    wc = ((0.8 if theme == 'void' else 0.55) - 0.35 * padz)[..., None] * core[..., None]
+    wc = ((0.8 if theme == 'void' else 0.12 if theme == 'rainbow' else 0.55) - 0.35 * padz)[..., None] * core[..., None]
     tube = col * (1 - wc) + wc
     rgb = rgb * (1 - line[..., None]) + tube * line[..., None]
     alpha = np.maximum(alpha, line)
@@ -190,6 +211,9 @@ def level_art(n, lv, dark=False, theme=''):
         rgb = rgb * (1 - hl_[..., None]) + (np.array([255, 70, 80]) / 255.0)[None, None, :] * hl_[..., None]; alpha = np.maximum(alpha, hl_)
         hb = np.clip(blur(arr(hz_brk), 0.8) * 0.95 + blur(arr(hz_brk), 6) * 0.5, 0, 1) * (1 - sm)
         rgb = rgb * (1 - hb[..., None]) + (np.array([255, 185, 90]) / 255.0)[None, None, :] * hb[..., None]; alpha = np.maximum(alpha, hb)
+    if theme == 'rainbow':   # hidden rainbows: dotted white ghost of the arc (it appears for real after the rain)
+        hd = np.clip(blur(arr(hid), 0.8) * 0.85 + blur(arr(hid), 4) * 0.35, 0, 1) * (1 - sm)
+        rgb = rgb * (1 - hd[..., None]) + np.array([1.0, 1.0, 1.0])[None, None, :] * hd[..., None]; alpha = np.maximum(alpha, hd * 0.8)
     a = np.clip(alpha, 1e-4, 1)
     save_rgba(rgb / a[..., None] * np.minimum(alpha, 1)[..., None] / a[..., None] if False else np.clip(rgb / a[..., None], 0, 1), alpha, f'level_{n + 1}.png')
     return (W // SS, H // SS)
@@ -320,5 +344,6 @@ ic = arr(im); ringb = np.exp(-((radial(s) - 40 * SS) / (1.5 * SS)) ** 2) * 0.7
 glow_sprite(np.clip(ic + blur(ic, 6) * 0.7 + ringb + blur(ringb, 5) * 0.5, 0, 1), CYAN, 'btn_restart.png', white_core=ic * 0.5)
 exec(open(os.path.join(HERE, 'gen_art2.py')).read())
 exec(open(os.path.join(HERE, 'gen_art3.py')).read())
-json.dump({'levelArtSize': sizes, 'movers': mover_sizes, 'clouds': cloud_sizes, 'cloudIndex': cloud_index, 'rings': ring_sizes, 'ringIndex': ring_index, 'rockVariants': ROCK_VARIANTS, 'margin': M, 'tile': T, 'ss': SS}, open(os.path.join(HERE, 'art_meta.json'), 'w'))
+exec(open(os.path.join(HERE, 'gen_art4.py')).read())
+json.dump({'levelArtSize': sizes, 'movers': mover_sizes, 'clouds': cloud_sizes, 'cloudIndex': cloud_index, 'rings': ring_sizes, 'ringIndex': ring_index, 'rockVariants': ROCK_VARIANTS, 'bows': bow_sizes, 'bowIndex': bow_index, 'margin': M, 'tile': T, 'ss': SS}, open(os.path.join(HERE, 'art_meta.json'), 'w'))
 print('art ok', sizes)

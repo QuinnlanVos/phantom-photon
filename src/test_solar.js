@@ -43,7 +43,7 @@ function plan(c, n, toks) {
   const ctx = await b.newContext({ viewport: { width: VIEW[0], height: VIEW[1] }, deviceScaleFactor: VIEW[2], isMobile: eng === 'chromium' ? VIEW[3] : VIEW[3], hasTouch: VIEW[3],
     userAgent: VIEW[3] ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' : undefined });
   const pg = await ctx.newPage();
-  const errs = []; pg.on('pageerror', e => errs.push('PAGEERR ' + e.message));
+  const errs = []; pg.on('pageerror', e => { if (!/gdevelop-app\.com|analytics/i.test(e.message)) errs.push('PAGEERR ' + e.message); });
   const W = VIEW[0], H = VIEW[1];
   const S = () => pg.evaluate(() => { const G = window.__pp; if (!G) return null; const C = window.__ppC;
     return { state: G.state, level: G.level, chapter: G.chapter, mode: G.st.mode, i: G.st.i, j: G.st.j, ride: G.st.ride ? G.st.ride.m : -1, time: G.st.time || 0, wts: G.st.ts || 1, log: G.log.slice(),
@@ -83,7 +83,7 @@ function plan(c, n, toks) {
   await pg.goto(url + '?unlock&select&ch=3'); await sleep(5000);
   const sel = await pg.evaluate(() => { const S = window.__ppSel; return S ? { cur: S.cur, n: S.cards.length, name: S.cards[2] && S.cards[2].name.getString(), open: S.cards[2].nodes.filter(b => b.open).length,
     vis: S.cards[2].nodes.filter(b => b.visible).length, fx: S.cards[2].frame.getX(), fw: S.cards[2].frame.getWidth(), UW: window.__ppC.UW } : null; });
-  ok(sel && sel.n === 3 && sel.cur === 2 && /SOLAR WINDS/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1, `select ?select&ch=3: 3 chapter cards, ch3 "Solar Winds" centred and on-screen, 5 levels open ${JSON.stringify(sel)}`);
+  ok(sel && sel.n === CH.length && sel.cur === 2 && /SOLAR WINDS/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1, `select ?select&ch=3: ${CH.length} chapter cards, ch3 "Solar Winds" centred and on-screen, 5 levels open ${JSON.stringify(sel)}`);
   await pg.screenshot({ path: `${outdir}/${tag}_select.png` });
   // ---------------------------------------------------------------- play every chapter-3 level
   for (let n = 0; n < CH[2].levels.length; n++) {

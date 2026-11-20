@@ -20,6 +20,16 @@
 //   hail:   [{i,j,w,h,d,n,phase,safe,tele}]    cosmic hail lanes: n cycles per period; calm for `safe` of each cycle, then a
 //           `tele`-second telegraph shimmer (harmless), then the barrage (lethal) until the cycle ends
 // Hazards only hit a flying orb; the solver verifies that no resting spot is ever inside one.
+// Song of Rainbows (chapter 5) adds level lists (static, no timing):
+//   bows:    [{i,j,r,a0,a1,cloud?}]  rainbow paths: circular arcs centred on tile (i,j), radius r tiles, from angle a0 to a1
+//           (degrees, 0 = east, 90 = south since screen y points down; multiples of 90, so both ends sit on tile centres with
+//           axis-aligned tangents). A flying orb that touches a rainbow (centre within BOW_SNAP of it) while moving along it
+//           snaps onto the curve and rides it to the end it was heading for, then leaves along the tangent and flies on by the
+//           normal rules. A dead-on perpendicular touch (or flying into an end from outside) just passes through.
+//           cloud: k -> the rainbow only appears once rain cloud k has burst (rainbows come after the rain)
+//   prisms:  [{i,j,c}]       passing through a prism splits your light and you carry its colour c (r o y g b v)
+//   gates:   [{i,j,w,h,c}]   colour gates: solid walls for any other colour, open glass for a photon of colour c
+//   rain:    [{i,j,w,h}]     rain clouds: fly through one and it bursts into rain (it stays burst for the level)
 // ============================================================================
 const T = 48;                    // tile size (world px)
 const H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)
@@ -40,6 +50,10 @@ const SUB = 1 / 600;             // fixed sub-step (game and solver produce iden
 const ROCK_PAD = 10;             // px added to an asteroid's core hit radius (0.82 r) for the orb
 const RING_PAD = 0.26 * T;       // the orb's radius against dust bands and gap edges
 const HAIL_PAD = 0.18 * T;       // the orb counts as in a hail lane once its centre is this close to the lane
+const BOW_SNAP = 0.3 * T;        // a rainbow catches the orb when its centre passes this close to the arc
+const BOW_MINV = 0.15;           // ...and it is moving along the arc at least this much (|v . tangent| / speed)
+const PRISM_R = 0.45 * T;        // passing this close to a prism's centre takes its colour
+let COLOR = '';                  // colour of the photon being simulated (colour gates are walls for every other colour)
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
 const RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\' },
@@ -82,10 +96,18 @@ function parseLevel(def) {
     return Object.assign(o, { x: center(g.i), y: center(g.j), R: o.r * T, hw: o.w * T / 2, gapR: o.gap * Math.PI / 180 }); });
   L.hail = (def.hail || []).map((h) => Object.assign({ d: 'D', n: 1, phase: 0, safe: 0.5, tele: 0.8 }, h,
     { x0: h.i * T, y0: h.j * T, x1: (h.i + h.w) * T, y1: (h.j + h.h) * T }));
+  // Song of Rainbows
+  L.bows = (def.bows || []).map((b) => Object.assign({ cloud: -1 }, b, { x: center(b.i), y: center(b.j), R: b.r * T, t0: b.a0 * Math.PI / 180, t1: b.a1 * Math.PI / 180 }));
+  L.prisms = (def.prisms || []).map((q) => Object.assign({}, q, { x: center(q.i), y: center(q.j) }));
+  for (const q of L.prisms) L.cells[q.j * L.w + q.i] = 'Q';            // passable, never stickable
+  L.gateC = {};
+  for (const g of (def.gates || [])) for (let j = g.j; j < g.j + (g.h || 1); j++) for (let i = g.i; i < g.i + (g.w || 1); i++) { L.cells[j * L.w + i] = 'G'; L.gateC[j * L.w + i] = g.c; }
+  L.rain = (def.rain || []).map((c) => Object.assign({}, c, { x0: c.i * T, y0: c.j * T, x1: (c.i + c.w) * T, y1: (c.j + c.h) * T }));
   return L;
 }
 function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
 const isFlat = (t) => t === '#' || t === 'P';
+const gateShut = (L, i, j) => cell(L, i, j) === 'G' && L.gateC[j * L.w + i] !== COLOR;
 const center = (i) => i * T + T / 2;
 const toCell = (x) => Math.floor(x / T);
 
@@ -162,6 +184,7 @@ const overlap = (x, y, r) => x + H > r.x0 && x - H < r.x1 && y + H > r.y0 && y -
 function faceFrom(L, i, j, side) {
   const t = cell(L, i, j);
   if (isFlat(t)) return true;
+  if (t === 'G') return gateShut(L, i, j);
   if (RAMPS[t]) return RAMPS[t].back.includes(side);
   return false;                           // empty tiles and mirrors: nothing to stick to
 }
@@ -171,7 +194,7 @@ function contacts(L, i, j) {
   for (const d in DIRS) { const [dx, dy] = DIRS[d]; if (faceFrom(L, i + dx, j + dy, OPP[d])) out.push(d); }
   return out;
 }
-function stuckContacts(L, st) { return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
+function stuckContacts(L, st) { COLOR = st.color || ''; return st.ride ? [st.ride.side] : contacts(L, st.i, st.j); }
 // Movement rule: a swipe in `d` is legal only if it is parallel to a wall the orb touches
 // and it is not straight into a wall face.
 function checkMove(L, st, d) {
@@ -196,6 +219,7 @@ function padLaunchDir(L, i, j, prefer) {
 function tileBlocks(L, i, j, x, y) {
   const t = cell(L, i, j);
   if (isFlat(t) || t === 'M') return true;
+  if (t === 'G') return gateShut(L, i, j);
   if (!RAMPS[t]) return false;
   const x0 = i * T, y0 = j * T, x1 = x0 + T, y1 = y0 + T, back = RAMPS[t].back;
   if (x >= x1 && back.includes('R')) return true;
@@ -228,20 +252,20 @@ function startFlight(st, d, kick, L) {
     GHOST = -1;
     st.ride = null;
   } else if (st.ride) st.ride = null;
-  st.mode = 'fly'; st.dir = d; st.t = 0; st.acc = 0; st.rail = null; st.boost = 0;
+  st.mode = 'fly'; st.dir = d; st.t = 0; st.acc = 0; st.rail = null; st.boost = 0; st.bow = null; st.bowSkip = -1;
   st.speed = kick ? PAD_V0 : V0; st.vx = dx * st.speed; st.vy = dy * st.speed;
   st.events = [];
 }
 function newState(L) {
   const [i, j] = L.start;
   return { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, normal: null, lastStuck: [i, j], ride: null,
-           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0 };
+           got: L.shards.map(() => false), events: [], t: 0, time: 0, acc: 0, color: '', lastColor: '', rain: 0, bow: null, bowSkip: -1 };
 }
 
 // Advance the world by dt seconds in fixed sub-steps: moving platforms (carrying a riding orb) and the orb's flight.
 // Pushes events: shard, deflect, mirror, graze, stick, exit, swallow, burn, crush, lost.
 function step(L, st, dt) {
-  st.acc = (st.acc || 0) + dt;
+  st.acc = (st.acc || 0) + dt; COLOR = st.color || '';
   while (st.acc >= SUB - 1e-9 && (st.mode === 'fly' || st.mode === 'stuck')) {
     st.acc -= SUB;
     const ts = L.wells.length ? timeScale(L, st.x, st.y) : 1; st.ts = ts;
@@ -269,6 +293,11 @@ function pickups(L, st) {
     if (!st.got[k] && Math.hypot(center(si) - st.x, center(sj) - st.y) < SHARD_R) { st.got[k] = true; st.events.push({ type: 'shard', k, x: center(si), y: center(sj) }); }
   });
   if (L.exit && Math.hypot(center(L.exit[0]) - st.x, center(L.exit[1]) - st.y) < EXIT_R) { st.mode = 'exit'; st.ride = null; st.events.push({ type: 'exit' }); }
+  if (st.mode !== 'fly') return;
+  for (let k = 0; k < L.prisms.length; k++) { const q = L.prisms[k];
+    if (q.c !== st.color && Math.hypot(q.x - st.x, q.y - st.y) < PRISM_R) { st.color = q.c; COLOR = q.c; st.events.push({ type: 'prism', k, c: q.c, x: q.x, y: q.y, dir: st.dir }); } }
+  for (let k = 0; k < L.rain.length; k++) { const c = L.rain[k];
+    if (!(st.rain & (1 << k)) && st.x > c.x0 && st.x < c.x1 && st.y > c.y0 && st.y < c.y1) { st.rain |= 1 << k; st.events.push({ type: 'rain', k, x: st.x, y: st.y }); } }
 }
 function flySub(L, st, h) {
   st.t += h;
@@ -295,6 +324,7 @@ function flySub2(L, st, h) {
     return stick(L, st, side, Object.assign(r, { mover: k, mirror: false }));
   }
   if (st.rail) return railSub(L, st, h);
+  if (st.bow) return bowSub(L, st, h);
   st.boost = Math.max(0, (st.boost || 0) - BOOST_DECAY * h);
   const wind = L.winds.length ? windAt(L, st.x, st.y) : null;
   if (wind) {   // wind: plain acceleration along its vector (tailwind = faster, headwind = slower / blown back, crosswind = bent)
@@ -335,6 +365,8 @@ function flySub2(L, st, h) {
   }
   // curved boost walls: entering a quarter-pipe block puts the orb on its arc
   if (L.curves.length) for (const c of L.curves) if (curveEnter(L, st, c, nx, ny)) return;
+  // rainbows: touching one while moving along it snaps the orb onto the curve
+  if (L.bows.length && bowEnter(L, st, nx, ny)) return;
   // move X, then Y (axis-separated box collision). Head-on hit = stick (or bounce off a mirror); grazing hit = slide.
   let hit = boxHit(L, nx, st.y, st.x, st.y, st.time);
   if (hit) {
@@ -358,7 +390,7 @@ function flySub2(L, st, h) {
   if (st.mode === 'fly' && st.t > maxFlight(L)) die(st, 'lost', st.x, st.y);
 }
 // ---------------------------------------------------------------- curved boost walls
-const maxFlight = (L) => L.curves.length ? 8 : MAX_FLIGHT;     // long curve rides on big levels need more time
+const maxFlight = (L) => (L.curves.length || L.bows.length) ? 8 : MAX_FLIGHT;     // long curve rides on big levels need more time
 const inBox = (x, y, c) => x > c.x0 && x < c.x1 && y > c.y0 && y < c.y1;
 function curveEnter(L, st, c, nx, ny) {
   if (!inBox(nx, ny, c) || inBox(st.x, st.y, c)) return false;
@@ -397,6 +429,59 @@ function railSub(L, st, h) {
   pickups(L, st);
   if (st.mode === 'fly' && st.t > maxFlight(L)) die(st, 'lost', st.x, st.y);   // endless curve loops are lost too
 }
+// ---------------------------------------------------------------- rainbows (chapter 5)
+const bowOn = (L, st, b) => b.cloud < 0 || !!(st.rain & (1 << b.cloud));
+// nearest point of rainbow b to (x,y): { th (clamped to the arc), d (distance), end: -1 | 0 (at a0) | 1 (at a1) }
+function bowNear(b, x, y) {
+  let th = Math.atan2(y - b.y, x - b.x); const span = b.t1 - b.t0;
+  let u = (th - b.t0) % (2 * Math.PI); if (u < 0) u += 2 * Math.PI;
+  let end = -1;
+  if (u > span) { end = (u - span < 2 * Math.PI - u) ? 1 : 0; u = end ? span : 0; }
+  th = b.t0 + u;
+  const px = b.x + b.R * Math.cos(th), py = b.y + b.R * Math.sin(th);
+  return { th, d: Math.hypot(x - px, y - py), end: end >= 0 ? end : (u < 1e-9 ? 0 : u > span - 1e-9 ? 1 : -1) };
+}
+function bowPos(st, b) {
+  const r = st.bow, co = Math.cos(r.th), si = Math.sin(r.th);
+  st.x = b.x + b.R * co; st.y = b.y + b.R * si;
+  st.vx = -si * r.dir * st.speed; st.vy = co * r.dir * st.speed;
+  st.dir = Math.abs(st.vx) > Math.abs(st.vy) ? (st.vx > 0 ? 'R' : 'L') : (st.vy > 0 ? 'D' : 'U');
+}
+function bowEnter(L, st, nx, ny) {
+  for (let k = 0; k < L.bows.length; k++) {
+    const b = L.bows[k];
+    if (!bowOn(L, st, b)) continue;
+    const n = bowNear(b, nx, ny);
+    if (k === st.bowSkip) { if (n.d > BOW_SNAP * 1.6) st.bowSkip = -1; continue; }
+    if (n.d > BOW_SNAP) continue;
+    const vt = (st.vx * -Math.sin(n.th) + st.vy * Math.cos(n.th)) / (st.speed || 1);
+    if (Math.abs(vt) < BOW_MINV) continue;                      // dead-on perpendicular touch: pass through
+    const dir = vt > 0 ? 1 : -1;
+    if ((n.end === 1 && dir > 0) || (n.end === 0 && dir < 0)) continue;   // flying into an end from outside the arc
+    st.bow = { k, th: n.th, dir }; st.boost = 0;
+    bowPos(st, b);
+    st.events.push({ type: 'bow', k, x: st.x, y: st.y, dir });
+    pickups(L, st);
+    return true;
+  }
+  return false;
+}
+function bowSub(L, st, h) {
+  const r = st.bow, b = L.bows[r.k];
+  if (st.speed < VMAX) st.speed = Math.min(VMAX, st.speed + ACC * h); else st.speed = Math.max(VMAX, st.speed - OVER_DECAY * h);
+  r.th += r.dir * st.speed * h / b.R;
+  const done = r.dir > 0 ? r.th >= b.t1 : r.th <= b.t0;
+  if (done) r.th = r.dir > 0 ? b.t1 : b.t0;
+  bowPos(st, b);
+  if (done) {   // leave along the tangent, exactly on a lane (the ends sit on tile centres)
+    st.x = Math.round((st.x - T / 2) / T) * T + T / 2; st.y = Math.round((st.y - T / 2) / T) * T + T / 2;
+    if (Math.abs(st.vx) > Math.abs(st.vy)) { st.vx = Math.sign(st.vx) * st.speed; st.vy = 0; } else { st.vy = Math.sign(st.vy) * st.speed; st.vx = 0; }
+    st.bow = null; st.bowSkip = r.k;
+    st.events.push({ type: 'bowexit', k: r.k, x: st.x, y: st.y, dir: st.dir });
+  }
+  pickups(L, st);
+  if (st.mode === 'fly' && st.t > maxFlight(L)) die(st, 'lost', st.x, st.y);
+}
 function reflectDiag(st, line, ci, cj, u, v) {
   let nx, ny;
   if (line === '/') { nx = ci * T + (1 - v) * T; ny = cj * T + (1 - u) * T; const vx = st.vx; st.vx = -st.vy; st.vy = -vx; }
@@ -428,14 +513,14 @@ function stick(L, st, side, hit) {
   }
   cand.sort((a, b) => a[0] - b[0]);
   if (cand.length) { i = cand[0][1]; j = cand[0][2]; }
-  st.rail = null; st.boost = 0; st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j];
+  st.rail = null; st.boost = 0; st.mode = 'stuck'; st.ride = null; st.i = i; st.j = j; st.normal = side; st.vx = st.vy = 0; st.speed = 0; st.lastStuck = [i, j]; st.lastColor = st.color || ''; st.bow = null;
   st.events.push({ type: 'stick', side, i, j, x: center(i), y: center(j), fromX, fromY, impact: impactSpeed });
   st.x = center(i); st.y = center(j);
   pickups(L, st);
 }
 function respawn(L, st) {
   const [i, j] = st.lastStuck;
-  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, rail: null, boost: 0, events: [] });
+  Object.assign(st, { mode: 'stuck', i, j, x: center(i), y: center(j), vx: 0, vy: 0, speed: 0, ride: null, rail: null, boost: 0, events: [], bow: null, bowSkip: -1, color: st.lastColor || '' });
 }
 function clone(st) { const s = JSON.parse(JSON.stringify(st)); s.events = []; return s; }
 // Run a whole move instantly (used by the solver/tests). `wait` seconds pass first (moving platforms keep moving).
@@ -445,6 +530,7 @@ function simulate(L, st0, action, wait) {
   const pre = st.events.splice(0);
   if (st.mode !== 'stuck') return { ok: false, why: 'busy', st };
   if (action === 'WAIT') return { ok: true, st, events: pre };
+  COLOR = st.color || '';
   if (action === 'TAP') {
     const d = padLaunchDir(L, st);
     if (!d) return { ok: false, why: 'nopad', st };
@@ -459,5 +545,5 @@ function simulate(L, st0, action, wait) {
   evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+return { bowNear, bowOn, BOW_SNAP, isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
          padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };

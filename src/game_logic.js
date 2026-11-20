@@ -21,6 +21,11 @@ const cc = (i) => i * T + T / 2;
 // The Abyss ambient: dim, never black - the whole level is always faintly readable; the orb is the strong light.
 const DUST_COLS = ['255;214;120', '255;240;205', '140;235;255', '255;150;205', '255;190;120'];
 const AMB = [46, 50, 76], FLARE_AMB = [250, 228, 200];
+// Song of Rainbows: photon / prism / gate colours, and the rainbow order used for sparkles and trails
+const RBC = { r: '255;86;110', o: '255;156;72', y: '255;205;60', g: '70;205;110', b: '70;150;255', v: '150;105;255' };
+const RBN = { r: 'RED', o: 'ORANGE', y: 'YELLOW', g: 'GREEN', b: 'BLUE', v: 'VIOLET' };
+const RBSEQ = ['255;86;110', '255;156;72', '255;205;60', '70;205;110', '70;150;255', '150;105;255'];
+const lightC = (c, k) => c.split(';').map((v) => Math.round(+v + (255 - v) * k)).join(';');
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const mk = (name, layer, x, y, z, blend) => C.mk(name, layer, x, y, z, blend);
 const del = (o) => C.del(o);
@@ -56,6 +61,8 @@ if (!G) {
   // Solar Winds: sunrise sky + sun bloom (Bg layer), slow-motion vignette and off-screen exit pointer (UI layer)
   G.sky = mk('Sky', 'Bg', 0, 0, -6); G.sunGlow = mk('SunGlow', 'Bg', 0, 0, -5, true);
   G.voidSky = mk('VoidSky', 'Bg', 0, 0, -7); G.voidSky.hide(true);     // Rocks from Space: pitch-dark deep-space backdrop
+  G.rbSky = mk('RainbowSky', 'Bg', 0, 0, -8); G.rbSky.hide(true);       // Song of Rainbows: bright pastel sky
+  G.orbShade = mk('Soft', '', 0, 0, 29, false); G.orbShade.setColor('70;36;130'); G.orbShade.setOpacity(0);   // contrast for the photon on bright skies
   G.vig = mk('Vignette', 'UI', 0, 0, 30); G.vig.setOpacity(0);
   G.hudTopF = mk('HudFade', 'UI', 0, 0, 29); G.hudBotF = mk('HudFade', 'UI', 0, 0, 29); G.hudTopF.setOpacity(0); G.hudBotF.setOpacity(0);   // readable HUD over scrolling worlds
   G.exitArrow = mk('ExitArrow', 'UI', 0, 0, 42, true); G.exitArrow.setOpacity(0); G.exitArrow.setColor('140;255;170');
@@ -151,6 +158,7 @@ function loadLevel(c, n) {
   });
   setupSolar(CHP, def);
   setupRocks(CHP, def, gi);
+  setupRainbow(CHP, def, gi);
   if (G.dark) {
     G.orbLight = light(st.x, st.y, 170, '210;235;255', 5);
     G.memory = [];
@@ -264,6 +272,54 @@ function setupRocks(CHP, def, gi) {
     return { h, k, zw, zh, cx, cy, zone, dv, lines, streaks, ph: 'calm', ang: Math.atan2(dv[1], dv[0]) * 180 / Math.PI };
   });
 }
+// ------------------------------------------------------------------ Song of Rainbows (chapter 5): pastel sky, rainbows, prisms, gates, rain clouds
+function setupRainbow(CHP, def, gi) {
+  const add = (name, x, y, z, blend, layer) => { const o = tag(mk(name, layer || '', x, y, z, blend)); G.dyn.push(o); return o; };
+  G.rb = CHP.theme === 'rainbow';
+  // bright pastel sky: bloom would wash the candy colours out to white, so only the very brightest sparkles bloom
+  try { const bl = runtimeScene.getLayer(''); bl.setEffectDoubleParameter('Bloom', 'threshold', G.rb ? 0.9 : 0.32); bl.setEffectDoubleParameter('Bloom', 'bloomScale', G.rb ? 0.5 : 1.15); } catch (e) {}
+  G.rbSky.hide(!G.rb); G.orbShade.setOpacity(0);
+  try { G.ui.hint.setColor(G.rb ? '255;250;255' : '170;200;235'); } catch (e) {}
+  G.rbDecor = []; G.bows = []; G.prismsV = []; G.gatesV = []; G.rclouds = []; G.rbFirst = G.rbFirst || {};
+  if (!G.rb) return;
+  // shards: additive sparkle vanishes on the pastel sky - draw them as solid gold crystals instead
+  for (const sh of G.shards) { try { sh.o.setBlendMode(0); } catch (e) {} sh.o.setColor('255;176;40'); }
+  const padX = 3000, padY = 900;
+  G.rbSky.setPosition(-padX, -padY); G.rbSky.setWidth(G.W + 2 * padX); G.rbSky.setHeight(G.H + 2 * padY);
+  G.bg.setOpacity(0); G.neb.setOpacity(0);
+  // far decor: two huge faint rainbows and drifting soft clouds at parallax depths (they wrap around the view)
+  for (let q = 0; q < 2; q++) { const o = add('BgBow', 0, 0, -6, false, 'Bg'); o.setOpacity(q ? 70 : 105);
+    G.rbDecor.push({ o, p: q ? 0.05 : 0.1, u: q ? 0.72 : 0.25, v: q ? 0.42 : 0.7, s: q ? 1.5 : 2.3, bow: true, vx: 0 }); }
+  const nC = LIB.lite ? 4 : (C.isTouch ? 9 : 12);
+  for (let q = 0; q < nC; q++) { const depth = q % 3, o = add('BgCloud', 0, 0, -5 + depth, false, 'Bg');
+    o.setOpacity(depth === 0 ? 120 : depth === 1 ? 160 : 200);
+    G.rbDecor.push({ o, p: depth === 0 ? rand(0.08, 0.14) : depth === 1 ? rand(0.18, 0.26) : rand(0.3, 0.4), u: Math.random(), v: Math.random(), s: (depth === 0 ? rand(0.3, 0.42) : depth === 1 ? rand(0.42, 0.6) : rand(0.6, 0.8)), vx: rand(6, 16) * (depth + 1) / 2 }); }
+  // rainbows: one image per arc; hidden ones (waiting for rain) start invisible - the level art shows their dotted ghost
+  G.bows = L.bows.map((b, k) => {
+    const K = ART.bowIndex[gi + ':' + k], bs = ART.bows[K];
+    const o = add('Bow', b.x + bs[2], b.y + bs[3], 6, false); o.setAnimationName('B' + K); o.setScale(0.5);
+    const on = SIM.bowOn(L, G.st, b); o.setOpacity(on ? 255 : 0);
+    const pips = []; for (let q = 0; q < (LIB.lite ? 2 : 5); q++) { const pp = add('SparkW', b.x, b.y, 7, true); pp.setOpacity(0); pips.push({ o: pp, u: q / 5 + rand(0, 0.1), sp: rand(0.12, 0.22) }); }
+    return { b, k, o, pips, rv: on ? 1 : 0, flare: 0, shown: on };
+  });
+  // prisms: glass crystal tinted with its colour over a soft colour aura
+  G.prismsV = L.prisms.map((q, k) => {
+    const aura = add('Soft', q.x, q.y, 5, false); aura.setColor(RBC[q.c]); aura.setScale(0.62); aura.setOpacity(150);
+    const o = add('Prism', q.x, q.y, 8, false); o.setColor(lightC(RBC[q.c], 0.35)); o.setScale(0.62);
+    return { q, k, o, aura, flare: 0 };
+  });
+  // colour-glass gates: one pane per tile (open = faint shimmer when your colour matches, solid glass otherwise)
+  for (const k in L.gateC) { const i = k % L.w, j = Math.floor(k / L.w), c = L.gateC[k];
+    const o = add('GatePane', cc(i), cc(j), 4, false); o.setColor(RBC[c]); o.setScale(0.5); G.gatesV.push({ o, c, i, j }); }
+  // rain clouds: fluffy clouds that burst into rain (and reveal rainbows) when you fly through them
+  G.rclouds = L.rain.map((c, k) => {
+    const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
+    const o = add('RainCloud', cx, cy, 16, false); o.setScaleX(0.5 * (c.x1 - c.x0) * 1.25 / 192); o.setScaleY(0.5 * (c.y1 - c.y0) * 1.35 / 112);
+    const drops = []; for (let q = 0; q < (LIB.lite ? 8 : 18); q++) { const d = add('RainDrop', cx, cy, 15, false); d.setColor('110;160;255'); d.setOpacity(0); drops.push({ o: d, t: -rand(0, 0.6), x: 0, y: 0 }); }
+    return { c, k, o, cx, cy, burst: !!(G.st.rain & (1 << k)), bt: 9, drops, ph: rand(0, 6.28) };
+  });
+}
+function rbToast(key, text, dur, color) { if (G.rbFirst[key + G.level] && key !== 'prism') return; G.rbFirst[key + G.level] = 1; showToast(text, dur, color); }
 // segment of the line through the hail lane (perpendicular offset f in 0..1 across the lane, direction dv) clipped to the lane rect
 function laneSeg(hz, f) {
   const h = hz.h, [dx, dy] = hz.dv, px = -dy, py = dx;     // perpendicular
@@ -294,7 +350,8 @@ function goNext() {
 // ------------------------------------------------------------------ particles (capped)
 function part(name, x, y, o) {
   if (G.parts.length >= MAXPARTS) { const old = G.parts.shift(); del(old.o); }
-  const ob = mk(name, '', x, y, o.z || 20, true); if (!ob) return;
+  const ob = mk(name, '', x, y, o.z || 20, !o.normal); if (!ob) return;
+  if (o.ang !== undefined) ob.setAngle(o.ang);
   if (o.color) ob.setColor(o.color);
   const p = Object.assign({ o: ob, x, y, vx: 0, vy: 0, life: 0.5, t: 0, s0: 0.5, s1: 0, a0: 255, drag: 3, sink: null }, o);
   ob.setScale(p.s0); G.parts.push(p); return p;
@@ -311,7 +368,8 @@ function updateParts(dt) {
     const p = G.parts[k]; p.t += dt; const u = p.t / p.life;
     if (u >= 1) { del(p.o); G.parts.splice(k, 1); continue; }
     if (p.sink) { const dx = p.sink[0] - p.x, dy = p.sink[1] - p.y; p.vx += dx * 30 * dt - dy * 12 * dt; p.vy += dy * 30 * dt + dx * 12 * dt; }
-    p.vx *= Math.exp(-p.drag * dt); p.vy *= Math.exp(-p.drag * dt); p.x += p.vx * dt; p.y += p.vy * dt;
+    p.vx *= Math.exp(-p.drag * dt); p.vy *= Math.exp(-p.drag * dt); if (p.grav) p.vy += p.grav * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.spin) p.o.setAngle(p.o.getAngle() + p.spin * dt);
     p.o.setPosition(p.x, p.y); p.o.setScale(Math.max(0.001, lerp(p.s0, p.s1, p.lin ? u : ease(u)))); p.o.setOpacity(p.a0 * (1 - u * u) * (p.cloudDim || 1));
   }
 }
@@ -449,6 +507,30 @@ function handleEvent(e) {
     ring(e.x, e.y, 0.9, [255, 160, 200]); part('RingW', e.x, e.y, { life: 0.5, s0: 0.05, s1: 0.9, drag: 0, lin: true, color: '255;220;150', z: 19 });
     G.shake = Math.max(G.shake, 4); G.surge = 1; G.flash = Math.max(G.flash, 0.12); showToast('BOOST!', 0.8, '255;205;120');
     G.log.push('boost ' + e.k + ' ' + e.dir);
+  } else if (e.type === 'bow') {      // snapped onto a rainbow: candy sparkles + rising music notes
+    const bv = G.bows[e.k]; if (bv) bv.flare = 1;
+    for (let q = 0; q < 12; q++) { const a = rand(0, 6.28), v = rand(60, 220); part('Spark', e.x, e.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.35, 0.7), s0: rand(0.3, 0.6), s1: 0, drag: 3, color: RBSEQ[q % 6] }); }
+    for (let q = 0; q < 3; q++) part('Note', e.x + rand(-14, 14), e.y + rand(-10, 4), { normal: true, vx: rand(-30, 30), vy: rand(-110, -70), life: 1.1, s0: 0.42, s1: 0.3, drag: 0.6, color: RBSEQ[(q * 2 + e.k) % 6], a0: 240, spin: rand(-40, 40), z: 26 });
+    G.shake = Math.max(G.shake, 1.5); G.squash = 0.4; G.log.push('bow ' + e.k + ' ' + (e.dir > 0 ? '+' : '-')); rbToast('bow', 'RAINBOW RIDE!', 1.0, '255;150;220');
+  } else if (e.type === 'bowexit') {
+    const [dx, dy] = DIRV[e.dir]; const bv = G.bows[e.k]; if (bv) bv.flare = 1;
+    for (let q = 0; q < 14; q++) part('Spark', e.x, e.y, { vx: dx * rand(120, 420) + rand(-90, 90), vy: dy * rand(120, 420) + rand(-90, 90), life: rand(0.3, 0.6), s0: rand(0.3, 0.55), s1: 0, drag: 3, color: RBSEQ[q % 6] });
+    part('Note', e.x, e.y - 8, { normal: true, vx: rand(-20, 20), vy: -90, life: 1.0, s0: 0.45, s1: 0.3, drag: 0.5, color: RBSEQ[e.k % 6], a0: 240, spin: rand(-40, 40), z: 26 });
+    G.log.push('bowexit ' + e.k + ' ' + e.dir);
+  } else if (e.type === 'prism') {    // light splits into a spectrum fan; the photon carries on in the prism's colour
+    const pv = G.prismsV[e.k]; if (pv) pv.flare = 1;
+    const base = Math.atan2(DIRV[e.dir][1], DIRV[e.dir][0]) * 180 / Math.PI;
+    for (let q = 0; q < 6; q++) { const a = base - 25 + q * 10, mine = RBSEQ[q] === RBC[e.c];
+      part('Beam', e.x, e.y, { ang: a, life: mine ? 0.75 : 0.55, s0: mine ? 0.9 : 0.6, s1: mine ? 1.5 : 1.0, drag: 0, lin: true, color: RBSEQ[q], a0: mine ? 255 : 200, z: 18 }); }
+    for (let q = 0; q < 16; q++) { const a = rand(0, 6.28), v = rand(80, 300); part('Spark', e.x, e.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.3, 0.6), s0: rand(0.35, 0.6), s1: 0, drag: 3, color: RBC[e.c] }); }
+    ring(e.x, e.y, 0.8, RBC[e.c].split(';').map(Number)); G.shake = Math.max(G.shake, 2.5); G.flash = Math.max(G.flash, 0.12);
+    showToast(RBN[e.c] + ' LIGHT!', 1.0, lightC(RBC[e.c], 0.25)); G.log.push('prism ' + e.k + ' ' + e.c);
+  } else if (e.type === 'rain') {      // a rain cloud bursts: puff, rain shower, and any rainbow waiting on it appears
+    const rc = G.rclouds[e.k]; if (rc) { rc.burst = true; rc.bt = 0; }
+    for (let q = 0; q < 14; q++) { const a = rand(0, 6.28), v = rand(60, 200); part('Soft', (rc ? rc.cx : e.x) + rand(-30, 30), (rc ? rc.cy : e.y) + rand(-16, 16), { normal: true, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.5, life: rand(0.5, 0.9), s0: rand(0.25, 0.4), s1: rand(0.45, 0.6), drag: 2.5, color: '255;255;255', a0: 220, z: 17 }); }
+    for (let q = 0; q < 4; q++) part('Note', e.x + rand(-30, 30), e.y + rand(-20, 10), { normal: true, vx: rand(-40, 40), vy: rand(-120, -70), life: 1.3, s0: 0.45, s1: 0.32, drag: 0.5, color: RBSEQ[q + 1], a0: 240, spin: rand(-50, 50), z: 26 });
+    G.shake = Math.max(G.shake, 2); G.log.push('rain ' + e.k);
+    if (L.bows.some((b) => b.cloud === e.k)) rbToast('rain', 'A RAINBOW APPEARS!', 1.4, '255;170;225'); else rbToast('rain', 'SPLASH!', 0.9, '150;200;255');
   } else if (e.type === 'graze') {
     if (!G.lastGraze || G.time - G.lastGraze > 0.15) { sparks(st.x, st.y, 0, 0, 4, null, 120); G.lastGraze = G.time; }
   } else if (e.type === 'shard') {
@@ -499,7 +581,9 @@ function handleEvent(e) {
     }
   }
 }
-function showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(color); G.toastT = dur; }
+function showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(G.rb ? '255;255;255' : color); G.toastT = dur;
+  // pastel sky: white letters with a coloured outline stay readable over the bright clouds and rainbows
+  try { G.ui.toast.setOutlineEnabled(!!G.rb); if (G.rb) { G.ui.toast.setOutlineColor(color ? color.split(';').map((v) => Math.round(v * 0.55)).join(';') : '120;40;170'); G.ui.toast.setOutlineThickness(5); } } catch (e) {} }
 
 // ------------------------------------------------------------------ state animations
 if (G.state === 'clear') {
@@ -573,10 +657,13 @@ let sxs = 0.5 * G.orbScale * pulse, sys = sxs, ang = 0;
 if (st.mode === 'fly' && G.state === 'play') { ang = Math.atan2(st.vy, st.vx) * 180 / Math.PI; sxs *= 1 + 0.45 * sp; sys *= 1 - 0.22 * sp; }
 else { const q = G.squash; if (G.squashAxis === 'x') { sxs *= 1 - 0.42 * q; sys *= 1 + 0.3 * q; } else { sxs *= 1 + 0.3 * q; sys *= 1 - 0.42 * q; } }
 orb.setPosition(G.vis.x + ox, G.vis.y + oy); orb.setAngle(ang); orb.setScaleX(Math.max(0.001, sxs)); orb.setScaleY(Math.max(0.001, sys));
-orb.setColor(G.bump ? '255;170;190' : (G.state === 'dying' && G.dieType === 'burn' ? '255;160;80' : '255;255;255'));
+const pcol = st.color ? RBC[st.color] : null;
+orb.setColor(G.bump ? '255;170;190' : (G.state === 'dying' && G.dieType === 'burn' ? '255;160;80' : (pcol ? lightC(pcol, 0.35) : '255;255;255')));
+if (G.rb) { G.orbShade.setPosition(G.vis.x + ox, G.vis.y + oy); G.orbShade.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.15 * sp))); G.orbShade.setOpacity(205 * G.orbScale);
+  G.orbShade.setColor(pcol ? pcol.split(';').map((v) => Math.round(v * 0.45)).join(';') : '70;36;130'); }
 G.surge = Math.max(0, (G.surge || 0) - rdt * 1.4);
 halo.setPosition(G.vis.x + ox, G.vis.y + oy); halo.setScale(Math.max(0.001, 0.5 * G.orbScale * (1 + 0.1 * Math.sin(G.time * 2.1) + 0.25 * sp + 0.9 * G.surge)));
-halo.setColor(G.surge > 0.02 ? '255;' + Math.round(255 - 70 * G.surge) + ';' + Math.round(255 - 90 * G.surge) : (G.ts < 0.95 ? Math.round(255 - 100 * (1 - G.ts)) + ';255;255' : '255;255;255'));
+if (pcol && G.surge <= 0.02) halo.setColor(pcol); else halo.setColor(G.surge > 0.02 ? '255;' + Math.round(255 - 70 * G.surge) + ';' + Math.round(255 - 90 * G.surge) : (G.ts < 0.95 ? Math.round(255 - 100 * (1 - G.ts)) + ';255;255' : '255;255;255'));
 const orbCloud = inCloud(G.vis.x, G.vis.y);
 G.cloudK = lerp(G.cloudK || 0, orbCloud ? 1 : 0, 1 - Math.pow(0.001, rdt));
 halo.setOpacity((200 + 55 * sp) * (1 - 0.6 * G.cloudK));
@@ -591,7 +678,10 @@ if (st.mode === 'fly' && G.state === 'play') {
     const u = s / dist, x = lerp(lx, st.x, u), y = lerp(ly, st.y, u);
     const dim = inCloud(x, y) ? 0.3 : 1;
     const bst = (st.boost || 0) > 0.05 || st.rail, tcol = bst ? ((G.trailN & 1) ? '255;205;120' : '255;120;210') : '150;225;255';
-    const tp = part('Trail', x, y, { life: G.dark ? 0.8 : (bst ? 0.6 : 0.42), s0: bst ? 0.8 : 0.62, s1: 0.04, drag: 0, a0: 200 * dim, z: 25, color: tcol }); if (tp) tp.lin = true;
+    const rcol = G.rb ? (st.bow ? RBSEQ[Math.floor(G.trailN / 3) % 6] : (st.color ? RBC[st.color] : '255;255;255')) : null;
+    const tp = G.rb ? part('Trail', x, y, { normal: true, life: st.bow ? 0.7 : 0.45, s0: st.bow ? 0.7 : 0.55, s1: 0.04, drag: 0, a0: 230, z: 25, color: rcol })
+                    : part('Trail', x, y, { life: G.dark ? 0.8 : (bst ? 0.6 : 0.42), s0: bst ? 0.8 : 0.62, s1: 0.04, drag: 0, a0: 200 * dim, z: 25, color: tcol }); if (tp) tp.lin = true;
+    if (G.rb && st.bow && G.trailN % 14 === 0) part('Note', x, y, { normal: true, vx: rand(-25, 25), vy: rand(-90, -60), life: 1.0, s0: 0.36, s1: 0.26, drag: 0.5, color: RBSEQ[(G.trailN / 14 | 0) % 6], a0: 230, spin: rand(-40, 40), z: 26 });
     if (bst && G.trailN % 3 === 0) part('Spark', x + rand(-6, 6), y + rand(-6, 6), { vx: rand(-60, 60), vy: rand(-60, 60), life: rand(0.3, 0.6), s0: rand(0.3, 0.55), s1: 0, drag: 3, color: Math.random() < 0.5 ? '255;220;140' : '255;140;220' });
     if (G.sun && G.trailN % 5 === 0 && L.winds.length && SIM.windAt(L, x, y)) { const wa = SIM.windAt(L, x, y), a = Math.atan2(wa[1], wa[0]);
       const sp2 = part('Spark', x + rand(-14, 14), y + rand(-14, 14), { vx: Math.cos(a) * 260, vy: Math.sin(a) * 260, life: 0.4, s0: 0.35, s1: 0, drag: 1, color: '200;245;255' }); }
@@ -795,6 +885,48 @@ for (const cv of G.curves || []) {
     }
   }
 }
+// ---- Song of Rainbows objects
+if (G.rb) {
+  for (const bv of G.bows) {
+    const on = SIM.bowOn(L, st, bv.b); bv.flare = Math.max(0, bv.flare - rdt * 1.2);
+    if (on && !bv.shown) { bv.shown = true; bv.rt = -0.25; G.log.push('reveal ' + bv.k);
+      const b = bv.b; for (let q = 0; q < 26; q++) { const th = b.t0 + (b.t1 - b.t0) * q / 25; part('Spark', b.x + b.R * Math.cos(th), b.y + b.R * Math.sin(th), { vx: rand(-40, 40), vy: rand(-60, 0), life: rand(0.6, 1.1), s0: rand(0.35, 0.6), s1: 0, drag: 1, color: RBSEQ[q % 6] }); } }
+    if (bv.rt !== undefined && bv.rt < 1) bv.rt += rdt;
+    const want = on ? 1 : 0; bv.rv = on ? (bv.rt === undefined ? 1 : clamp01(bv.rt / 0.6)) : 0;
+    const pop = bv.rt !== undefined && bv.rt < 0.9 ? 1 + 0.06 * Math.sin(clamp01(bv.rt / 0.9) * Math.PI) : 1;
+    bv.o.setOpacity(255 * bv.rv); bv.o.setScale(0.5 * pop);
+    const b = bv.b;
+    for (const pp of bv.pips) {
+      pp.u = (pp.u + rdt * pp.sp * (1 + 2 * bv.flare)) % 1; const th = b.t0 + (b.t1 - b.t0) * pp.u, r = b.R + Math.sin(pp.u * 30 + G.time * 2) * 6;
+      pp.o.setPosition(b.x + r * Math.cos(th), b.y + r * Math.sin(th)); pp.o.setScale(0.32 + 0.25 * bv.flare); pp.o.setOpacity(bv.rv * Math.min(255, 150 + 100 * Math.sin(G.time * 5 + pp.u * 20) + 100 * bv.flare)); pp.o.setAngle(G.time * 90);
+    }
+  }
+  for (const pv of G.prismsV) {
+    pv.flare = Math.max(0, pv.flare - rdt * 1.6);
+    const mine = st.color === pv.q.c;
+    pv.o.setPosition(pv.q.x, pv.q.y + Math.sin(G.time * 2 + pv.k) * 2.5); pv.o.setAngle(Math.sin(G.time * 1.3 + pv.k) * 6);
+    pv.o.setScale(0.62 * (1 + 0.25 * pv.flare));
+    pv.aura.setScale(0.62 * (1 + 0.1 * Math.sin(G.time * 3 + pv.k) + 0.6 * pv.flare)); pv.aura.setOpacity(Math.min(255, (mine ? 190 : 150) + 60 * pv.flare));
+  }
+  for (const gv of G.gatesV) {
+    const open = st.color === gv.c;
+    gv.o.setOpacity(open ? 95 + 35 * Math.sin(G.time * 4 + gv.i + gv.j) : 225);
+  }
+  for (const rc of G.rclouds) {
+    rc.ph += rdt; rc.bt += rdt;
+    const bob = Math.sin(rc.ph * 0.8) * 3;
+    if (!rc.burst) { rc.o.setPosition(rc.cx + Math.sin(rc.ph * 0.37) * 4, rc.cy + bob); rc.o.setOpacity(240); }
+    else { const u = clamp01(rc.bt / 0.55); rc.o.setOpacity(240 * (1 - u) * (1 - u)); rc.o.setPosition(rc.cx, rc.cy + bob - 10 * u); }
+    const raining = rc.burst && rc.bt < 3.2, c = rc.c;
+    for (const d of rc.drops) {
+      if (!raining) { d.o.setOpacity(0); continue; }
+      d.t += rdt; if (d.t < 0) continue;
+      if (d.t === rdt || d.y === 0 || d.y > c.y1 + 3.2 * T) { d.x = rand(c.x0 + 6, c.x1 - 6); d.y = (c.y0 + c.y1) / 2 + rand(-6, 8); d.t = 0.0001; }
+      d.y += rdt * 620; d.o.setPosition(d.x, d.y); d.o.setScale(0.5); d.o.setOpacity(Math.min(200, 230 * (1 - (d.y - c.y1) / (3.4 * T))) * (1 - clamp01((rc.bt - 2.6) / 0.6)));
+      if (d.y > c.y1 + 3.1 * T && Math.random() < 0.3) part('Ring', d.x, d.y, { life: 0.3, s0: 0.05, s1: 0.25, drag: 0, color: '150;200;255', a0: 150, z: 14 });
+    }
+  }
+}
 if (G.slowT !== undefined && G.ts < 0.8 && G.state === 'play' && !LIB.lite) {    // bullet-time ripples around the orb
   G.slowT -= rdt; if (G.slowT <= 0) { G.slowT = 0.45; part('RingW', G.vis.x, G.vis.y, { life: 0.9, s0: 0.75, s1: 0.1, drag: 0, lin: true, a0: 110, color: '150;230;255', z: 24 }); }
 }
@@ -853,9 +985,17 @@ if (G.pins && G.pins.length) {
     d.o.setPosition(x, y); d.o.setScale(d.s / czoom * 0.9); d.o.setOpacity(d.a * tw);
   }
 }
-if (G.void) for (const m of G.motes) m.o.setOpacity(0);
+if (G.rb && G.rbDecor) {
+  const vw = rw / czoom * 1.3 + 600, vh = rh / czoom * 1.2 + 300, md = (a, b) => ((a % b) + b) % b;
+  for (const d of G.rbDecor) {
+    if (!d.bow) d.u += d.vx * rdt / vw;
+    const x = camX + md(d.u * vw - camX * d.p, vw) - vw / 2, y = camY + md(d.v * vh - camY * d.p, vh) - vh / 2;
+    d.o.setPosition(x, y); d.o.setScale(d.s / czoom);
+  }
+}
+if (G.void || G.rb) for (const m of G.motes) m.o.setOpacity(0);
 G.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);
-if (G.void) G.neb.setOpacity(0);      // deep space stays black: no nebula haze
+if (G.void || G.rb) G.neb.setOpacity(0);      // deep space stays black: no nebula haze (the rainbow sky stays clean too)
 const bgL = runtimeScene.getLayer('Bg');
 if (G.holes.length && !LIB.lite) {
   const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;
@@ -894,8 +1034,8 @@ G.ui.shardIcon.setScale(0.3); G.ui.shardIcon.setPosition(UW / 2 - G.ui.shards.ge
   G.vig.setPosition(-10, -10); G.vig.setWidth(UW + 20); G.vig.setHeight(UH + 20); G.vig.setColor(Math.round(70 + 40 * Math.sin(G.time * 2)) + ';150;220');
   G.vig.setOpacity(LIB.lite ? 0 : 120 * Math.sqrt(sl));
   const fadeOn = G.scroll ? 1 : 0, tb = hudTop / uiS * 1.05, bb = (hudBot / uiS + (G.wmLift || 0)) * 1.25;
-  G.hudTopF.setColor(G.void ? '3;4;9' : '36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
-  G.hudBotF.setColor(G.void ? '3;4;9' : '46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
+  G.hudTopF.setColor(G.void ? '3;4;9' : G.rb ? '74;40;128' : '36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
+  G.hudBotF.setColor(G.void ? '3;4;9' : G.rb ? '74;40;128' : '46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
 }
 G.hintA = (G.firstMove && G.moves >= 2) ? Math.max(0.35, G.hintA - rdt * 0.5) : 1;
 G.ui.hint.setWrapping(true); G.ui.hint.setWrappingWidth(Math.min(UW - 40, 620));

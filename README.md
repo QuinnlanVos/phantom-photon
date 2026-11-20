@@ -14,6 +14,7 @@ You play a photon of light that can only move along walls. Swipe along a wall to
   - Add `?lite` to the URL to turn off glow, lens and darkness effects on weak devices (also automatic when WebGL is unavailable).
 - **3 · Solar Winds:** solar winds, curved boost walls, gravity wells and stardust, with a follow camera on big levels.
 - **4 · Rocks from Space:** a pitch-dark starfield with drifting asteroids, spinning rings of space dust and timed cosmic hail. Use `?unlock&select&ch=4` to jump to it, or `?ch=4&level=N` for a level.
+- **5 · Song of Rainbows:** a cheerful pastel sky. Touch a rainbow while moving along it and you snap on, ride it to the end and launch off tangentially. Prisms tint your light, and coloured glass gates only let the matching colour through. Rain clouds burst when you fly through them, and the rain reveals hidden rainbows. Use `?unlock&select&ch=5` to jump to it, or `?ch=5&level=N` for a level.
 
 Progress is saved in your browser (localStorage).
 

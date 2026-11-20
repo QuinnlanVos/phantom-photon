@@ -133,8 +133,8 @@ function deathPlan(c, n, type) {
   await pg.goto(url + '?unlock&select&ch=4'); await sleep(5000);
   const sel = await pg.evaluate((C4) => { const S = window.__ppSel; const cd = S && S.cards[C4]; return S ? { cur: S.cur, n: S.cards.length, dots: S.dots.length, name: cd.name.getString(), open: cd.nodes.filter(b => b.open).length,
     vis: cd.nodes.filter(b => b.visible).length, fx: cd.frame.getX(), fw: cd.frame.getWidth(), UW: window.__ppC.UW, voidA: S.voidSky.getOpacity() } : null; }, C4);
-  ok(sel && sel.n === 4 && sel.dots === 4 && sel.cur === C4 && /ROCKS FROM SPACE/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.voidA > 200,
-    `select ?unlock&select&ch=4: 4 cards + 4 dots, "Rocks from Space" centred on-screen, 5 levels open, deep-space backdrop ${JSON.stringify(sel)}`);
+  ok(sel && sel.n === CH.length && sel.dots === CH.length && sel.cur === C4 && /ROCKS FROM SPACE/.test(sel.name) && sel.open === 5 && sel.vis === 5 && sel.fx >= 0 && sel.fx + sel.fw <= sel.UW + 1 && sel.voidA > 200,
+    `select ?unlock&select&ch=4: ${CH.length} cards + dots, "Rocks from Space" centred on-screen, 5 levels open, deep-space backdrop ${JSON.stringify(sel)}`);
   await pg.screenshot({ path: `${outdir}/${tag}_select.png` });
   // swipe / arrow back to chapter 3 and forward again
   if (VIEW[3]) {
