@@ -89,6 +89,26 @@ def level_art(n, lv, dark=False, theme=''):
         dash = 6 * SS
         for x in range(int(x0), int(x1), dash * 2): dtk.line([(x, y0 + 2), (min(x + dash, x1), y0 + 2)], fill=150, width=SS); dtk.line([(x, y1 - 3), (min(x + dash, x1), y1 - 3)], fill=150, width=SS)
         for y in range(int(y0), int(y1), dash * 2): dtk.line([(x0 + 2, y), (x0 + 2, min(y + dash, y1))], fill=150, width=SS); dtk.line([(x1 - 3, y), (x1 - 3, min(y + dash, y1))], fill=150, width=SS)
+    hz_trk = Image.new('L', (W, H), 0); dht = ImageDraw.Draw(hz_trk)       # Rocks from Space: asteroid drift tracks (dotted)
+    hz_lane = Image.new('L', (W, H), 0); dhl = ImageDraw.Draw(hz_lane)     # hail lane borders (dashed) + corner brackets
+    hz_brk = Image.new('L', (W, H), 0); dhb = ImageDraw.Draw(hz_brk)
+    for rk in lv.get('rocks', []):
+        if not rk.get('range'): continue
+        x0, y0 = m + rk['i'] * S + S / 2, m + rk['j'] * S + S / 2
+        x1, y1 = (x0 + rk['range'] * S, y0) if rk.get('axis', 'x') == 'x' else (x0, y0 + rk['range'] * S)
+        n_ = max(2, int(math.hypot(x1 - x0, y1 - y0) / (9 * SS)))
+        for q in range(n_ + 1):
+            u = q / n_; px, py = x0 + (x1 - x0) * u, y0 + (y1 - y0) * u
+            dht.ellipse([px - 1.6 * SS, py - 1.6 * SS, px + 1.6 * SS, py + 1.6 * SS], fill=255)
+        for (px, py) in ((x0, y0), (x1, y1)): dht.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], outline=255, width=SS)
+    for hl in lv.get('hail', []):
+        x0, y0 = m + hl['i'] * S, m + hl['j'] * S; x1, y1 = x0 + hl['w'] * S, y0 + hl['h'] * S
+        dash = 7 * SS
+        for x in range(int(x0), int(x1), dash * 2): dhl.line([(x, y0), (min(x + dash, x1), y0)], fill=255, width=SS); dhl.line([(x, y1), (min(x + dash, x1), y1)], fill=255, width=SS)
+        for y in range(int(y0), int(y1), dash * 2): dhl.line([(x0, y), (x0, min(y + dash, y1))], fill=255, width=SS); dhl.line([(x1, y), (x1, min(y + dash, y1))], fill=255, width=SS)
+        L_ = 12 * SS
+        for (cx_, cy_, sx_, sy_) in ((x0, y0, 1, 1), (x1, y0, -1, 1), (x0, y1, 1, -1), (x1, y1, -1, -1)):
+            dhb.line([(cx_, cy_), (cx_ + sx_ * L_, cy_)], fill=255, width=2 * SS); dhb.line([(cx_, cy_), (cx_, cy_ + sy_ * L_)], fill=255, width=2 * SS)
     sm = arr(solid.filter(ImageFilter.GaussianBlur(5)))      # rounded corners
     sm = (sm > 0.5).astype(np.float32)
     inner = minf(sm, 13)
@@ -110,6 +130,14 @@ def level_art(n, lv, dark=False, theme=''):
         cz = blur(maxf(arr(crv), 9), 3) * blur(crv_w, 2)
         ccol = GOLD[None, None, :] * (1 - crv_t[..., None]) + ROSEM[None, None, :] * crv_t[..., None]
         col = col * (1 - cz[..., None]) + ccol * cz[..., None]
+    if theme == 'void':     # Rocks from Space: stark icy white-cyan / brilliant silver walls; curves sear amber -> crimson
+        yy_, xx_ = np.mgrid[0:H, 0:W]; t = np.clip(0.5 + 0.5 * np.sin(yy_ / H * 3.1 + xx_ / W * 2.3), 0, 1)[..., None]
+        base = np.array([215, 240, 255])[None, None, :] * (1 - t) + np.array([170, 225, 255])[None, None, :] * t
+        nz = (1 - padz - rampz).clip(0, 1)[..., None]
+        col = col * (1 - nz) + base * nz
+        cz = blur(maxf(arr(crv), 9), 3) * blur(crv_w, 2)
+        ccol = np.array([255, 190, 70])[None, None, :] * (1 - crv_t[..., None]) + np.array([255, 60, 70])[None, None, :] * crv_t[..., None]
+        col = col * (1 - cz[..., None]) + ccol * cz[..., None]
     col = col * (1 - mirz[..., None]) + SILVER[None, None, :] * mirz[..., None]
     col = col / 255.0
     g1 = blur(line, 8); g2 = blur(line, 22); g3 = blur(line, 52)
@@ -117,7 +145,7 @@ def level_art(n, lv, dark=False, theme=''):
     # wall interior: deep dark with faint diagonal hatching + inner glow from its edges
     yy, xx = np.mgrid[0:H, 0:W]
     hatch = ((xx + yy) % 22 < 2).astype(np.float32) * 0.05
-    interior_rgb = np.array([0.19, 0.08, 0.23] if theme == 'sun' else [0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
+    interior_rgb = np.array([0.19, 0.08, 0.23] if theme == 'sun' else [0.012, 0.016, 0.03] if theme == 'void' else [0.025, 0.035, 0.09])[None, None, :] + col * (hatch[..., None] + 0.55 * blur(line, 10)[..., None])
     padin = arr(pad) * ((((xx // 2) + (yy // 2)) % 16) < 7)        # energised stripes inside pad tiles
     interior_rgb = interior_rgb + (MAGENTA / 255.0)[None, None, :] * (padin * 0.28 + arr(pad) * 0.10)[..., None]
     sheen = arr(mir) * ((((xx - yy) % 40) < 9).astype(np.float32) * 0.35 + 0.18)        # mirror blocks: polished diagonal sheen
@@ -127,11 +155,12 @@ def level_art(n, lv, dark=False, theme=''):
     # glow spilling into the open area (straight alpha)
     gl = np.clip(0.85 * g1 + 0.55 * g2 + 0.4 * g3, 0, 1) * outside
     if theme == 'sun': gl = np.clip(0.75 * g1 + 0.25 * g2, 0, 1) * outside * 0.8     # bright sky behind: keep the spill tight (no flat panels)
+    if theme == 'void': gl = np.clip(0.8 * g1 + 0.06 * g2, 0, 1) * outside * 0.7   # deep space: crisp tube, short halo, the void stays black
     rgb = rgb + col * gl[..., None]
     alpha = alpha + gl
     # bright tube with white-hot core
     core = np.clip(minf(line, 5) * 1.2, 0, 1)        # thin white-hot centre of the tube
-    wc = (0.55 - 0.35 * padz)[..., None] * core[..., None]
+    wc = ((0.8 if theme == 'void' else 0.55) - 0.35 * padz)[..., None] * core[..., None]
     tube = col * (1 - wc) + wc
     rgb = rgb * (1 - line[..., None]) + tube * line[..., None]
     alpha = np.maximum(alpha, line)
@@ -146,13 +175,21 @@ def level_art(n, lv, dark=False, theme=''):
     # moving-platform tracks (faint mint dashes)
     tk = blur(arr(trk), 1.0) * 0.45; tkg = blur(arr(trk), 8) * 0.25; tt = np.clip(tk + tkg, 0, 1) * (1 - sm)
     rgb = rgb * (1 - tt[..., None]) + (MINT / 255.0)[None, None, :] * tt[..., None]; alpha = np.maximum(alpha, tt)
-    if theme == 'sun':   # curve rims: extra-bright gold->magenta tube, plus faint golden riding lanes
+    if theme in ('sun', 'void'):   # curve rims: extra-bright gold->magenta (void: amber->crimson) tube, plus faint golden riding lanes
         cl_ = blur(arr(crv), 1.0); clg = np.clip(blur(arr(crv), 6) * 0.9 + blur(arr(crv), 16) * 0.5, 0, 1) * (1 - sm * 0.5)
-        ccol = (GOLD[None, None, :] * (1 - crv_t[..., None]) + ROSEM[None, None, :] * crv_t[..., None]) / 255.0
+        c0_, c1_ = (GOLD, ROSEM) if theme == 'sun' else (np.array([255, 190, 70]), np.array([255, 60, 70]))
+        ccol = (c0_[None, None, :] * (1 - crv_t[..., None]) + c1_[None, None, :] * crv_t[..., None]) / 255.0
         rgb = rgb * (1 - clg[..., None]) + ccol * clg[..., None]; alpha = np.maximum(alpha, clg)
         rgb = rgb * (1 - cl_[..., None]) + (ccol * 0.4 + 0.6) * cl_[..., None]; alpha = np.maximum(alpha, cl_)
         ln_ = np.clip(blur(arr(lanes), 0.8) * 0.7 + blur(arr(lanes), 5) * 0.4, 0, 1) * (1 - sm)
         rgb = rgb * (1 - ln_[..., None]) + (GOLD / 255.0)[None, None, :] * ln_[..., None]; alpha = np.maximum(alpha, ln_)
+    if theme == 'void':   # hazard markings: silver dotted asteroid tracks, crimson dashed hail lanes with amber corner brackets
+        ht = np.clip(blur(arr(hz_trk), 0.7) * 0.55 + blur(arr(hz_trk), 5) * 0.25, 0, 1) * (1 - sm)
+        rgb = rgb * (1 - ht[..., None]) + (np.array([200, 215, 240]) / 255.0)[None, None, :] * ht[..., None]; alpha = np.maximum(alpha, ht)
+        hl_ = np.clip(blur(arr(hz_lane), 0.7) * 0.5 + blur(arr(hz_lane), 5) * 0.25, 0, 1) * (1 - sm)
+        rgb = rgb * (1 - hl_[..., None]) + (np.array([255, 70, 80]) / 255.0)[None, None, :] * hl_[..., None]; alpha = np.maximum(alpha, hl_)
+        hb = np.clip(blur(arr(hz_brk), 0.8) * 0.95 + blur(arr(hz_brk), 6) * 0.5, 0, 1) * (1 - sm)
+        rgb = rgb * (1 - hb[..., None]) + (np.array([255, 185, 90]) / 255.0)[None, None, :] * hb[..., None]; alpha = np.maximum(alpha, hb)
     a = np.clip(alpha, 1e-4, 1)
     save_rgba(rgb / a[..., None] * np.minimum(alpha, 1)[..., None] / a[..., None] if False else np.clip(rgb / a[..., None], 0, 1), alpha, f'level_{n + 1}.png')
     return (W // SS, H // SS)
@@ -195,7 +232,7 @@ rim = np.exp(-((r - 12 * SS) / (3.5 * SS)) ** 2)
 halo = np.exp(-(r / (14 * SS)) ** 2) * 0.9
 glow_sprite(np.clip(rim * 0.9 + halo, 0, 1), np.array([120, 240, 255]), 'orb.png', white_core=core)
 s = 256 * SS; r = radial(s)
-glow_sprite(np.exp(-(r / (40 * SS)) ** 2) * 0.55 + np.exp(-(r / (100 * SS)) ** 2) * 0.25, CYAN, 'orb_halo.png')
+glow_sprite((np.exp(-(r / (40 * SS)) ** 2) * 0.55 + np.exp(-(r / (100 * SS)) ** 2) * 0.25) * np.clip((s / 2 - r) / (s * 0.12), 0, 1), CYAN, 'orb_halo.png')   # windowed: no faint square edge on black space
 s = 48 * SS; r = radial(s)
 glow_sprite(np.exp(-(r / (9 * SS)) ** 2), np.array([110, 230, 255]), 'trail.png', white_core=np.exp(-(r / (3.5 * SS)) ** 2) * 0.8)
 s = 24 * SS; r = radial(s)
@@ -282,5 +319,6 @@ d.polygon([(ax + 12 * SS, ay - 2 * SS), (ax - 8 * SS, ay - 10 * SS), (ax - 2 * S
 ic = arr(im); ringb = np.exp(-((radial(s) - 40 * SS) / (1.5 * SS)) ** 2) * 0.7
 glow_sprite(np.clip(ic + blur(ic, 6) * 0.7 + ringb + blur(ringb, 5) * 0.5, 0, 1), CYAN, 'btn_restart.png', white_core=ic * 0.5)
 exec(open(os.path.join(HERE, 'gen_art2.py')).read())
-json.dump({'levelArtSize': sizes, 'movers': mover_sizes, 'clouds': cloud_sizes, 'cloudIndex': cloud_index, 'margin': M, 'tile': T, 'ss': SS}, open(os.path.join(HERE, 'art_meta.json'), 'w'))
+exec(open(os.path.join(HERE, 'gen_art3.py')).read())
+json.dump({'levelArtSize': sizes, 'movers': mover_sizes, 'clouds': cloud_sizes, 'cloudIndex': cloud_index, 'rings': ring_sizes, 'ringIndex': ring_index, 'rockVariants': ROCK_VARIANTS, 'margin': M, 'tile': T, 'ss': SS}, open(os.path.join(HERE, 'art_meta.json'), 'w'))
 print('art ok', sizes)

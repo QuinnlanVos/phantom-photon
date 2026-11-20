@@ -55,6 +55,7 @@ if (!G) {
   G.halo = mk('OrbHalo', '', 0, 0, 30, true); G.orb = mk('Orb', '', 0, 0, 32, true);
   // Solar Winds: sunrise sky + sun bloom (Bg layer), slow-motion vignette and off-screen exit pointer (UI layer)
   G.sky = mk('Sky', 'Bg', 0, 0, -6); G.sunGlow = mk('SunGlow', 'Bg', 0, 0, -5, true);
+  G.voidSky = mk('VoidSky', 'Bg', 0, 0, -7); G.voidSky.hide(true);     // Rocks from Space: pitch-dark deep-space backdrop
   G.vig = mk('Vignette', 'UI', 0, 0, 30); G.vig.setOpacity(0);
   G.hudTopF = mk('HudFade', 'UI', 0, 0, 29); G.hudBotF = mk('HudFade', 'UI', 0, 0, 29); G.hudTopF.setOpacity(0); G.hudBotF.setOpacity(0);   // readable HUD over scrolling worlds
   G.exitArrow = mk('ExitArrow', 'UI', 0, 0, 42, true); G.exitArrow.setOpacity(0); G.exitArrow.setColor('140;255;170');
@@ -149,6 +150,7 @@ function loadLevel(c, n) {
     return { x0, y0, x1, y1, cx, cy, vis, block, puffs, w: x1 - x0, h: y1 - y0, mask, scat, lit: 0 };
   });
   setupSolar(CHP, def);
+  setupRocks(CHP, def, gi);
   if (G.dark) {
     G.orbLight = light(st.x, st.y, 170, '210;235;255', 5);
     G.memory = [];
@@ -210,6 +212,70 @@ function setupSolar(CHP, def) {
         s: (depth === 0 ? rand(0.18, 0.32) : depth === 1 ? rand(0.28, 0.48) : rand(0.4, 0.75)) * (star ? 1.1 : 1), a: depth === 0 ? 130 : depth === 1 ? 180 : 235, star });
     }
   }
+}
+// ------------------------------------------------------------------ Rocks from Space (chapter 4): void, pinpoint stars, asteroids, dust rings, hail
+function setupRocks(CHP, def, gi) {
+  const PIN_COLS = ['235;242;255', '235;242;255', '205;225;255', '170;210;255', '255;228;180'];
+  const add = (name, x, y, z, blend, layer) => { const o = tag(mk(name, layer || '', x, y, z, blend)); G.dyn.push(o); return o; };
+  G.void = CHP.theme === 'void';
+  G.voidSky.hide(!G.void);
+  G.pins = [];
+  if (!G.void) G.neb.setOpacity(255);
+  if (G.void) {
+    const padX = 3000, padY = 2000;
+    G.voidSky.setPosition(-padX, -padY); G.voidSky.setWidth(G.W + 2 * padX); G.voidSky.setHeight(G.H + 2 * padY);
+    G.bg.setOpacity(0); G.neb.setColor('120;140;220');
+    // faint, crisp pinpoint stars at three parallax depths (they barely move: they are far behind the play field)
+    const n = LIB.lite ? 50 : (C.isTouch ? 120 : 170);
+    for (let q = 0; q < n; q++) {
+      const depth = q % 3, big = Math.random() < 0.06;
+      const o = add(big ? 'DustStar' : 'PinStar', 0, 0, -4 + depth, true, 'Bg');
+      o.setColor(PIN_COLS[Math.floor(Math.random() * PIN_COLS.length)]);
+      G.pins.push({ o, p: depth === 0 ? rand(0.03, 0.08) : depth === 1 ? rand(0.1, 0.18) : rand(0.22, 0.32), u: Math.random(), v: Math.random(), ph: rand(0, 6.28), tw: rand(0.6, 2.2),
+        s: big ? rand(0.16, 0.24) : (depth === 0 ? rand(0.22, 0.32) : depth === 1 ? rand(0.28, 0.42) : rand(0.38, 0.55)), a: big ? rand(70, 110) : (depth === 0 ? rand(55, 95) : depth === 1 ? rand(80, 130) : rand(110, 170)), big });
+    }
+  }
+  // asteroids: blazing-rimmed faceted rocks, slowly tumbling; drifting ones follow the dotted track in the level art
+  G.rocks = L.rocks.map((r, k) => {
+    const glow = add('RockGlow', r.x, r.y, 4, true); glow.setScale(0.5 * r.r * 1.15);
+    const o = add('Asteroid', r.x, r.y, 9); o.setAnimationName('A' + (k % (ART.rockVariants || 3) + 1)); o.setScale(0.5 * r.r);
+    return { r, k, o, glow, a0: rand(0, 360), spin: (k % 2 ? -1 : 1) * rand(10, 22), flare: 0 };
+  });
+  // rings of space dust: the band (one image per ring, rotated by the sim's ring angle) + glittering grains riding the arcs + the calm eye
+  G.rings = L.rings.map((g, k) => {
+    const o = add('DustRing', g.x, g.y, 6, true); o.setAnimationName('R' + ART.ringIndex[gi + ':' + k]); o.setScale(0.5);
+    const eye = add('Soft', g.x, g.y, 2, true); eye.setColor('255;225;160'); eye.setScale((g.R - g.hw) / 128 * 1.2); eye.setOpacity(26);
+    const step = 2 * Math.PI / g.gaps, grains = [];
+    for (let q = 0; q < (LIB.lite ? 8 : 22); q++) {
+      const gs = add(q % 3 ? 'SparkW' : 'DustStar', g.x, g.y, 7, true); gs.setColor(q % 2 ? '255;232;170' : '235;240;255');
+      grains.push({ o: gs, m: q % g.gaps, f: Math.random(), dr: rand(-0.75, 0.75) * g.hw, sp: rand(0.04, 0.12) * (Math.random() < 0.5 ? -1 : 1), ph: rand(0, 6.28), s: q % 3 ? rand(0.4, 0.8) : rand(0.18, 0.28) });
+    }
+    return { g, k, o, eye, grains, step, flare: 0 };
+  });
+  // cosmic hail lanes: soft zone panel, telegraph shimmer lines, a pool of hail streaks for the barrage
+  G.hails = L.hail.map((h, k) => {
+    const zw = h.x1 - h.x0, zh = h.y1 - h.y0, cx = (h.x0 + h.x1) / 2, cy = (h.y0 + h.y1) / 2;
+    const zone = add('WindZone', cx, cy, 2, true); zone.setScaleX((zw + T * 0.25) / 108); zone.setScaleY((zh + T * 0.25) / 108); zone.setOpacity(0);
+    const dv = { D: [0, 1], U: [0, -1], L: [-1, 0], R: [1, 0], DL: [-0.7071, 0.7071], DR: [0.7071, 0.7071] }[h.d] || [0, 1];
+    const nL = Math.max(3, Math.min(9, Math.round((Math.abs(dv[0]) > 0.9 ? zh : zw) / (T * 0.55))));
+    const lines = []; for (let q = 0; q < nL; q++) { const o = add('HailTele', cx, cy, 3, true); o.setOpacity(0); lines.push({ o, f: (q + 0.5) / nL }); }
+    const nS = LIB.lite ? 6 : Math.min(30, Math.max(10, Math.round(zw * zh / (T * T) * 2.2)));
+    const streaks = []; for (let q = 0; q < nS; q++) { const o = add('HailStreak', cx, cy, 12, true); o.setOpacity(0); streaks.push({ o, t: -rand(0, 0.5), f: Math.random(), len: 1 }); }
+    return { h, k, zw, zh, cx, cy, zone, dv, lines, streaks, ph: 'calm', ang: Math.atan2(dv[1], dv[0]) * 180 / Math.PI };
+  });
+}
+// segment of the line through the hail lane (perpendicular offset f in 0..1 across the lane, direction dv) clipped to the lane rect
+function laneSeg(hz, f) {
+  const h = hz.h, [dx, dy] = hz.dv, px = -dy, py = dx;     // perpendicular
+  const half = (Math.abs(px) * hz.zw + Math.abs(py) * hz.zh) / 2, off = (f - 0.5) * 2 * half;
+  const ox = hz.cx + px * off, oy = hz.cy + py * off;
+  let t0 = -1e9, t1 = 1e9;
+  for (const [o, d, lo, hi] of [[ox, dx, h.x0, h.x1], [oy, dy, h.y0, h.y1]]) {
+    if (Math.abs(d) < 1e-6) { if (o < lo || o > hi) return null; continue; }
+    let a = (lo - o) / d, b = (hi - o) / d; if (a > b) [a, b] = [b, a]; t0 = Math.max(t0, a); t1 = Math.min(t1, b);
+  }
+  if (t1 - t0 < 8) return null;
+  return { x0: ox + dx * t0, y0: oy + dy * t0, x1: ox + dx * t1, y1: oy + dy * t1, len: t1 - t0 };
 }
 function restart() { G.log.push('restart'); loadLevel(G.chapter, G.level); G.flash = 0.25; }
 function toSelect() { if (C.trans) return; LIB.nav.from = 'game'; G.log.push('to-select'); C.go('LevelSelect', 'fade', { dur: 0.45 }); }
@@ -394,7 +460,7 @@ function handleEvent(e) {
     const got = G.shards.filter((s) => s.got).length;
     LIB.complete(G.chapter, G.level, got, G.shards.length, G.moves); G.saved = true;
     G.log.push('saved ' + LIB.id(G.chapter, G.level) + ' ' + got + '/' + G.shards.length);
-  } else if (e.type === 'swallow' || e.type === 'lost' || e.type === 'burn' || e.type === 'crush') {
+  } else if (e.type === 'swallow' || e.type === 'lost' || e.type === 'burn' || e.type === 'crush' || e.type === 'rock' || e.type === 'dust' || e.type === 'hail') {
     G.state = 'dying'; G.dieT = 0; G.deaths++; G.dieFrom = [st.x, st.y]; G.dieHole = e.type === 'swallow' ? [e.x, e.y] : null; G.dieType = e.type;
     G.log.push(e.type); G.shake = Math.max(G.shake, 6);
     if (G.dieHole) for (let k = 0; k < 26; k++) { const a = rand(0, 6.28), r = rand(30, 90);
@@ -408,6 +474,29 @@ function handleEvent(e) {
     }
     if (e.type === 'crush') { sparks(st.x, st.y, 0, 0, 24, '120;255;210', 380); ring(st.x, st.y, 0.9, [120, 255, 210]); showToast('CRUSHED', 1.2, '120;255;210'); }
     if (e.type === 'lost') showToast('LOST IN THE VOID', 1.2, '150;180;255');
+    if (e.type === 'rock') {     // shattered on an asteroid: white-hot burst + tumbling rock chips
+      for (let k = 0; k < 30; k++) { const a = rand(0, 6.28), v = rand(120, 520);
+        part('Spark', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.3, 0.7), s0: rand(0.35, 0.8), s1: 0, drag: 3, color: Math.random() < 0.5 ? '255;255;255' : '255;170;80' }); }
+      for (let k = 0; k < 10; k++) { const a = rand(0, 6.28), v = rand(90, 300);
+        const b = part('RockBit', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.5, 0.9), s0: rand(0.35, 0.6), s1: 0.1, drag: 2, color: '255;205;150' }); if (b) b.o.setAngle(rand(0, 360)); }
+      ring(st.x, st.y, 1.0, [255, 230, 200]); part('RingW', st.x, st.y, { life: 0.45, s0: 0.05, s1: 0.8, drag: 0, lin: true, color: '255;190;110', z: 19 });
+      G.flash = Math.max(G.flash, 0.3); G.shake = Math.max(G.shake, 9);
+      for (const r of G.rocks || []) { const [rx, ry] = SIM.rockPos(L, r.r, st.time); if (Math.hypot(rx - st.x, ry - st.y) < r.r.hit + T) r.flare = 1; }
+      showToast('SHATTERED', 1.2, '255;200;140');
+    }
+    if (e.type === 'dust') {     // scattered by a dust ring: the photon bursts into glittering grains
+      for (let k = 0; k < 34; k++) { const a = rand(0, 6.28), v = rand(60, 380);
+        part(k % 3 ? 'SparkW' : 'Spark', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.4, 0.9), s0: rand(0.3, 0.7), s1: 0, drag: 2.2, color: Math.random() < 0.5 ? '255;230;160' : '235;242;255' }); }
+      ring(st.x, st.y, 0.9, [255, 230, 170]);
+      for (const rg of G.rings || []) if (Math.hypot(rg.g.x - st.x, rg.g.y - st.y) < rg.g.R + T) rg.flare = 1;
+      G.flash = Math.max(G.flash, 0.22); showToast('SCATTERED', 1.2, '255;225;160');
+    }
+    if (e.type === 'hail') {     // struck by cosmic hail: icy shatter
+      part('IceBurst', st.x, st.y, { life: 0.4, s0: 0.4, s1: 1.4, drag: 0, lin: true, color: '200;245;255', z: 21 });
+      for (let k = 0; k < 30; k++) { const a = rand(0, 6.28), v = rand(100, 480);
+        part('Spark', st.x, st.y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.25, 0.6), s0: rand(0.3, 0.7), s1: 0, drag: 3.5, color: Math.random() < 0.5 ? '255;255;255' : '120;230;255' }); }
+      ring(st.x, st.y, 0.9, [170, 240, 255]); G.flash = Math.max(G.flash, 0.3); G.shake = Math.max(G.shake, 7); showToast('HAIL STRIKE', 1.2, '170;235;255');
+    }
   }
 }
 function showToast(text, dur, color) { G.ui.toast.setString(text); if (color) G.ui.toast.setColor(color); G.toastT = dur; }
@@ -650,6 +739,62 @@ for (const cv of G.curves || []) {
     pp.o.setScale(0.32 * (1 + 0.8 * cv.flare)); pp.o.setOpacity(Math.min(255, 120 + 80 * Math.sin(G.wtime * 4 + pp.u * 9) + 120 * cv.flare));
   }
 }
+// ---- Rocks from Space objects (driven by the sim's world time, so what you see is exactly what the solver checks)
+{
+  const wt = st.time || 0;
+  for (const rk of G.rocks || []) {
+    const [x, y] = SIM.rockPos(L, rk.r, wt); rk.flare = Math.max(0, rk.flare - rdt * 1.5);
+    rk.o.setPosition(x, y); rk.o.setAngle(rk.a0 + G.wtime * rk.spin);
+    rk.glow.setPosition(x, y); rk.glow.setScale(0.5 * rk.r.r * (1.15 + 0.08 * Math.sin(G.time * 2.3 + rk.k) + 0.7 * rk.flare));
+    rk.glow.setOpacity(Math.min(255, 175 + 45 * Math.sin(G.time * 1.7 + rk.k * 2) + 80 * rk.flare));
+  }
+  for (const rg of G.rings || []) {
+    const g = rg.g, a = SIM.ringAngle(L, g, wt); rg.flare = Math.max(0, rg.flare - rdt * 1.4);
+    rg.o.setAngle(a * 180 / Math.PI); rg.o.setOpacity(Math.min(255, 225 + 30 * Math.sin(G.time * 2 + rg.k) + 60 * rg.flare)); rg.o.setScale(0.5 * (1 + 0.03 * rg.flare));
+    rg.eye.setOpacity(22 + 8 * Math.sin(G.time * 1.3 + rg.k));
+    const arc = rg.step - g.gapR;
+    for (const gr of rg.grains) {
+      gr.f = ((gr.f + gr.sp * wdt) % 1 + 1) % 1; gr.ph += wdt * 3;
+      const th = a + gr.m * rg.step + g.gapR / 2 + (0.08 + 0.84 * gr.f) * arc, rr = g.R + gr.dr + Math.sin(gr.ph) * 2;
+      gr.o.setPosition(g.x + Math.cos(th) * rr, g.y + Math.sin(th) * rr); gr.o.setScale(gr.s * (0.8 + 0.3 * Math.sin(gr.ph * 1.7)) * 0.5 * 2);
+      gr.o.setOpacity(Math.min(255, 140 + 110 * Math.sin(gr.ph * 1.3) + 80 * rg.flare)); gr.o.setAngle(gr.ph * 40);
+    }
+  }
+  for (const hz of G.hails || []) {
+    const P = SIM.hailPhase(L, hz.h, wt), was = hz.ph; hz.ph = P.ph;
+    const onScreen = Math.abs(hz.cx - (G.camX || hz.cx)) < C.rw / (G.zoom || 1) && Math.abs(hz.cy - (G.camY || hz.cy)) < C.rh / (G.zoom || 1);
+    if (P.ph === 'hail' && was !== 'hail') { G.log.push('hail-on ' + hz.k); if (onScreen && G.state === 'play') G.shake = Math.max(G.shake, 1.5); }
+    if (P.ph === 'tele' && was !== 'tele') G.log.push('hail-warn ' + hz.k);
+    const fl = 0.5 + 0.5 * Math.sin(G.time * 38);
+    if (P.ph === 'calm') { hz.zone.setColor('120;165;235'); hz.zone.setOpacity(16 + 6 * Math.sin(G.time * 1.5 + hz.k)); }
+    else if (P.ph === 'tele') { hz.zone.setColor(fl > 0.5 ? '255;80;70' : '255;180;90'); hz.zone.setOpacity(40 + 50 * P.u + 25 * fl); }
+    else { hz.zone.setColor('150;225;255'); hz.zone.setOpacity(38 + 18 * fl); }
+    // telegraph: crisp shimmering lines showing the exact incoming corridor
+    for (const ln of hz.lines) {
+      const sg = (P.ph === 'tele') ? laneSeg(hz, ln.f) : null;
+      if (!sg) { ln.o.setOpacity(0); continue; }
+      ln.o.setPosition((sg.x0 + sg.x1) / 2, (sg.y0 + sg.y1) / 2); ln.o.setAngle(hz.ang); ln.o.setScaleX(sg.len / 256); ln.o.setScaleY(0.5);
+      ln.o.setColor((Math.floor(G.time * 12) + Math.round(ln.f * 7)) % 2 ? '255;90;80' : '255;200;110');
+      ln.o.setOpacity(Math.min(255, (110 + 145 * P.u) * (0.55 + 0.45 * Math.sin(G.time * 30 + ln.f * 9))));
+    }
+    // barrage: fast blazing streaks tearing along the lane, with an icy flare where each one leaves it
+    const vS = 1500;
+    for (const sk of hz.streaks) {
+      if (P.ph !== 'hail') { sk.o.setOpacity(0); sk.t = -rand(0, 0.25); continue; }
+      sk.t += rdt;
+      if (sk.t < 0) { sk.o.setOpacity(0); continue; }
+      if (!sk.sg) { sk.f = Math.random(); sk.sg = laneSeg(hz, sk.f); if (!sk.sg) { sk.t = -0.05; continue; } }
+      const d = sk.t * vS - 60, sg = sk.sg;
+      if (d > sg.len) {
+        if (onScreen && Math.random() < 0.5) part('IceBurst', sg.x1, sg.y1, { life: 0.22, s0: 0.15, s1: 0.5, drag: 0, lin: true, color: '170;235;255', z: 13 });
+        sk.sg = null; sk.t = -rand(0, 0.12); sk.o.setOpacity(0); continue;
+      }
+      const u = Math.max(0, d) / sg.len, x = sg.x0 + (sg.x1 - sg.x0) * u, y = sg.y0 + (sg.y1 - sg.y0) * u;
+      sk.o.setPosition(x - hz.dv[0] * 24, y - hz.dv[1] * 24); sk.o.setAngle(hz.ang); sk.o.setScaleX(0.62 * Math.min(1, (d + 60) / 60)); sk.o.setScaleY(0.62);
+      sk.o.setOpacity(255 * Math.min(1, (1 - u) * 6));
+    }
+  }
+}
 if (G.slowT !== undefined && G.ts < 0.8 && G.state === 'play' && !LIB.lite) {    // bullet-time ripples around the orb
   G.slowT -= rdt; if (G.slowT <= 0) { G.slowT = 0.45; part('RingW', G.vis.x, G.vis.y, { life: 0.9, s0: 0.75, s1: 0.1, drag: 0, lin: true, a0: 110, color: '150;230;255', z: 24 }); }
 }
@@ -698,7 +843,19 @@ if (G.dust && G.dust.length) {
     if (d.star) d.o.setAngle(d.ph * 20);
   }
 }
+// pinpoint stars (Rocks from Space): wrap around the view at very slow parallax, faint crisp twinkle
+if (G.pins && G.pins.length) {
+  const vw = rw / czoom * 1.1 + 120, vh = rh / czoom * 1.1 + 120, md = (a, b) => ((a % b) + b) % b;
+  for (const d of G.pins) {
+    d.ph += rdt;
+    const x = camX + md(d.u * vw - camX * d.p, vw) - vw / 2, y = camY + md(d.v * vh - camY * d.p, vh) - vh / 2;
+    const tw = 0.75 + 0.25 * Math.sin(d.ph * d.tw);
+    d.o.setPosition(x, y); d.o.setScale(d.s / czoom * 0.9); d.o.setOpacity(d.a * tw);
+  }
+}
+if (G.void) for (const m of G.motes) m.o.setOpacity(0);
 G.neb.setPosition(G.W / 2, G.H / 2); G.neb.setScale(Math.max(G.W, G.H) / 512 * 1.5);
+if (G.void) G.neb.setOpacity(0);      // deep space stays black: no nebula haze
 const bgL = runtimeScene.getLayer('Bg');
 if (G.holes.length && !LIB.lite) {
   const h = G.holes[0], sx = (h.x - camX) * zoom + rw / 2, sy = (h.y - camY) * zoom + rh / 2;
@@ -737,8 +894,8 @@ G.ui.shardIcon.setScale(0.3); G.ui.shardIcon.setPosition(UW / 2 - G.ui.shards.ge
   G.vig.setPosition(-10, -10); G.vig.setWidth(UW + 20); G.vig.setHeight(UH + 20); G.vig.setColor(Math.round(70 + 40 * Math.sin(G.time * 2)) + ';150;220');
   G.vig.setOpacity(LIB.lite ? 0 : 120 * Math.sqrt(sl));
   const fadeOn = G.scroll ? 1 : 0, tb = hudTop / uiS * 1.05, bb = (hudBot / uiS + (G.wmLift || 0)) * 1.25;
-  G.hudTopF.setColor('36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
-  G.hudBotF.setColor('46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
+  G.hudTopF.setColor(G.void ? '3;4;9' : '36;12;64'); G.hudTopF.setPosition(-10, -2); G.hudTopF.setWidth(UW + 20); G.hudTopF.setHeight(tb); G.hudTopF.setOpacity(215 * fadeOn);
+  G.hudBotF.setColor(G.void ? '3;4;9' : '46;14;52'); G.hudBotF.flipY(true); G.hudBotF.setPosition(-10, UH - bb + 2); G.hudBotF.setWidth(UW + 20); G.hudBotF.setHeight(bb); G.hudBotF.setOpacity(190 * fadeOn);
 }
 G.hintA = (G.firstMove && G.moves >= 2) ? Math.max(0.35, G.hintA - rdt * 0.5) : 1;
 G.ui.hint.setWrapping(true); G.ui.hint.setWrappingWidth(Math.min(UW - 40, 620));

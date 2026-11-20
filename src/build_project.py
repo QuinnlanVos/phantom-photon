@@ -80,6 +80,11 @@ objects = [
     sprite("Mover", [(f"M{k}", [f"mover_{k}.png"], 1) for k in sorted(META['movers'])]), one("TrackDot", "track_dot.png"),
     sprite("Cloud", [(f"C{k}", [f"cloud_{k}.png"], 1) for k in sorted(META['clouds'], key=int)]), one("CloudPuff", "cloud_puff.png"), one("CloudMask", "cloud_mask.png"),
     dict(one("CloudBlock", "flash.png", False), behaviors=[{"name": "LightObstacle", "type": "Lighting::LightObstacleBehavior"}]),
+    # --- Rocks from Space (chapter 4)
+    one("VoidSky", "sky_void.png", False), one("PinStar", "pin_star.png"),
+    sprite("Asteroid", [(f"A{k + 1}", [f"asteroid_{k + 1}.png"], 1) for k in range(META['rockVariants'])]), one("RockGlow", "rock_glow.png"), one("RockBit", "rock_bit.png"),
+    sprite("DustRing", [(f"R{k}", [f"dustring_{k}.png"], 1) for k in sorted(META['rings'], key=int)]),
+    one("HailStreak", "hail_streak.png"), one("HailTele", "hail_tele.png"), one("IceBurst", "ice_burst.png"),
     {"assetStoreId": "", "name": "Light", "type": "Lighting::LightObject", "variables": [], "effects": [], "behaviors": [],
      "content": {"radius": 100, "color": "255;255;255", "debugMode": False, "texture": ""}},
 ]

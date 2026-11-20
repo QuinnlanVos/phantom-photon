@@ -157,11 +157,29 @@ gdjs.LevelSelectCode.GDCloudMaskObjects1= [];
 gdjs.LevelSelectCode.GDCloudMaskObjects2= [];
 gdjs.LevelSelectCode.GDCloudBlockObjects1= [];
 gdjs.LevelSelectCode.GDCloudBlockObjects2= [];
+gdjs.LevelSelectCode.GDVoidSkyObjects1= [];
+gdjs.LevelSelectCode.GDVoidSkyObjects2= [];
+gdjs.LevelSelectCode.GDPinStarObjects1= [];
+gdjs.LevelSelectCode.GDPinStarObjects2= [];
+gdjs.LevelSelectCode.GDAsteroidObjects1= [];
+gdjs.LevelSelectCode.GDAsteroidObjects2= [];
+gdjs.LevelSelectCode.GDRockGlowObjects1= [];
+gdjs.LevelSelectCode.GDRockGlowObjects2= [];
+gdjs.LevelSelectCode.GDRockBitObjects1= [];
+gdjs.LevelSelectCode.GDRockBitObjects2= [];
+gdjs.LevelSelectCode.GDDustRingObjects1= [];
+gdjs.LevelSelectCode.GDDustRingObjects2= [];
+gdjs.LevelSelectCode.GDHailStreakObjects1= [];
+gdjs.LevelSelectCode.GDHailStreakObjects2= [];
+gdjs.LevelSelectCode.GDHailTeleObjects1= [];
+gdjs.LevelSelectCode.GDHailTeleObjects2= [];
+gdjs.LevelSelectCode.GDIceBurstObjects1= [];
+gdjs.LevelSelectCode.GDIceBurstObjects2= [];
 gdjs.LevelSelectCode.GDLightObjects1= [];
 gdjs.LevelSelectCode.GDLightObjects2= [];
 
 
-gdjs.LevelSelectCode.userFunc0x91b628 = function GDJSInlineCode(runtimeScene) {
+gdjs.LevelSelectCode.userFunc0x987108 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -179,6 +197,14 @@ const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
 //           a flight entering the block rides the arc (lane-snapped, deterministic) and exits along the tangent at BOOST_V
 //   wells:  [{i,j,r}]                        gravity wells: time runs slower near them (TS_MIN at the core) - everything,
 //           the orb and the moving platforms alike, so timing windows open up
+// Rocks from Space (chapter 4) adds level lists (all on world time st.time, periodic in level.period -> solver-exact):
+//   rocks:  [{i,j,r,axis?,range?,phase?,k?}]  asteroids: lethal discs (radius r tiles); optional ping-pong drift along axis
+//           (range tiles, k round trips per period) on a dotted track
+//   rings:  [{i,j,r,w,gaps,gap,spin,a0}]       rings of space dust: a band (radius r, width w tiles) around a calm eye, with
+//           `gaps` openings of `gap` degrees each, turning `spin` revolutions per period (sign = direction)
+//   hail:   [{i,j,w,h,d,n,phase,safe,tele}]    cosmic hail lanes: n cycles per period; calm for `safe` of each cycle, then a
+//           `tele`-second telegraph shimmer (harmless), then the barrage (lethal) until the cycle ends
+// Hazards only hit a flying orb; the solver verifies that no resting spot is ever inside one.
 // ============================================================================
 const T = 48;                    // tile size (world px)
 const H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)
@@ -196,6 +222,9 @@ const OVER_DECAY = 1400;         // px/s^2: extra speed (from wind) bleeds off o
 const TS_MIN = 0.3;              // gravity well: time scale at its core
 const MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost
 const SUB = 1 / 600;             // fixed sub-step (game and solver produce identical paths)
+const ROCK_PAD = 10;             // px added to an asteroid's core hit radius (0.82 r) for the orb
+const RING_PAD = 0.26 * T;       // the orb's radius against dust bands and gap edges
+const HAIL_PAD = 0.18 * T;       // the orb counts as in a hail lane once its centre is this close to the lane
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
 const RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\' },
@@ -232,6 +261,12 @@ function parseLevel(def) {
     return Object.assign({ sx, sy, x0, y0, x1, y1, cx: sx > 0 ? x0 : x1, cy: sy > 0 ? y0 : y1 }, c);
   });
   L.wells = (def.wells || []).map((w) => Object.assign({ x: center(w.i), y: center(w.j), R: (w.r || 2.5) * T }, w));
+  L.rocks = (def.rocks || []).map((r) => Object.assign({ axis: 'x', range: 0, phase: 0, k: 1, r: 0.8 }, r, { x: center(r.i), y: center(r.j) }));
+  L.rocks.forEach((r) => { r.R = r.r * T; r.hit = r.r * T * 0.82 + ROCK_PAD; });
+  L.rings = (def.rings || []).map((g) => { const o = Object.assign({ r: 2.25, w: 0.6, gaps: 2, gap: 100, spin: 1, a0: 0 }, g);
+    return Object.assign(o, { x: center(g.i), y: center(g.j), R: o.r * T, hw: o.w * T / 2, gapR: o.gap * Math.PI / 180 }); });
+  L.hail = (def.hail || []).map((h) => Object.assign({ d: 'D', n: 1, phase: 0, safe: 0.5, tele: 0.8 }, h,
+    { x0: h.i * T, y0: h.j * T, x1: (h.i + h.w) * T, y1: (h.j + h.h) * T }));
   return L;
 }
 function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
@@ -263,6 +298,48 @@ function timeScale(L, x, y) {
     ts = Math.min(ts, 1 - (1 - TS_MIN) * k);
   }
   return ts;
+}
+// ---------------------------------------------------------------- Rocks from Space hazards (pure functions of world time)
+function isTimed(L) { return L.movers.length > 0 || L.rings.length > 0 || L.hail.length > 0 || L.rocks.some((r) => r.range > 0); }
+function rockPos(L, r, t) {
+  if (!r.range) return [r.x, r.y];
+  const o = r.range * T * (0.5 - 0.5 * Math.cos(2 * Math.PI * (r.k * t / L.period + r.phase)));
+  return r.axis === 'x' ? [r.x + o, r.y] : [r.x, r.y + o];
+}
+function ringAngle(L, g, t) { return g.a0 * Math.PI / 180 + 2 * Math.PI * g.spin * t / L.period; }
+// angular distance (radians) from angle a to the nearest gap centre of ring g at time t
+function gapOffset(L, g, a, t) {
+  const step = 2 * Math.PI / g.gaps; let u = (a - ringAngle(L, g, t)) % step; if (u < 0) u += step;
+  return Math.min(u, step - u);
+}
+// hail lane phase at time t: { ph: 'calm'|'tele'|'hail', u: 0..1 progress through that phase, cyc: cycle length (s) }
+function hailPhase(L, h, t) {
+  const cyc = L.period / h.n; let u = (t / cyc + h.phase) % 1; if (u < 0) u += 1;
+  const te = Math.min(0.45, h.tele / cyc), s0 = h.safe, s1 = Math.min(0.95, h.safe + te);
+  if (u < s0) return { ph: 'calm', u: u / s0, cyc };
+  if (u < s1) return { ph: 'tele', u: (u - s0) / (s1 - s0), cyc };
+  return { ph: 'hail', u: (u - s1) / (1 - s1), cyc };
+}
+// which hazard (if any) hits an orb centred at (x,y) at world time t: 'rock' | 'dust' | 'hail' | null
+function hazardAt(L, x, y, t) {
+  for (const r of L.rocks) { const [rx, ry] = rockPos(L, r, t); if (Math.hypot(x - rx, y - ry) < r.hit) return 'rock'; }
+  for (const g of L.rings) {
+    const d = Math.hypot(x - g.x, y - g.y);
+    if (d < g.R - g.hw - RING_PAD || d > g.R + g.hw + RING_PAD) continue;
+    const off = gapOffset(L, g, Math.atan2(y - g.y, x - g.x), t), need = Math.asin(Math.min(1, RING_PAD / Math.max(d, 1)));
+    if (off > g.gapR / 2 - need) return 'dust';
+  }
+  for (const h of L.hail) {
+    if (x > h.x0 - HAIL_PAD && x < h.x1 + HAIL_PAD && y > h.y0 - HAIL_PAD && y < h.y1 + HAIL_PAD && hailPhase(L, h, t).ph === 'hail') return 'hail';
+  }
+  return null;
+}
+// can a hazard ever reach the point (x,y)? (static check over the whole period, used for resting spots)
+function hazardEver(L, x, y) {
+  for (const g of L.rings) { const d = Math.hypot(x - g.x, y - g.y); if (d >= g.R - g.hw - RING_PAD && d <= g.R + g.hw + RING_PAD) return 'dust'; }
+  for (const h of L.hail) if (x > h.x0 - HAIL_PAD && x < h.x1 + HAIL_PAD && y > h.y0 - HAIL_PAD && y < h.y1 + HAIL_PAD) return 'hail';
+  for (let q = 0; q < 240; q++) { const t = q * L.period / 240; for (const r of L.rocks) { const [rx, ry] = rockPos(L, r, t); if (Math.hypot(x - rx, y - ry) < r.hit) return 'rock'; } }
+  return null;
 }
 const overlap = (x, y, r) => x + H > r.x0 && x - H < r.x1 && y + H > r.y0 && y - H < r.y1;
 
@@ -386,6 +463,7 @@ function flySub(L, st, h) {
     if (clear || st.t > 0.6) st.ghost = -1;
   }
   GHOST = st.ghost >= 0 ? st.ghost : -1;
+  if (L.rocks.length || L.rings.length || L.hail.length) { const hz = hazardAt(L, st.x, st.y, st.time); if (hz) { GHOST = -1; return die(st, hz, st.x, st.y); } }
   const res = flySub2(L, st, h);
   GHOST = -1;
   return res;
@@ -566,7 +644,7 @@ function simulate(L, st0, action, wait) {
   evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+return { isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
          padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };
 
 })());
@@ -579,8 +657,8 @@ const LIB = gdjs.__PPLib || (gdjs.__PPLib = (function () {
 // particles (capped), juicy neon buttons, scene transitions.
 // ============================================================================
 const LIB = {};
-LIB.CHAPTERS = [{"id": "awakening", "name": "Awakening", "sub": "The tutorial: learn to move like light.", "dark": false, "levels": [{"name": "First Light", "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.", "map": ["###########", "#.........#", "#....E...*#", "#.........#", "##........#", "#..*..##..#", "#.........#", "#.........#", "#.........#", "#S...*....#", "###########"]}, {"name": "Angles", "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.", "map": ["###########", "#..S.....d#", "#.........#", "#....#....#", "#...#E#...#", "#.........#", "#.........#", "#.........#", "#.........#", "#b.*.a...*#", "###########"]}, {"name": "Kick", "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.", "map": ["###########", "#...*.#...#", "#.........#", "#....E....#", "#.........#", "#.........#", "#.........#", "#.........#", "#....S...*#", "#####P#####", "###########"]}, {"name": "Event Horizon", "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.", "map": ["###########", "#S....#...#", "#.......*.#", "##......E.#", "#....*....#", "#....O....#", "#.........#", "#........##", "#.........#", "#...#.....#", "###########"]}, {"name": "Phantom Run", "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.", "map": ["###########", "##.......##", "#........##", "#.........#", "#.......a.#", "#.O..##...#", "#.........#", "#...*.....#", "#.#...E.*.P", "#.#.......#", "#.S.*.....#", "###########"]}]}, {"id": "abyss", "name": "The Abyss", "sub": "Total darkness. Your light shows the way.", "dark": true, "levels": [{"name": "Reflections", "hint": "Silver mirrors bounce your light - you can't cling to them. Diagonal mirrors turn you 90\u00b0.", "map": ["###########", "#.....#...#", "#.M...S.*.#", "#.........#", "#...M##...#", "#.........#", "#....#.*..#", "###..#m.###", "#*........#", "#.....m#..#", "#..E.....##", "###########"]}, {"name": "Drift", "hint": "Neon platforms slide on their tracks. Stick to one and ride it - then time your launch.", "period": 4, "map": ["###########", "#...#.....#", "#.........#", "#.........#", "#.........#", "#.........#", "#.........#", "#..*......#", "#.....*.E.#", "#.........#", "#S........#", "###########"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 6, "phase": 0}]}, {"name": "Solar Flare", "hint": "Stars burn. Their glow lights the dark - just don't touch them.", "map": ["###########", "###.X...b.#", "#..*...*E.#", "#.........#", "#.....#..S#", "#...*.....#", "#....#....#", "#......#.X#", "#...##....#", "#.........#", "#...#.....#", "###########"]}, {"name": "Murk", "hint": "Gas clouds swallow light. Faint outlines show where they drift.", "map": ["###########", "#...#M.M.S#", "#..mE.....#", "#....n#...#", "##......#.#", "#.....*...#", "#.........#", "#........*#", "#.........#", "#..*#.....#", "##.....#..#", "###########"], "clouds": [{"i": 5, "j": 1, "w": 4, "h": 4}, {"i": 1, "j": 6, "w": 4, "h": 4}]}, {"name": "Event Horizon", "hint": "Everything at once. Read the light, then move.", "map": ["############", "#..........#", "#.#........#", "##...c.....P", "##.##...*.O#", "#......*...#", "#S....M....#", "#.....#....#", "#.###......#", "#...#...E..#", "#.....*.#..#", "#X....m....#", "############"], "clouds": [{"i": 6, "j": 7, "w": 5, "h": 4}]}, {"name": "Singularity", "hint": "Ride the drift, catch the mirror - and mind the star.", "period": 4, "map": ["############", "#...#......#", "#..........#", "#..........#", "#..........#", "#..........#", "#......*.n.#", "#.........X#", "#.......*..#", "#..........#", "#........E.#", "#S..*....#.#", "############"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 4, "phase": 0}], "clouds": [{"i": 5, "j": 2, "w": 3, "h": 5}]}]}, {"id": "winds", "name": "Solar Winds", "sub": "Bright skies, solar winds and stardust. The world grows!", "dark": false, "theme": "sun", "scroll": true, "levels": [{"name": "Tailwind", "hint": "Solar winds push your light. Ride the updraft - then let the breeze carry you home. The view follows you!", "map": ["#############", "#E....#.....#", "#...........#", "#...........#", "#....*......#", "#...........#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########..*#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#...........#", "#...........#", "#...........#", "#...........#", "#S....*.....#", "#############"], "winds": [{"i": 9, "j": 6, "w": 3, "h": 28, "d": "U"}, {"i": 1, "j": 2, "w": 8, "h": 4, "d": "L", "s": 5200}]}, {"name": "Quarter Pipe", "hint": "Glowing curved walls swing you around the bend and launch you at boosted speed.", "map": ["######################################", "#.........#..............*...........#", "#....................................#", "#.........*..........................#", "#...##############################...#", "#...##############################...#", "#...###########.....E..###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...#############..###############...#", "#...#############..###############...#", "#..........................#.........#", "#....................................#", "#.....S.........#............*.......#", "######################################"], "curves": [{"i": 34, "j": 13, "r": 3, "c": "SE"}, {"i": 34, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}, {"i": 1, "j": 13, "r": 3, "c": "SW"}]}, {"name": "Bullet Time", "hint": "Gravity wells slow time for everything - use the slow-mo to time your ride.", "period": 3.2, "map": ["######################", "#..............#..E..#", "#..............#.....#", "#..............#.....#", "#....................#", "#....................#", "#....................#", "#####................#", "#........*...........#", "#....................#", "#..*.................#", "#....................#", "#...............######", "#....................#", "#....................#", "#....................#", "#....................#", "#....................#", "######...............#", "#....................#", "#....................#", "#....................#", "#....................#", "#....................#", "#.........*..........#", "#....................#", "#S...................#", "######################"], "movers": [{"i": 10, "j": 5, "w": 2, "h": 1, "axis": "y", "range": 20, "phase": 0}], "wells": [{"i": 2, "j": 9, "r": 2.8}, {"i": 10, "j": 15, "r": 2.4}, {"i": 16, "j": 22, "r": 2.6}]}, {"name": "Crosswind Circuit", "hint": "Only a boosted photon can punch through a headwind. Chain the pipes!", "period": 3, "map": ["################################", "#.....................*........#", "#..............................#", "#..............................#", "#...########################...#", "#...########################...#", "#...########################...#", "#...########################...#", "#................#.....#####...#", "#................#.....#####...#", "#.....................*#####...#", "#......................#####...#", "#......................#####...#", "#......................#####...#", "################....##P#####...#", "##############........######...#", "##############........######...#", "##############...E....######...#", "############################...#", "#..............................#", "#..............................#", "#..............................#", "#S.......*.....................#", "################################"], "curves": [{"i": 28, "j": 20, "r": 3, "c": "SE"}, {"i": 28, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}], "winds": [{"i": 12, "j": 1, "w": 6, "h": 3, "d": "R", "s": 2600}, {"i": 16, "j": 14, "w": 4, "h": 3, "d": "D", "s": 2600}], "wells": [{"i": 19, "j": 9, "r": 2.6}], "movers": [{"i": 14, "j": 13, "w": 2, "h": 1, "axis": "x", "range": 6, "phase": 0}]}, {"name": "Solar Crown", "hint": "The grand finale: loop the arena, catch the lift, and ride the river of light.", "period": 3.2, "solveWait": 0.4, "map": ["##################################", "#...............*................#", "#................................#", "#................................#", "#...##########################...#", "#...##########################...#", "#...##########################...#", "#...###........####........###...#", "#...###........####........###...#", "#...###........#E.#........###...#", "#...###....................###...#", "#...###....................###...#", "#...###....................###...#", "#...###.....*..............###...#", "#...###...####.............###..*#", "#..........................###...#", "#..........................###...#", "###.###....................###...#", "#.........*........#####...###...#", "#..........................###...#", "#...###....................###...#", "#...###....................###...#", "#...###.*..........#.......###...#", "#...######P####....###########...#", "#...###########....###########...#", "#...###########....###########...#", "####.............................#", "####.............................#", "####.............S...............#", "##################################"], "curves": [{"i": 30, "j": 26, "r": 3, "c": "SE"}, {"i": 30, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}], "winds": [{"i": 30, "j": 12, "w": 3, "h": 13, "d": "U", "s": 2400}, {"i": 12, "j": 1, "w": 8, "h": 3, "d": "R", "s": 2400}, {"i": 7, "j": 10, "w": 20, "h": 4, "d": "L", "s": 4400}], "wells": [{"i": 24, "j": 16, "r": 2.8}, {"i": 9, "j": 18, "r": 2.6}], "movers": [{"i": 21, "j": 12, "w": 2, "h": 1, "axis": "y", "range": 8, "phase": 0}]}]}];
-LIB.ART = {"levelArtSize": [[608, 608], [608, 608], [608, 608], [608, 608], [608, 656], [608, 656], [608, 656], [608, 656], [608, 656], [656, 704], [656, 704], [704, 1808], [1904, 896], [1136, 1424], [1616, 1232], [1712, 1520]], "movers": {"2x1": [136, 88]}, "clouds": {"1": [244, 244], "2": [244, 244], "3": [292, 244], "4": [196, 292]}, "cloudIndex": {"8:0": 1, "8:1": 2, "9:0": 3, "10:0": 4}, "margin": 40, "tile": 48, "ss": 2};
+LIB.CHAPTERS = [{"id": "awakening", "name": "Awakening", "sub": "The tutorial: learn to move like light.", "dark": false, "levels": [{"name": "First Light", "hint": "Swipe along a wall to slide. Past the edge you keep flying until you hit the next wall.", "map": ["###########", "#.........#", "#....E...*#", "#.........#", "##........#", "#..*..##..#", "#.........#", "#.........#", "#.........#", "#S...*....#", "###########"]}, {"name": "Angles", "hint": "Violet ramps mirror your flight 90 degrees. You can't stick to their slanted side.", "map": ["###########", "#..S.....d#", "#.........#", "#....#....#", "#...#E#...#", "#.........#", "#.........#", "#.........#", "#.........#", "#b.*.a...*#", "###########"]}, {"name": "Kick", "hint": "Pink launch pads: TAP (or Space) to kick straight off them, away from the wall.", "map": ["###########", "#...*.#...#", "#.........#", "#....E....#", "#.........#", "#.........#", "#.........#", "#.........#", "#....S...*#", "#####P#####", "###########"]}, {"name": "Event Horizon", "hint": "Black holes bend your flight - get too close and you're swallowed. You're safe while stuck to a wall.", "map": ["###########", "#S....#...#", "#.......*.#", "##......E.#", "#....*....#", "#....O....#", "#.........#", "#........##", "#.........#", "#...#.....#", "###########"]}, {"name": "Phantom Run", "hint": "Everything at once: ramps, a pad and a black hole. Follow the shards - and use the hole's pull.", "map": ["###########", "##.......##", "#........##", "#.........#", "#.......a.#", "#.O..##...#", "#.........#", "#...*.....#", "#.#...E.*.P", "#.#.......#", "#.S.*.....#", "###########"]}]}, {"id": "abyss", "name": "The Abyss", "sub": "Total darkness. Your light shows the way.", "dark": true, "levels": [{"name": "Reflections", "hint": "Silver mirrors bounce your light - you can't cling to them. Diagonal mirrors turn you 90\u00b0.", "map": ["###########", "#.....#...#", "#.M...S.*.#", "#.........#", "#...M##...#", "#.........#", "#....#.*..#", "###..#m.###", "#*........#", "#.....m#..#", "#..E.....##", "###########"]}, {"name": "Drift", "hint": "Neon platforms slide on their tracks. Stick to one and ride it - then time your launch.", "period": 4, "map": ["###########", "#...#.....#", "#.........#", "#.........#", "#.........#", "#.........#", "#.........#", "#..*......#", "#.....*.E.#", "#.........#", "#S........#", "###########"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 6, "phase": 0}]}, {"name": "Solar Flare", "hint": "Stars burn. Their glow lights the dark - just don't touch them.", "map": ["###########", "###.X...b.#", "#..*...*E.#", "#.........#", "#.....#..S#", "#...*.....#", "#....#....#", "#......#.X#", "#...##....#", "#.........#", "#...#.....#", "###########"]}, {"name": "Murk", "hint": "Gas clouds swallow light. Faint outlines show where they drift.", "map": ["###########", "#...#M.M.S#", "#..mE.....#", "#....n#...#", "##......#.#", "#.....*...#", "#.........#", "#........*#", "#.........#", "#..*#.....#", "##.....#..#", "###########"], "clouds": [{"i": 5, "j": 1, "w": 4, "h": 4}, {"i": 1, "j": 6, "w": 4, "h": 4}]}, {"name": "Event Horizon", "hint": "Everything at once. Read the light, then move.", "map": ["############", "#..........#", "#.#........#", "##...c.....P", "##.##...*.O#", "#......*...#", "#S....M....#", "#.....#....#", "#.###......#", "#...#...E..#", "#.....*.#..#", "#X....m....#", "############"], "clouds": [{"i": 6, "j": 7, "w": 5, "h": 4}]}, {"name": "Singularity", "hint": "Ride the drift, catch the mirror - and mind the star.", "period": 4, "map": ["############", "#...#......#", "#..........#", "#..........#", "#..........#", "#..........#", "#......*.n.#", "#.........X#", "#.......*..#", "#..........#", "#........E.#", "#S..*....#.#", "############"], "movers": [{"i": 2, "j": 3, "w": 2, "h": 1, "axis": "y", "range": 4, "phase": 0}], "clouds": [{"i": 5, "j": 2, "w": 3, "h": 5}]}]}, {"id": "winds", "name": "Solar Winds", "sub": "Bright skies, solar winds and stardust. The world grows!", "dark": false, "theme": "sun", "scroll": true, "levels": [{"name": "Tailwind", "hint": "Solar winds push your light. Ride the updraft - then let the breeze carry you home. The view follows you!", "map": ["#############", "#E....#.....#", "#...........#", "#...........#", "#....*......#", "#...........#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########..*#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#########...#", "#...........#", "#...........#", "#...........#", "#...........#", "#S....*.....#", "#############"], "winds": [{"i": 9, "j": 6, "w": 3, "h": 28, "d": "U"}, {"i": 1, "j": 2, "w": 8, "h": 4, "d": "L", "s": 5200}]}, {"name": "Quarter Pipe", "hint": "Glowing curved walls swing you around the bend and launch you at boosted speed.", "map": ["######################################", "#.........#..............*...........#", "#....................................#", "#.........*..........................#", "#...##############################...#", "#...##############################...#", "#...###########.....E..###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...###########........###########...#", "#...#############..###############...#", "#...#############..###############...#", "#..........................#.........#", "#....................................#", "#.....S.........#............*.......#", "######################################"], "curves": [{"i": 34, "j": 13, "r": 3, "c": "SE"}, {"i": 34, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}, {"i": 1, "j": 13, "r": 3, "c": "SW"}]}, {"name": "Bullet Time", "hint": "Gravity wells slow time for everything - use the slow-mo to time your ride.", "period": 3.2, "map": ["######################", "#..............#..E..#", "#..............#.....#", "#..............#.....#", "#....................#", "#....................#", "#....................#", "#####................#", "#........*...........#", "#....................#", "#..*.................#", "#....................#", "#...............######", "#....................#", "#....................#", "#....................#", "#....................#", "#....................#", "######...............#", "#....................#", "#....................#", "#....................#", "#....................#", "#....................#", "#.........*..........#", "#....................#", "#S...................#", "######################"], "movers": [{"i": 10, "j": 5, "w": 2, "h": 1, "axis": "y", "range": 20, "phase": 0}], "wells": [{"i": 2, "j": 9, "r": 2.8}, {"i": 10, "j": 15, "r": 2.4}, {"i": 16, "j": 22, "r": 2.6}]}, {"name": "Crosswind Circuit", "hint": "Only a boosted photon can punch through a headwind. Chain the pipes!", "period": 3, "map": ["################################", "#.....................*........#", "#..............................#", "#..............................#", "#...########################...#", "#...########################...#", "#...########################...#", "#...########################...#", "#................#.....#####...#", "#................#.....#####...#", "#.....................*#####...#", "#......................#####...#", "#......................#####...#", "#......................#####...#", "################....##P#####...#", "##############........######...#", "##############........######...#", "##############...E....######...#", "############################...#", "#..............................#", "#..............................#", "#..............................#", "#S.......*.....................#", "################################"], "curves": [{"i": 28, "j": 20, "r": 3, "c": "SE"}, {"i": 28, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}], "winds": [{"i": 12, "j": 1, "w": 6, "h": 3, "d": "R", "s": 2600}, {"i": 16, "j": 14, "w": 4, "h": 3, "d": "D", "s": 2600}], "wells": [{"i": 19, "j": 9, "r": 2.6}], "movers": [{"i": 14, "j": 13, "w": 2, "h": 1, "axis": "x", "range": 6, "phase": 0}]}, {"name": "Solar Crown", "hint": "The grand finale: loop the arena, catch the lift, and ride the river of light.", "period": 3.2, "solveWait": 0.4, "map": ["##################################", "#...............*................#", "#................................#", "#................................#", "#...##########################...#", "#...##########################...#", "#...##########################...#", "#...###........####........###...#", "#...###........####........###...#", "#...###........#E.#........###...#", "#...###....................###...#", "#...###....................###...#", "#...###....................###...#", "#...###.....*..............###...#", "#...###...####.............###..*#", "#..........................###...#", "#..........................###...#", "###.###....................###...#", "#.........*........#####...###...#", "#..........................###...#", "#...###....................###...#", "#...###....................###...#", "#...###.*..........#.......###...#", "#...######P####....###########...#", "#...###########....###########...#", "#...###########....###########...#", "####.............................#", "####.............................#", "####.............S...............#", "##################################"], "curves": [{"i": 30, "j": 26, "r": 3, "c": "SE"}, {"i": 30, "j": 1, "r": 3, "c": "NE"}, {"i": 1, "j": 1, "r": 3, "c": "NW"}], "winds": [{"i": 30, "j": 12, "w": 3, "h": 13, "d": "U", "s": 2400}, {"i": 12, "j": 1, "w": 8, "h": 3, "d": "R", "s": 2400}, {"i": 7, "j": 10, "w": 20, "h": 4, "d": "L", "s": 4400}], "wells": [{"i": 24, "j": 16, "r": 2.8}, {"i": 9, "j": 18, "r": 2.6}], "movers": [{"i": 21, "j": 12, "w": 2, "h": 1, "axis": "y", "range": 8, "phase": 0}]}]}, {"id": "rocks", "name": "Rocks from Space", "sub": "Deep space. Asteroids, dust rings and cosmic hail.", "dark": false, "theme": "void", "scroll": true, "levels": [{"name": "Stone Drift", "hint": "Asteroids! Their glowing rims shatter light. Watch each rock drift on its track, then dash past.", "period": 4, "map": ["#############", "#...*.....E.#", "#...........#", "#.......#####", "#...........#", "#...........#", "#####.......#", "#...........#", "#...........#", "#.......#####", "#...........#", "#...........#", "#####.......#", "#...........#", "#...........#", "#.......#####", "#..*........#", "#...........#", "#####.......#", "#...........#", "#S..........#", "#############"], "rocks": [{"i": 6, "j": 14, "r": 0.8, "axis": "y", "range": 3, "phase": 0}, {"i": 5, "j": 8, "r": 0.9, "axis": "y", "range": 3, "phase": 0.5}, {"i": 7, "j": 2, "r": 0.75, "axis": "y", "range": 3, "phase": 0.25}, {"i": 8.5, "j": 11.5, "r": 0.85}, {"i": 9, "j": 5.5, "r": 0.7}, {"i": 9, "j": 17.5, "r": 0.95}]}, {"name": "Dust Rings", "hint": "Rings of space dust spin around calm eyes. Thread a gap, rest in the eye, then slip out.", "period": 4, "map": ["###################", "#.................#", "#.................#", "#.................#", "#.................#", "#.................#", "#.................#", "#..........#......#", "#..........E......#", "#................##", "#.................#", "#.................#", "##................#", "#..*#.............#", "#.......*...##....#", "#.................#", "#.................#", "#S...#............#", "###################"], "rings": [{"i": 4, "j": 13, "r": 2.25, "w": 0.6, "gaps": 2, "gap": 110, "spin": 1}, {"i": 11, "j": 7, "r": 2.25, "w": 0.6, "gaps": 2, "gap": 110, "spin": -1}]}, {"name": "Cosmic Hail", "hint": "Cosmic hail! Lanes shimmer red just before a barrage. Cross in the calm, shelter under ledges.", "period": 4, "map": ["###############", "#...*.....E...#", "#.............#", "#.............#", "#.........#####", "#.............#", "#.............#", "#.............#", "#####.........#", "#......*......#", "#.............#", "#.............#", "#.........#####", "#.............#", "#.............#", "#.............#", "#####.........#", "#......*......#", "#.............#", "#.............#", "#S............#", "###############"], "hail": [{"i": 5, "j": 17, "w": 4, "h": 3, "d": "D", "n": 1, "phase": 0}, {"i": 5, "j": 12, "w": 4, "h": 3, "d": "DL", "n": 1, "phase": 0.5}, {"i": 6, "j": 9, "w": 3, "h": 2, "d": "DR", "n": 1, "phase": 0.2}, {"i": 5, "j": 5, "w": 4, "h": 3, "d": "D", "n": 1, "phase": 0.7}, {"i": 5, "j": 1, "w": 4, "h": 3, "d": "DL", "n": 1, "phase": 0.35}]}, {"name": "Meteor Crossing", "hint": "Rocks, rings and hail together. Read the rhythm of each hazard before you leap.", "period": 4, "map": ["##########################", "#...........#..*.........#", "#...........#............#", "#...........#............#", "#...........#............#", "#*..........#.....####...#", "#...................E....#", "#........................#", "#........................#", "#####...#................#", "#.............#.........##", "#........................#", "#........................#", "#........................#", "#S.......#.....*.....#...#", "##########################"], "rocks": [{"i": 5, "j": 10, "r": 0.8, "axis": "y", "range": 3.5, "phase": 0}, {"i": 19, "j": 9, "r": 0.9, "axis": "x", "range": 4, "phase": 0}, {"i": 18, "j": 12.5, "r": 0.75}], "rings": [{"i": 14, "j": 10, "r": 2.25, "w": 0.6, "gaps": 2, "gap": 120, "spin": 1, "a0": 35}], "hail": [{"i": 6, "j": 11, "w": 3, "h": 3, "d": "D", "n": 1, "phase": 0}, {"i": 14, "j": 1, "w": 4, "h": 3, "d": "DL", "n": 1, "phase": 0}]}, {"name": "Starfall", "hint": "The finale: ride the curves around the rock belt, through the hail and into the rings.", "period": 4, "map": ["##############################", "#...........#.....*..........#", "#............................#", "#............................#", "#...#########.############...#", "#...#########.############...#", "#...#########.############...#", "#......................###...#", "#...###................###...#", "#...###................###...#", "#...###.........*..E...###...#", "#...###......#.....#...###..*#", "#...###................###...#", "#...###................###...#", "#...###................###...#", "#...###................###...#", "#...###................###...#", "#...######################...#", "#...######################...#", "#...######################...#", "#............................#", "#............................#", "#.S...*......................#", "##############################"], "curves": [{"i": 26, "j": 20, "r": 3, "c": "SE"}, {"i": 26, "j": 1, "r": 3, "c": "NE"}], "rocks": [{"i": 9, "j": 20, "r": 0.7, "axis": "y", "range": 2, "phase": 0}, {"i": 15, "j": 20, "r": 0.7, "axis": "y", "range": 2, "phase": 0.9}, {"i": 21, "j": 20, "r": 0.7, "axis": "y", "range": 2, "phase": 0.8}, {"i": 22, "j": 2, "r": 0.6}], "rings": [{"i": 13, "j": 11, "r": 2.25, "w": 0.6, "gaps": 2, "gap": 110, "spin": 1}, {"i": 19, "j": 11, "r": 2.25, "w": 0.6, "gaps": 2, "gap": 110, "spin": 1, "a0": 50}], "hail": [{"i": 26, "j": 13, "w": 3, "h": 3, "d": "DL", "n": 1, "phase": 0}, {"i": 26, "j": 6, "w": 3, "h": 3, "d": "DL", "n": 1, "phase": 0}]}]}];
+LIB.ART = {"levelArtSize": [[608, 608], [608, 608], [608, 608], [608, 608], [608, 656], [608, 656], [608, 656], [608, 656], [608, 656], [656, 704], [656, 704], [704, 1808], [1904, 896], [1136, 1424], [1616, 1232], [1712, 1520], [704, 1136], [992, 992], [800, 1136], [1328, 848], [1520, 1232]], "movers": {"2x1": [136, 88]}, "clouds": {"1": [244, 244], "2": [244, 244], "3": [292, 244], "4": [196, 292]}, "cloudIndex": {"8:0": 1, "8:1": 2, "9:0": 3, "10:0": 4}, "rings": {"1": [288, 288], "2": [288, 288], "3": [288, 288], "4": [288, 288], "5": [288, 288]}, "ringIndex": {"17:0": 1, "17:1": 2, "19:0": 3, "20:0": 4, "20:1": 5}, "rockVariants": 3, "margin": 40, "tile": 48, "ss": 2};
 LIB.PALETTE = ['120;240;255', '255;90;210', '180;120;255', '120;255;170', '255;210;90', '255;140;80'];
 const KEY = 'phantomPhoton.progress.v1';
 const qs = (typeof location !== 'undefined') ? new URLSearchParams(location.search) : new URLSearchParams('');
@@ -871,12 +949,17 @@ const THEME = [
   { color: '120;240;255', node: '120;240;255', done: '120;255;170', frame: '90;220;255' },
   { color: '160;130;255', node: '170;140;255', done: '120;255;200', frame: '130;100;255' },
   { color: '255;200;110', node: '255;196;120', done: '120;255;210', frame: '255;150;110' },     // Solar Winds: golden sunrise
+  { color: '235;242;255', node: '225;238;255', done: '255;190;100', frame: '215;228;248' },     // Rocks from Space: stark silver on black
 ];
 if (!S) {
   S = runtimeScene.__sel = { cur: clamp(LIB.nav.chapter || 0, 0, CH.length - 1), pos: 0, drag: 0, dragging: false, cards: [], toastT: 0, wig: 0 };
   S.pos = S.cur;
   C.bg(36);
   S.sky = C.mk('Sky', 'Bg', 0, 0, -6); S.sky.setOpacity(0); S.sun = C.mk('SunGlow', 'Bg', 0, 0, -5, true); S.sun.setOpacity(0);
+  // chapter 4 backdrop: pitch-dark deep space + faint pinpoint stars (fades in as the Rocks from Space card is selected)
+  S.voidSky = C.mk('VoidSky', 'Bg', 0, 0, -4); S.voidSky.setOpacity(0); S.pins = [];
+  for (let k = 0; k < 90; k++) { const o = C.mk(Math.random() < 0.06 ? 'DustStar' : 'PinStar', 'Bg', 0, 0, -3, true); o.setColor(['235;242;255', '205;225;255', '170;210;255', '255;228;180'][k % 4]);
+    S.pins.push({ o, u: Math.random(), v: Math.random(), p: rand(0.2, 1), ph: rand(0, 6.28), tw: rand(0.6, 2), a: rand(60, 160), s: o.getName && o.getName() === 'DustStar' ? rand(0.16, 0.22) : rand(0.28, 0.5) }); }
   C.buttonNav = false; C.modalKeys = true;      // this scene drives keyboard focus itself
   S.head = C.mk('HeadText', 'UI', 0, 0, 80); S.head.setString('SELECT LEVEL');
   S.back = C.button({ kind: 'round', icon: 'IcBack', color: '120;240;255', delay: 0.1, name: 'back', pool: false, onPress: () => C.go('Menu', 'fade', { dur: 0.45 }) });
@@ -985,7 +1068,7 @@ S.cards.forEach((cd, c) => {
   cd.frame.setWidth(cardW * sc); cd.frame.setHeight(cardH * sc); cd.frame.setPosition(x - cardW * sc / 2, cy - cardH * sc / 2);
   cd.frame.setOpacity(255 * a * (cd.unlocked ? 1 : 0.75));
   cd.glow.setPosition(x, cy); cd.glow.setScaleX(cardW / 256 * 1.3 * sc); cd.glow.setScaleY(cardH / 256 * 1.2 * sc);
-  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
+  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
   const top = cy - cardH * sc / 2;
   cd.small.setPosition(x - cd.small.getWidth() / 2, top + 26 * sc); cd.small.setOpacity(200 * a);
   cd.name.setScale(sc); cd.name.setPosition(x - cd.name.getWidth() / 2, top + 50 * sc); cd.name.setOpacity(255 * a);
@@ -1030,13 +1113,18 @@ const [shx, shy] = C.shakeOffset();
 for (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(C.uiS); l.setCameraX(UW / 2 + shx + S.pos * 40); l.setCameraY(UH / 2 + shy); }
 C.neb.setPosition(UW / 2 + S.pos * 40, UH / 2); C.neb.setScale(Math.max(UW, UH) / 512 * 1.6);
 // chapter 2 darkens the background; chapter 3 fades in a warm sunrise sky
-const dark = clamp(S.pos, 0, 1) - clamp(S.pos - 1, 0, 1), warm = clamp(S.pos - 1, 0, 1);
-C.neb.setOpacity(150 * (1 - 0.6 * dark) + 40 * warm); C.neb.setColor(warm > 0.01 ? '255;' + Math.round(255 - 80 * warm) + ';' + Math.round(255 - 50 * warm) : '255;255;255');
-C.bgT.setOpacity(255 * (1 - 0.55 * dark) * (1 - warm));
+const vd = clamp(S.pos - 2, 0, 1);       // chapter 4: deep-space void
+const dark = clamp(S.pos, 0, 1) - clamp(S.pos - 1, 0, 1), warm = clamp(S.pos - 1, 0, 1) * (1 - vd);
+C.neb.setOpacity((150 * (1 - 0.6 * dark) + 40 * warm) * (1 - 0.85 * vd)); C.neb.setColor(warm > 0.01 ? '255;' + Math.round(255 - 80 * warm) + ';' + Math.round(255 - 50 * warm) : '255;255;255');
+C.bgT.setOpacity(255 * (1 - 0.55 * dark) * (1 - warm) * (1 - vd));
 S.sky.setPosition(-200, -200); S.sky.setWidth(UW + 400 + S.pos * 40 + 200); S.sky.setHeight(UH + 400); S.sky.setOpacity(255 * warm);
 S.sun.setPosition(UW * 0.7 + S.pos * 40, UH * 0.08); S.sun.setScale(Math.max(UW, UH) / 256 * 0.9); S.sun.setOpacity(170 * warm);
 for (const m of C.motes) m.o.setColor(warm > 0.5 ? '255;220;150' : '255;255;255');
 C.updateMotes(dt, UW + 100, UH, []);
+if (vd > 0) for (const m of C.motes) m.o.setOpacity(m.o.getOpacity() * (1 - vd));
+S.voidSky.setPosition(-300, -300); S.voidSky.setWidth(UW + 800 + S.pos * 40); S.voidSky.setHeight(UH + 600); S.voidSky.setOpacity(255 * vd);
+for (const p of S.pins) { p.ph += dt; const x = ((p.u * (UW + 200) - S.pos * 40 * p.p) % (UW + 200) + UW + 200) % (UW + 200) - 100 + S.pos * 40, y = p.v * UH;
+  p.o.setPosition(x, y); p.o.setScale(p.s); p.o.setOpacity(vd * p.a * (0.75 + 0.25 * Math.sin(p.ph * p.tw))); }
 runtimeScene.getLayer('Bg').enableEffect('Lens', false);
 S.toastT = Math.max(0, S.toastT - dt); S.toast.setOpacity(255 * Math.min(1, S.toastT * 3)); S.toast.setPosition(UW / 2 - S.toast.getWidth() / 2, C.portrait ? 140 : UH - 70);
 C.updateTrans(dt);
@@ -1047,7 +1135,7 @@ gdjs.LevelSelectCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.LevelSelectCode.userFunc0x91b628(runtimeScene);
+gdjs.LevelSelectCode.userFunc0x987108(runtimeScene);
 
 }
 
@@ -1222,6 +1310,24 @@ gdjs.LevelSelectCode.GDCloudMaskObjects1.length = 0;
 gdjs.LevelSelectCode.GDCloudMaskObjects2.length = 0;
 gdjs.LevelSelectCode.GDCloudBlockObjects1.length = 0;
 gdjs.LevelSelectCode.GDCloudBlockObjects2.length = 0;
+gdjs.LevelSelectCode.GDVoidSkyObjects1.length = 0;
+gdjs.LevelSelectCode.GDVoidSkyObjects2.length = 0;
+gdjs.LevelSelectCode.GDPinStarObjects1.length = 0;
+gdjs.LevelSelectCode.GDPinStarObjects2.length = 0;
+gdjs.LevelSelectCode.GDAsteroidObjects1.length = 0;
+gdjs.LevelSelectCode.GDAsteroidObjects2.length = 0;
+gdjs.LevelSelectCode.GDRockGlowObjects1.length = 0;
+gdjs.LevelSelectCode.GDRockGlowObjects2.length = 0;
+gdjs.LevelSelectCode.GDRockBitObjects1.length = 0;
+gdjs.LevelSelectCode.GDRockBitObjects2.length = 0;
+gdjs.LevelSelectCode.GDDustRingObjects1.length = 0;
+gdjs.LevelSelectCode.GDDustRingObjects2.length = 0;
+gdjs.LevelSelectCode.GDHailStreakObjects1.length = 0;
+gdjs.LevelSelectCode.GDHailStreakObjects2.length = 0;
+gdjs.LevelSelectCode.GDHailTeleObjects1.length = 0;
+gdjs.LevelSelectCode.GDHailTeleObjects2.length = 0;
+gdjs.LevelSelectCode.GDIceBurstObjects1.length = 0;
+gdjs.LevelSelectCode.GDIceBurstObjects2.length = 0;
 gdjs.LevelSelectCode.GDLightObjects1.length = 0;
 gdjs.LevelSelectCode.GDLightObjects2.length = 0;
 
@@ -1382,6 +1488,24 @@ gdjs.LevelSelectCode.GDCloudMaskObjects1.length = 0;
 gdjs.LevelSelectCode.GDCloudMaskObjects2.length = 0;
 gdjs.LevelSelectCode.GDCloudBlockObjects1.length = 0;
 gdjs.LevelSelectCode.GDCloudBlockObjects2.length = 0;
+gdjs.LevelSelectCode.GDVoidSkyObjects1.length = 0;
+gdjs.LevelSelectCode.GDVoidSkyObjects2.length = 0;
+gdjs.LevelSelectCode.GDPinStarObjects1.length = 0;
+gdjs.LevelSelectCode.GDPinStarObjects2.length = 0;
+gdjs.LevelSelectCode.GDAsteroidObjects1.length = 0;
+gdjs.LevelSelectCode.GDAsteroidObjects2.length = 0;
+gdjs.LevelSelectCode.GDRockGlowObjects1.length = 0;
+gdjs.LevelSelectCode.GDRockGlowObjects2.length = 0;
+gdjs.LevelSelectCode.GDRockBitObjects1.length = 0;
+gdjs.LevelSelectCode.GDRockBitObjects2.length = 0;
+gdjs.LevelSelectCode.GDDustRingObjects1.length = 0;
+gdjs.LevelSelectCode.GDDustRingObjects2.length = 0;
+gdjs.LevelSelectCode.GDHailStreakObjects1.length = 0;
+gdjs.LevelSelectCode.GDHailStreakObjects2.length = 0;
+gdjs.LevelSelectCode.GDHailTeleObjects1.length = 0;
+gdjs.LevelSelectCode.GDHailTeleObjects2.length = 0;
+gdjs.LevelSelectCode.GDIceBurstObjects1.length = 0;
+gdjs.LevelSelectCode.GDIceBurstObjects2.length = 0;
 gdjs.LevelSelectCode.GDLightObjects1.length = 0;
 gdjs.LevelSelectCode.GDLightObjects2.length = 0;
 

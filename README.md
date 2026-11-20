@@ -12,6 +12,8 @@ You play a photon of light that can only move along walls. Swipe along a wall to
   - It adds mirrors, moving platforms, burning stars and light-swallowing gas clouds, one at a time, then combines them.
   - It unlocks when you finish Awakening. Add `?unlock` to the URL to unlock everything for testing.
   - Add `?lite` to the URL to turn off glow, lens and darkness effects on weak devices (also automatic when WebGL is unavailable).
+- **3 · Solar Winds:** solar winds, curved boost walls, gravity wells and stardust, with a follow camera on big levels.
+- **4 · Rocks from Space:** a pitch-dark starfield with drifting asteroids, spinning rings of space dust and timed cosmic hail. Use `?unlock&select&ch=4` to jump to it, or `?ch=4&level=N` for a level.
 
 Progress is saved in your browser (localStorage).
 

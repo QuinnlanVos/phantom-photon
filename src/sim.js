@@ -12,6 +12,14 @@
 //           a flight entering the block rides the arc (lane-snapped, deterministic) and exits along the tangent at BOOST_V
 //   wells:  [{i,j,r}]                        gravity wells: time runs slower near them (TS_MIN at the core) - everything,
 //           the orb and the moving platforms alike, so timing windows open up
+// Rocks from Space (chapter 4) adds level lists (all on world time st.time, periodic in level.period -> solver-exact):
+//   rocks:  [{i,j,r,axis?,range?,phase?,k?}]  asteroids: lethal discs (radius r tiles); optional ping-pong drift along axis
+//           (range tiles, k round trips per period) on a dotted track
+//   rings:  [{i,j,r,w,gaps,gap,spin,a0}]       rings of space dust: a band (radius r, width w tiles) around a calm eye, with
+//           `gaps` openings of `gap` degrees each, turning `spin` revolutions per period (sign = direction)
+//   hail:   [{i,j,w,h,d,n,phase,safe,tele}]    cosmic hail lanes: n cycles per period; calm for `safe` of each cycle, then a
+//           `tele`-second telegraph shimmer (harmless), then the barrage (lethal) until the cycle ends
+// Hazards only hit a flying orb; the solver verifies that no resting spot is ever inside one.
 // ============================================================================
 const T = 48;                    // tile size (world px)
 const H = T / 2 - 0.5;           // collision half-size of the orb (a box ~1 tile)
@@ -29,6 +37,9 @@ const OVER_DECAY = 1400;         // px/s^2: extra speed (from wind) bleeds off o
 const TS_MIN = 0.3;              // gravity well: time scale at its core
 const MAX_FLIGHT = 5;            // seconds; a flight that never lands is treated as lost
 const SUB = 1 / 600;             // fixed sub-step (game and solver produce identical paths)
+const ROCK_PAD = 10;             // px added to an asteroid's core hit radius (0.82 r) for the orb
+const RING_PAD = 0.26 * T;       // the orb's radius against dust bands and gap edges
+const HAIL_PAD = 0.18 * T;       // the orb counts as in a hail lane once its centre is this close to the lane
 const DIRS = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
 const OPP = { L: 'R', R: 'L', U: 'D', D: 'U' };
 const RAMPS = { a: { solid: 'SE', back: 'RD', line: '/' }, b: { solid: 'SW', back: 'LD', line: '\\' },
@@ -65,6 +76,12 @@ function parseLevel(def) {
     return Object.assign({ sx, sy, x0, y0, x1, y1, cx: sx > 0 ? x0 : x1, cy: sy > 0 ? y0 : y1 }, c);
   });
   L.wells = (def.wells || []).map((w) => Object.assign({ x: center(w.i), y: center(w.j), R: (w.r || 2.5) * T }, w));
+  L.rocks = (def.rocks || []).map((r) => Object.assign({ axis: 'x', range: 0, phase: 0, k: 1, r: 0.8 }, r, { x: center(r.i), y: center(r.j) }));
+  L.rocks.forEach((r) => { r.R = r.r * T; r.hit = r.r * T * 0.82 + ROCK_PAD; });
+  L.rings = (def.rings || []).map((g) => { const o = Object.assign({ r: 2.25, w: 0.6, gaps: 2, gap: 100, spin: 1, a0: 0 }, g);
+    return Object.assign(o, { x: center(g.i), y: center(g.j), R: o.r * T, hw: o.w * T / 2, gapR: o.gap * Math.PI / 180 }); });
+  L.hail = (def.hail || []).map((h) => Object.assign({ d: 'D', n: 1, phase: 0, safe: 0.5, tele: 0.8 }, h,
+    { x0: h.i * T, y0: h.j * T, x1: (h.i + h.w) * T, y1: (h.j + h.h) * T }));
   return L;
 }
 function cell(L, i, j) { return (i < 0 || j < 0 || i >= L.w || j >= L.h) ? '#' : L.cells[j * L.w + i]; }
@@ -96,6 +113,48 @@ function timeScale(L, x, y) {
     ts = Math.min(ts, 1 - (1 - TS_MIN) * k);
   }
   return ts;
+}
+// ---------------------------------------------------------------- Rocks from Space hazards (pure functions of world time)
+function isTimed(L) { return L.movers.length > 0 || L.rings.length > 0 || L.hail.length > 0 || L.rocks.some((r) => r.range > 0); }
+function rockPos(L, r, t) {
+  if (!r.range) return [r.x, r.y];
+  const o = r.range * T * (0.5 - 0.5 * Math.cos(2 * Math.PI * (r.k * t / L.period + r.phase)));
+  return r.axis === 'x' ? [r.x + o, r.y] : [r.x, r.y + o];
+}
+function ringAngle(L, g, t) { return g.a0 * Math.PI / 180 + 2 * Math.PI * g.spin * t / L.period; }
+// angular distance (radians) from angle a to the nearest gap centre of ring g at time t
+function gapOffset(L, g, a, t) {
+  const step = 2 * Math.PI / g.gaps; let u = (a - ringAngle(L, g, t)) % step; if (u < 0) u += step;
+  return Math.min(u, step - u);
+}
+// hail lane phase at time t: { ph: 'calm'|'tele'|'hail', u: 0..1 progress through that phase, cyc: cycle length (s) }
+function hailPhase(L, h, t) {
+  const cyc = L.period / h.n; let u = (t / cyc + h.phase) % 1; if (u < 0) u += 1;
+  const te = Math.min(0.45, h.tele / cyc), s0 = h.safe, s1 = Math.min(0.95, h.safe + te);
+  if (u < s0) return { ph: 'calm', u: u / s0, cyc };
+  if (u < s1) return { ph: 'tele', u: (u - s0) / (s1 - s0), cyc };
+  return { ph: 'hail', u: (u - s1) / (1 - s1), cyc };
+}
+// which hazard (if any) hits an orb centred at (x,y) at world time t: 'rock' | 'dust' | 'hail' | null
+function hazardAt(L, x, y, t) {
+  for (const r of L.rocks) { const [rx, ry] = rockPos(L, r, t); if (Math.hypot(x - rx, y - ry) < r.hit) return 'rock'; }
+  for (const g of L.rings) {
+    const d = Math.hypot(x - g.x, y - g.y);
+    if (d < g.R - g.hw - RING_PAD || d > g.R + g.hw + RING_PAD) continue;
+    const off = gapOffset(L, g, Math.atan2(y - g.y, x - g.x), t), need = Math.asin(Math.min(1, RING_PAD / Math.max(d, 1)));
+    if (off > g.gapR / 2 - need) return 'dust';
+  }
+  for (const h of L.hail) {
+    if (x > h.x0 - HAIL_PAD && x < h.x1 + HAIL_PAD && y > h.y0 - HAIL_PAD && y < h.y1 + HAIL_PAD && hailPhase(L, h, t).ph === 'hail') return 'hail';
+  }
+  return null;
+}
+// can a hazard ever reach the point (x,y)? (static check over the whole period, used for resting spots)
+function hazardEver(L, x, y) {
+  for (const g of L.rings) { const d = Math.hypot(x - g.x, y - g.y); if (d >= g.R - g.hw - RING_PAD && d <= g.R + g.hw + RING_PAD) return 'dust'; }
+  for (const h of L.hail) if (x > h.x0 - HAIL_PAD && x < h.x1 + HAIL_PAD && y > h.y0 - HAIL_PAD && y < h.y1 + HAIL_PAD) return 'hail';
+  for (let q = 0; q < 240; q++) { const t = q * L.period / 240; for (const r of L.rocks) { const [rx, ry] = rockPos(L, r, t); if (Math.hypot(x - rx, y - ry) < r.hit) return 'rock'; } }
+  return null;
 }
 const overlap = (x, y, r) => x + H > r.x0 && x - H < r.x1 && y + H > r.y0 && y - H < r.y1;
 
@@ -219,6 +278,7 @@ function flySub(L, st, h) {
     if (clear || st.t > 0.6) st.ghost = -1;
   }
   GHOST = st.ghost >= 0 ? st.ghost : -1;
+  if (L.rocks.length || L.rings.length || L.hail.length) { const hz = hazardAt(L, st.x, st.y, st.time); if (hz) { GHOST = -1; return die(st, hz, st.x, st.y); } }
   const res = flySub2(L, st, h);
   GHOST = -1;
   return res;
@@ -399,5 +459,5 @@ function simulate(L, st0, action, wait) {
   evs.push(...st.events); st.events = [];
   return { ok: true, st, events: evs };
 }
-return { BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
+return { isTimed, rockPos, ringAngle, gapOffset, hailPhase, hazardAt, hazardEver, RING_PAD, HAIL_PAD, BOOST_V, WIND_VMAX, TS_MIN, windAt, timeScale, T, H, V0, VMAX, ACC, G, G_RANGE, KILL, STAR_R, DIRS, OPP, RAMPS, DIAG_MIRRORS, parseLevel, cell, contacts, stuckContacts, checkMove,
          padLaunchDir, startFlight, newState, step, simulate, center, faceFrom, moverRect, moverOffset, respawn, clone };

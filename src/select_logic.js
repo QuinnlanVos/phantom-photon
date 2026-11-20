@@ -10,12 +10,17 @@ const THEME = [
   { color: '120;240;255', node: '120;240;255', done: '120;255;170', frame: '90;220;255' },
   { color: '160;130;255', node: '170;140;255', done: '120;255;200', frame: '130;100;255' },
   { color: '255;200;110', node: '255;196;120', done: '120;255;210', frame: '255;150;110' },     // Solar Winds: golden sunrise
+  { color: '235;242;255', node: '225;238;255', done: '255;190;100', frame: '215;228;248' },     // Rocks from Space: stark silver on black
 ];
 if (!S) {
   S = runtimeScene.__sel = { cur: clamp(LIB.nav.chapter || 0, 0, CH.length - 1), pos: 0, drag: 0, dragging: false, cards: [], toastT: 0, wig: 0 };
   S.pos = S.cur;
   C.bg(36);
   S.sky = C.mk('Sky', 'Bg', 0, 0, -6); S.sky.setOpacity(0); S.sun = C.mk('SunGlow', 'Bg', 0, 0, -5, true); S.sun.setOpacity(0);
+  // chapter 4 backdrop: pitch-dark deep space + faint pinpoint stars (fades in as the Rocks from Space card is selected)
+  S.voidSky = C.mk('VoidSky', 'Bg', 0, 0, -4); S.voidSky.setOpacity(0); S.pins = [];
+  for (let k = 0; k < 90; k++) { const o = C.mk(Math.random() < 0.06 ? 'DustStar' : 'PinStar', 'Bg', 0, 0, -3, true); o.setColor(['235;242;255', '205;225;255', '170;210;255', '255;228;180'][k % 4]);
+    S.pins.push({ o, u: Math.random(), v: Math.random(), p: rand(0.2, 1), ph: rand(0, 6.28), tw: rand(0.6, 2), a: rand(60, 160), s: o.getName && o.getName() === 'DustStar' ? rand(0.16, 0.22) : rand(0.28, 0.5) }); }
   C.buttonNav = false; C.modalKeys = true;      // this scene drives keyboard focus itself
   S.head = C.mk('HeadText', 'UI', 0, 0, 80); S.head.setString('SELECT LEVEL');
   S.back = C.button({ kind: 'round', icon: 'IcBack', color: '120;240;255', delay: 0.1, name: 'back', pool: false, onPress: () => C.go('Menu', 'fade', { dur: 0.45 }) });
@@ -124,7 +129,7 @@ S.cards.forEach((cd, c) => {
   cd.frame.setWidth(cardW * sc); cd.frame.setHeight(cardH * sc); cd.frame.setPosition(x - cardW * sc / 2, cy - cardH * sc / 2);
   cd.frame.setOpacity(255 * a * (cd.unlocked ? 1 : 0.75));
   cd.glow.setPosition(x, cy); cd.glow.setScaleX(cardW / 256 * 1.3 * sc); cd.glow.setScaleY(cardH / 256 * 1.2 * sc);
-  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
+  cd.glow.setOpacity(a * (cd.c === 1 ? 22 : cd.c === 2 ? 34 : cd.c === 3 ? 20 : 28) * (0.8 + 0.2 * Math.sin(C.time * 1.6 + c)));
   const top = cy - cardH * sc / 2;
   cd.small.setPosition(x - cd.small.getWidth() / 2, top + 26 * sc); cd.small.setOpacity(200 * a);
   cd.name.setScale(sc); cd.name.setPosition(x - cd.name.getWidth() / 2, top + 50 * sc); cd.name.setOpacity(255 * a);
@@ -169,13 +174,18 @@ const [shx, shy] = C.shakeOffset();
 for (const ln of ['', 'Bg']) { const l = runtimeScene.getLayer(ln); l.setCameraZoom(C.uiS); l.setCameraX(UW / 2 + shx + S.pos * 40); l.setCameraY(UH / 2 + shy); }
 C.neb.setPosition(UW / 2 + S.pos * 40, UH / 2); C.neb.setScale(Math.max(UW, UH) / 512 * 1.6);
 // chapter 2 darkens the background; chapter 3 fades in a warm sunrise sky
-const dark = clamp(S.pos, 0, 1) - clamp(S.pos - 1, 0, 1), warm = clamp(S.pos - 1, 0, 1);
-C.neb.setOpacity(150 * (1 - 0.6 * dark) + 40 * warm); C.neb.setColor(warm > 0.01 ? '255;' + Math.round(255 - 80 * warm) + ';' + Math.round(255 - 50 * warm) : '255;255;255');
-C.bgT.setOpacity(255 * (1 - 0.55 * dark) * (1 - warm));
+const vd = clamp(S.pos - 2, 0, 1);       // chapter 4: deep-space void
+const dark = clamp(S.pos, 0, 1) - clamp(S.pos - 1, 0, 1), warm = clamp(S.pos - 1, 0, 1) * (1 - vd);
+C.neb.setOpacity((150 * (1 - 0.6 * dark) + 40 * warm) * (1 - 0.85 * vd)); C.neb.setColor(warm > 0.01 ? '255;' + Math.round(255 - 80 * warm) + ';' + Math.round(255 - 50 * warm) : '255;255;255');
+C.bgT.setOpacity(255 * (1 - 0.55 * dark) * (1 - warm) * (1 - vd));
 S.sky.setPosition(-200, -200); S.sky.setWidth(UW + 400 + S.pos * 40 + 200); S.sky.setHeight(UH + 400); S.sky.setOpacity(255 * warm);
 S.sun.setPosition(UW * 0.7 + S.pos * 40, UH * 0.08); S.sun.setScale(Math.max(UW, UH) / 256 * 0.9); S.sun.setOpacity(170 * warm);
 for (const m of C.motes) m.o.setColor(warm > 0.5 ? '255;220;150' : '255;255;255');
 C.updateMotes(dt, UW + 100, UH, []);
+if (vd > 0) for (const m of C.motes) m.o.setOpacity(m.o.getOpacity() * (1 - vd));
+S.voidSky.setPosition(-300, -300); S.voidSky.setWidth(UW + 800 + S.pos * 40); S.voidSky.setHeight(UH + 600); S.voidSky.setOpacity(255 * vd);
+for (const p of S.pins) { p.ph += dt; const x = ((p.u * (UW + 200) - S.pos * 40 * p.p) % (UW + 200) + UW + 200) % (UW + 200) - 100 + S.pos * 40, y = p.v * UH;
+  p.o.setPosition(x, y); p.o.setScale(p.s); p.o.setOpacity(vd * p.a * (0.75 + 0.25 * Math.sin(p.ph * p.tw))); }
 runtimeScene.getLayer('Bg').enableEffect('Lens', false);
 S.toastT = Math.max(0, S.toastT - dt); S.toast.setOpacity(255 * Math.min(1, S.toastT * 3)); S.toast.setPosition(UW / 2 - S.toast.getWidth() / 2, C.portrait ? 140 : UH - 70);
 C.updateTrans(dt);
