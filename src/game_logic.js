@@ -127,8 +127,8 @@ function loadLevel(c, n) {
                                         glow: add('BhGlow', cc(i), cc(j), 4, true), disk: add('BhDisk', cc(i), cc(j), 9), core: add('BhCore', cc(i), cc(j), 10), pulse: 0,
                                         light: G.dark ? light(cc(i), cc(j), 120, '120;40;70') : null }));
   for (const h of G.holes) { for (const k of ['range', 'swirl', 'glow', 'disk', 'core']) h[k].setScale(0.5); h.disk.setBlendMode(ADD); }
-  G.stars = (L.stars || []).map(([i, j], k) => ({ x: cc(i), y: cc(j), k, glow: add('StarGlow', cc(i), cc(j), 0, true), corona: add('StarCorona', cc(i), cc(j), 0, true),     // halo under the walls (z<1) so neighbours stay crisp
-    corona2: add('StarCorona', cc(i), cc(j), 0, true), core: add('StarDisc', cc(i), cc(j), 11, false), light: G.dark ? light(cc(i), cc(j), 110, '255;170;90') : null, flare: 0, tele: 0 }));
+  G.stars = (L.stars || []).map(([i, j], k) => ({ x: cc(i), y: cc(j), k, haze: add('StarGlow', cc(i), cc(j), 2, true), glow: add('StarGlow', cc(i), cc(j), 0, true), corona: add('StarCorona', cc(i), cc(j), 0, true),     // halo under the walls (z<1) so neighbours stay crisp
+    corona2: add('StarCorona', cc(i), cc(j), 0, true), core: add('StarDisc', cc(i), cc(j), 11, false), light: G.dark ? light(cc(i), cc(j), 380, '255;190;120') : null, light2: G.dark ? light(cc(i), cc(j), 240, '255;170;100') : null, flare: 0, tele: 0 }));
   G.flareT = rand(6, 10); G.flareStar = null; G.flareAge = 99; G.flareAmp = 0;
   G.movers = L.movers.map((m, k) => {
     const o = add('Mover', 0, 0, 7, true); o.setAnimationName('M' + m.w + 'x' + m.h); o.setScale(0.5);
@@ -857,7 +857,11 @@ for (const s of G.stars) {    // burning stars: slow pulsing corona, strong ligh
   s.corona2.setAngle(-G.time * 5 + 17); s.corona2.setScale(0.13 * (1 + 0.3 * tw)); s.corona2.setOpacity(70);
   s.core.setScale(0.5 * (1 + 0.03 * Math.sin(G.time * 7 + s.k) + 0.08 * s.flare + 0.12 * tw + 0.03 * Math.sin(G.time * 40) * tw));
   s.glow.setScale(0.17 * (1 + 0.1 * pu + 0.3 * s.flare + 0.8 * tw)); s.glow.setOpacity(Math.min(130, 105 + 25 * tw));
-  if (s.light) { s.light.setRadius(105 + 15 * pu + 40 * s.flare + 70 * tw); s.light.setColor(Math.round(Math.min(255, 225 + 30 * pu + 30 * tw)) + ';' + Math.round(140 + 40 * pu + 80 * tw) + ';' + Math.round(70 + 20 * pu + 90 * tw)); }
+  // the star lights the dark around it (lighting layer only, so walls are revealed, not covered): bright out to ~5 tiles
+  // with a soft falloff beyond (wide light ~8 tiles + hot inner light ~5 tiles), both swelling before a solar flare
+  if (s.light) { s.light.setRadius(380 + 25 * pu + 90 * s.flare + 220 * tw); s.light.setColor('255;' + Math.round(185 + 25 * pu + 40 * tw) + ';' + Math.round(115 + 20 * pu + 90 * tw)); }
+  s.haze.setScale(2.0 * (1 + 0.05 * pu + 0.25 * s.flare + 0.5 * tw)); s.haze.setOpacity(Math.min(150, 80 + 10 * pu + 60 * tw));   // faint additive warm wash (brightens, never occludes), ~5 tiles
+  if (s.light2) { s.light2.setRadius(240 + 15 * pu + 60 * s.flare + 140 * tw); s.light2.setColor('255;' + Math.round(165 + 20 * pu + 50 * tw) + ';' + Math.round(95 + 15 * pu + 90 * tw)); }
 }
 // ---- solar flares: every 8-15 s a star swells for ~1 s, then blasts light across the whole level for ~2.5 s
 if (G.stars.length && G.state !== 'clear') {
