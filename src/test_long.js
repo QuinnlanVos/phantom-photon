@@ -198,7 +198,8 @@ function plan(c, n, toks) {
       for (let k = 0; k < 3; k++) { if (P.timed && kill.win < 0.97) await syncPhase(kill.t, P.period); await act(kill.a); await sleep(40); await ts(1); await sleep(300); await settle(); }
       for (let k = 0; k < 60; k++) { s = await S(); if (s.panel) break; await sleep(60); } await sleep(500);
       await tapBtn('window.__pp.btnLevels'); await sleep(1800);
-      const sc = await pg.evaluate(() => window.__ppScene.getName());
+      let sc = await pg.evaluate(() => window.__ppScene.getName());
+      for (let k = 0; k < 30 && sc !== 'LevelSelect'; k++) { await sleep(200); sc = await pg.evaluate(() => window.__ppScene.getName()); }   // slow software-GL frames
       ok(sc === 'LevelSelect', `${id}: LEVELS on the game-over panel goes to level select (${sc})`);
     }
   }
