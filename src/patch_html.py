@@ -7,6 +7,13 @@ tag = ('<style id="mobile-fix">html,body{margin:0;background:#04060f;overflow:hi
 if 'mobile-fix' not in s: s = s.replace('</head>', tag + '\n</head>', 1)
 s = s.replace('<title>', '<meta name="theme-color" content="#04060f">\n<title>', 1) if 'theme-color' not in s else s
 if 'rel="icon"' not in s: s = s.replace('</head>', '<link rel="icon" type="image/png" href="favicon.png">\n</head>', 1)
+
+# cache-busting: version the game's own scripts by content hash so phones never run a stale build
+import re, hashlib, glob as _g
+_d = os.path.dirname(p); _h = hashlib.md5()
+for _f in sorted(_g.glob(os.path.join(_d, 'code*.js'))) + [os.path.join(_d, 'data.js')]: _h.update(open(_f, 'rb').read())
+_v = _h.hexdigest()[:10]
+s = re.sub(r'src="((?:code\d+|data)\.js)(?:\?v=\w+)?"', lambda m: 'src="%s?v=%s"' % (m.group(1), _v), s)
 open(p, 'w').write(s)
 src = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'project', 'assets', 'orb.png')
 bg = Image.new('RGBA', (128, 128), (4, 6, 15, 255)); o = Image.open(src).convert('RGBA')

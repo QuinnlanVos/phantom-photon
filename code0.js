@@ -141,6 +141,8 @@ gdjs.MenuCode.GDHudFadeObjects1= [];
 gdjs.MenuCode.GDHudFadeObjects2= [];
 gdjs.MenuCode.GDStarCoreObjects1= [];
 gdjs.MenuCode.GDStarCoreObjects2= [];
+gdjs.MenuCode.GDStarDiscObjects1= [];
+gdjs.MenuCode.GDStarDiscObjects2= [];
 gdjs.MenuCode.GDStarCoronaObjects1= [];
 gdjs.MenuCode.GDStarCoronaObjects2= [];
 gdjs.MenuCode.GDStarGlowObjects1= [];
@@ -227,7 +229,7 @@ gdjs.MenuCode.GDLightObjects1= [];
 gdjs.MenuCode.GDLightObjects2= [];
 
 
-gdjs.MenuCode.userFunc0xbd9b98 = function GDJSInlineCode(runtimeScene) {
+gdjs.MenuCode.userFunc0xbde3b0 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -1261,7 +1263,7 @@ gdjs.MenuCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.MenuCode.userFunc0xbd9b98(runtimeScene);
+gdjs.MenuCode.userFunc0xbde3b0(runtimeScene);
 
 }
 
@@ -1420,6 +1422,8 @@ gdjs.MenuCode.GDHudFadeObjects1.length = 0;
 gdjs.MenuCode.GDHudFadeObjects2.length = 0;
 gdjs.MenuCode.GDStarCoreObjects1.length = 0;
 gdjs.MenuCode.GDStarCoreObjects2.length = 0;
+gdjs.MenuCode.GDStarDiscObjects1.length = 0;
+gdjs.MenuCode.GDStarDiscObjects2.length = 0;
 gdjs.MenuCode.GDStarCoronaObjects1.length = 0;
 gdjs.MenuCode.GDStarCoronaObjects2.length = 0;
 gdjs.MenuCode.GDStarGlowObjects1.length = 0;
@@ -1646,6 +1650,8 @@ gdjs.MenuCode.GDHudFadeObjects1.length = 0;
 gdjs.MenuCode.GDHudFadeObjects2.length = 0;
 gdjs.MenuCode.GDStarCoreObjects1.length = 0;
 gdjs.MenuCode.GDStarCoreObjects2.length = 0;
+gdjs.MenuCode.GDStarDiscObjects1.length = 0;
+gdjs.MenuCode.GDStarDiscObjects2.length = 0;
 gdjs.MenuCode.GDStarCoronaObjects1.length = 0;
 gdjs.MenuCode.GDStarCoronaObjects2.length = 0;
 gdjs.MenuCode.GDStarGlowObjects1.length = 0;

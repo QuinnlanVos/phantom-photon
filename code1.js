@@ -141,6 +141,8 @@ gdjs.LevelSelectCode.GDHudFadeObjects1= [];
 gdjs.LevelSelectCode.GDHudFadeObjects2= [];
 gdjs.LevelSelectCode.GDStarCoreObjects1= [];
 gdjs.LevelSelectCode.GDStarCoreObjects2= [];
+gdjs.LevelSelectCode.GDStarDiscObjects1= [];
+gdjs.LevelSelectCode.GDStarDiscObjects2= [];
 gdjs.LevelSelectCode.GDStarCoronaObjects1= [];
 gdjs.LevelSelectCode.GDStarCoronaObjects2= [];
 gdjs.LevelSelectCode.GDStarGlowObjects1= [];
@@ -227,7 +229,7 @@ gdjs.LevelSelectCode.GDLightObjects1= [];
 gdjs.LevelSelectCode.GDLightObjects2= [];
 
 
-gdjs.LevelSelectCode.userFunc0xbcfea8 = function GDJSInlineCode(runtimeScene) {
+gdjs.LevelSelectCode.userFunc0xbde3b0 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 // Movement simulation (src/sim.js) - shared with the Node level solver.
 const PPSim = gdjs.__PPSim || (gdjs.__PPSim = (function () {
@@ -1335,7 +1337,7 @@ gdjs.LevelSelectCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.LevelSelectCode.userFunc0xbcfea8(runtimeScene);
+gdjs.LevelSelectCode.userFunc0xbde3b0(runtimeScene);
 
 }
 
@@ -1494,6 +1496,8 @@ gdjs.LevelSelectCode.GDHudFadeObjects1.length = 0;
 gdjs.LevelSelectCode.GDHudFadeObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarCoreObjects1.length = 0;
 gdjs.LevelSelectCode.GDStarCoreObjects2.length = 0;
+gdjs.LevelSelectCode.GDStarDiscObjects1.length = 0;
+gdjs.LevelSelectCode.GDStarDiscObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarCoronaObjects1.length = 0;
 gdjs.LevelSelectCode.GDStarCoronaObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarGlowObjects1.length = 0;
@@ -1720,6 +1724,8 @@ gdjs.LevelSelectCode.GDHudFadeObjects1.length = 0;
 gdjs.LevelSelectCode.GDHudFadeObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarCoreObjects1.length = 0;
 gdjs.LevelSelectCode.GDStarCoreObjects2.length = 0;
+gdjs.LevelSelectCode.GDStarDiscObjects1.length = 0;
+gdjs.LevelSelectCode.GDStarDiscObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarCoronaObjects1.length = 0;
 gdjs.LevelSelectCode.GDStarCoronaObjects2.length = 0;
 gdjs.LevelSelectCode.GDStarGlowObjects1.length = 0;
